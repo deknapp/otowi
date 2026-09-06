@@ -16,6 +16,7 @@ re-running every time we change our mind about how to treat a road class.
 
 from __future__ import annotations
 
+import logging
 import shutil
 import subprocess
 import sys
@@ -25,6 +26,8 @@ from pathlib import Path
 import httpx
 
 from .config import BBOX, CACHE_DIR, HIGHWAY_TYPES
+
+log = logging.getLogger(__name__)
 
 # Several public Overpass instances run the same API. If the main one is busy
 # -- and for a query this size it often is -- try the next rather than
@@ -136,6 +139,16 @@ def fetch_osm(*, force: bool = False) -> Path:
 
     Merging is keyed on OSM element id, because a way crossing a tile boundary
     comes back from both tiles and netconvert will not accept the duplicate.
+
+    Elements are written **all nodes first, then all ways**, which is not
+    cosmetic. netconvert parses OSM as ordered sections and stops trusting the
+    file once they interleave -- it says "Expected different XML section" once
+    and then quietly keeps only what it has already understood. Appending nine
+    tiles in fetch order produces node,way,node,way,... and netconvert built a
+    network out of roughly the first tile: 911 edges from 11,710 ways, with
+    every motorway and trunk road in the study area missing and no traffic
+    lights at all. The file was complete and well-formed the whole time, which
+    is what made it hard to see.
     """
     path = osm_path()
     if path.exists() and not force and path.stat().st_size > 0:
@@ -147,6 +160,7 @@ def fetch_osm(*, force: bool = False) -> Path:
     root = etree.Element("osm", version="0.6", generator="otowi")
     seen: set[tuple[str, str]] = set()
     counts = {"node": 0, "way": 0}
+    collected: dict[str, list] = {"node": [], "way": []}
 
     for i, box in enumerate(_tiles()):
         tile = _fetch_tile(box, i)
@@ -157,6 +171,10 @@ def fetch_osm(*, force: bool = False) -> Path:
                 continue
             seen.add(key)
             counts[el.tag] += 1
+            collected[el.tag].append(el)
+
+    for tag in ("node", "way"):
+        for el in collected[tag]:
             root.append(el)
 
     tmp = path.with_suffix(".partial")
@@ -233,6 +251,18 @@ def build_network(*, force: bool = False) -> Path:
         "--remove-edges.isolated",
         "--keep-edges.by-vclass", "passenger",
         "--no-turnarounds",
+        # Off by default, and needed here: counts.py has to match NMDOT and MPO
+        # count stations to edges, and CORRIDORS is defined in terms of road
+        # names ("St Francis Drive", "NM-502"). Without this the net has no
+        # name attribute at all and every corridor has to be recovered from
+        # geometry.
+        "--output.street-names",
     ]
-    subprocess.run(cmd, check=True, capture_output=True, text=True)
+    result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+    # netconvert reports "Success" while having silently discarded most of the
+    # input, so the warnings are the only signal that anything went wrong.
+    # Summarised rather than dumped: a clean run still emits a few hundred.
+    for line in result.stderr.splitlines():
+        if "Expected different XML section" in line:
+            log.warning("netconvert could not read the whole file: %s", line.strip())
     return out
