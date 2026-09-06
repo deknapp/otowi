@@ -1,3 +1,9 @@
+# The SUMO toolchain itself. Installing it from PyPI rather than Homebrew
+# means `pip install -r requirements.txt` gets netconvert, sumo, duarouter and
+# sumo-gui into the venv with no tap to trust and no XQuartz needed for the
+# command-line tools.
+eclipse-sumo>=1.27
+
 httpx>=0.27
 lxml>=5.0
 pytest>=8.0

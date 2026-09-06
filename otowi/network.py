@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import shutil
 import subprocess
+import sys
 import time
 from pathlib import Path
 
@@ -103,8 +104,23 @@ def fetch_osm(*, force: bool = False) -> Path:
     raise RuntimeError(f"every Overpass endpoint failed; last error: {last}")
 
 
+def find_tool(name: str) -> str | None:
+    """Locate a SUMO binary.
+
+    SUMO is installed from PyPI (``eclipse-sumo``), which puts its binaries in
+    the same directory as the interpreter. Running ``.venv/bin/python`` does
+    NOT put ``.venv/bin`` on PATH -- only ``activate`` does that -- so
+    ``shutil.which`` alone finds nothing in the normal case. Look next to the
+    running interpreter first, then fall back to PATH for a system install.
+    """
+    beside = Path(sys.executable).parent / name
+    if beside.exists():
+        return str(beside)
+    return shutil.which(name)
+
+
 def netconvert_available() -> bool:
-    return shutil.which("netconvert") is not None
+    return find_tool("netconvert") is not None
 
 
 def network_path() -> Path:
@@ -133,14 +149,15 @@ def build_network(*, force: bool = False) -> Path:
     out = network_path()
     if out.exists() and not force:
         return out
-    if not netconvert_available():
+    tool = find_tool("netconvert")
+    if tool is None:
         raise RuntimeError(
-            "netconvert not found. Install SUMO first:\n"
-            "  brew tap dlr-ts/sumo && brew install sumo")
+            "netconvert not found. Install the SUMO toolchain with:\n"
+            "  pip install -r requirements.txt")
 
     osm = fetch_osm()
     cmd = [
-        "netconvert",
+        tool,
         "--osm-files", str(osm),
         "--output-file", str(out),
         "--geometry.remove",
