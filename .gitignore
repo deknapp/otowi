@@ -1,0 +1,15 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+data/
+.cache/
+.pytest_cache/
+.DS_Store
+*.egg-info/
+# SUMO build products — large, and regenerated from the pipeline
+*.net.xml
+*.rou.xml
+*.osm
+*.osm.bz2
+sumo/
