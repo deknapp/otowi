@@ -32,23 +32,51 @@ from .config import BBOX, CACHE_DIR, HIGHWAY_TYPES
 OVERPASS_ENDPOINTS = [
     "https://overpass-api.de/api/interpreter",
     "https://overpass.kumi.systems/api/interpreter",
-    "https://overpass.osm.ch/api/interpreter",
 ]
 
-# Generous: this is ~12,000 ways and every node on them. Measured against the
-# study area on 2026-09-05, so it is a known quantity, not a guess.
-OVERPASS_TIMEOUT_S = 900
+# Overpass runs behind an Apache that answers httpx's default user-agent with
+# a bare 406 Not Acceptable -- no error message, nothing to suggest the query
+# is fine and only the client string is objectionable. Identifying the tool
+# and where it comes from is also simply the polite thing to do to a service
+# that costs someone else money.
+HEADERS = {
+    "User-Agent": "otowi/0.1 (traffic simulation; +https://github.com/deknapp/otowi)",
+}
+
+# Per-tile, not for the whole area. One query for all ~12,000 ways plus every
+# node on them sat in the Overpass queue for twenty minutes without returning a
+# byte; nine smaller queries come back in seconds each. Tiling is also the
+# better-behaved thing to do to a donated service.
+OVERPASS_TIMEOUT_S = 180
+
+# 3x3 over the study area. Ways crossing a tile boundary are returned by both
+# tiles, which is fine -- the merge is keyed on OSM id.
+TILE_GRID = 3
+
+# How many times to go round the endpoint list before giving up on a tile,
+# and the base pause between attempts.
+ROUNDS = 4
+BACKOFF_S = 5
 
 
-def _query() -> str:
-    """The Overpass QL for every road we model in the study area.
+def _tiles(grid: int = TILE_GRID) -> list[tuple[float, float, float, float]]:
+    """Split the study area into a grid of (west, south, east, north) boxes."""
+    west, south, east, north = BBOX
+    dx = (east - west) / grid
+    dy = (north - south) / grid
+    return [(west + i * dx, south + j * dy, west + (i + 1) * dx, south + (j + 1) * dy)
+            for i in range(grid) for j in range(grid)]
+
+
+def _query(box: tuple[float, float, float, float]) -> str:
+    """The Overpass QL for every road we model in one tile.
 
     ``(._;>;)`` is the important part: it recurses from the matched ways down
     to the nodes they are built from. Without it Overpass returns ways with
     node references and no coordinates, and netconvert has nothing to work
     with.
     """
-    west, south, east, north = BBOX
+    west, south, east, north = box
     pattern = "|".join(t for t in HIGHWAY_TYPES if not t.endswith("_link"))
     return f"""
 [out:xml][timeout:{OVERPASS_TIMEOUT_S}];
@@ -64,44 +92,79 @@ def osm_path() -> Path:
     return CACHE_DIR / "study-area.osm"
 
 
-def fetch_osm(*, force: bool = False) -> Path:
-    """Download the study area from Overpass, once.
+def _fetch_tile(box: tuple[float, float, float, float], index: int) -> Path:
+    """One tile, cached on disk. Endpoints are tried in rotation."""
+    out = CACHE_DIR / f"tile-{index:02d}.osm"
+    if out.exists() and out.stat().st_size > 1024:
+        return out
 
-    The result is cached and never expires on its own. A road network is not
-    a live quantity -- it changes on the timescale of construction projects,
-    not of page loads -- and Overpass is a donated resource. Pass ``force`` to
-    deliberately refresh it.
+    body = _query(box)
+    last: Exception | None = None
+
+    # Overpass answers 504 when it is busy, which it often is, and the same
+    # tile succeeds seconds later. Several rounds over the endpoints with a
+    # growing pause beats giving up on a transient overload -- and beats
+    # hammering, which is how a shared service ends up blocking you.
+    for attempt in range(ROUNDS):
+        for endpoint in OVERPASS_ENDPOINTS:
+            try:
+                resp = httpx.post(endpoint, data={"data": body}, headers=HEADERS,
+                                  timeout=OVERPASS_TIMEOUT_S, follow_redirects=True)
+                resp.raise_for_status()
+                # A tile can legitimately be almost empty -- the south-west
+                # corner of the study area is the Jemez wilderness, with
+                # hardly a road on it. Only reject a non-XML response.
+                if not resp.content.lstrip().startswith(b"<?xml"):
+                    raise RuntimeError(
+                        f"{endpoint} returned {len(resp.content)} bytes of non-XML")
+                tmp = out.with_suffix(".partial")
+                tmp.write_bytes(resp.content)
+                tmp.replace(out)
+                return out
+            except (httpx.HTTPError, RuntimeError) as exc:
+                last = exc
+                time.sleep(BACKOFF_S * (attempt + 1))
+    raise RuntimeError(f"tile {index} failed after {ROUNDS} rounds: {last}")
+
+
+def fetch_osm(*, force: bool = False) -> Path:
+    """Download the study area from Overpass, tile by tile, and merge.
+
+    Cached and never expiring on its own: a road network changes on the
+    timescale of construction projects, not page loads, and Overpass is a
+    donated resource. Pass ``force`` to deliberately refresh.
+
+    Merging is keyed on OSM element id, because a way crossing a tile boundary
+    comes back from both tiles and netconvert will not accept the duplicate.
     """
     path = osm_path()
     if path.exists() and not force and path.stat().st_size > 0:
         return path
 
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    body = _query()
-    last: Exception | None = None
+    from lxml import etree
 
-    for endpoint in OVERPASS_ENDPOINTS:
-        try:
-            with httpx.stream("POST", endpoint, data={"data": body},
-                              timeout=OVERPASS_TIMEOUT_S,
-                              follow_redirects=True) as resp:
-                resp.raise_for_status()
-                # Stream to a temporary file: the response is tens of
-                # megabytes and a partial write must never look like a
-                # complete cache entry.
-                tmp = path.with_suffix(".partial")
-                with tmp.open("wb") as fh:
-                    for chunk in resp.iter_bytes(1 << 16):
-                        fh.write(chunk)
-            if tmp.stat().st_size < 1024:
-                raise RuntimeError(f"{endpoint} returned {tmp.stat().st_size} bytes")
-            tmp.replace(path)
-            return path
-        except (httpx.HTTPError, RuntimeError) as exc:
-            last = exc
-            time.sleep(3)
+    root = etree.Element("osm", version="0.6", generator="otowi")
+    seen: set[tuple[str, str]] = set()
+    counts = {"node": 0, "way": 0}
 
-    raise RuntimeError(f"every Overpass endpoint failed; last error: {last}")
+    for i, box in enumerate(_tiles()):
+        tile = _fetch_tile(box, i)
+        tree = etree.parse(str(tile))
+        for el in tree.getroot():
+            key = (el.tag, el.get("id", ""))
+            if el.tag not in ("node", "way") or key in seen:
+                continue
+            seen.add(key)
+            counts[el.tag] += 1
+            root.append(el)
+
+    tmp = path.with_suffix(".partial")
+    etree.ElementTree(root).write(str(tmp), encoding="utf-8",
+                                  xml_declaration=True)
+    tmp.replace(path)
+    print(f"merged {counts['way']} ways and {counts['node']} nodes")
+    return path
 
 
 def find_tool(name: str) -> str | None:
