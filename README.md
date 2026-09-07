@@ -10,12 +10,12 @@ mesa, and there is no redundant route — which is why a small change in demand
 produces a large change in delay, and why the commute is worth simulating
 rather than estimating.
 
-> **Status: it runs end to end, and it is not calibrated.** Network, demand,
-> departure times, routing and simulation are all built — `otowi run` goes from
-> an empty checkout to a finished morning peak. What is missing is the part
-> that would make the output believable: no edge volume has yet been compared
-> against a count station, so the travel times are the model's opinion with no
-> error bar. See [Running it](#running-it) and [Honesty](#honesty).
+> **Status: it runs end to end, it is validated against real counts, and it
+> fails them.** `otowi run` goes from an empty checkout to a finished morning
+> peak compared against 1,894 NMDOT-measured links. On held-out segments the
+> median GEH is 6.15 and **the model carries 8% of measured peak-hour volume**.
+> That number is reported rather than tuned away, because it is not a tuning
+> error — see [What the calibration says](#what-the-calibration-says).
 
 ## What it is for
 
@@ -45,12 +45,16 @@ The demand here is not invented, and the model is not trusted on its own word:
   the survey question asking what time people left home for work. LODES has no
   time in it at all, and a fabricated departure curve would move every
   congestion number while looking entirely plausible.
-- **Calibration and validation come from real count stations.** The
-  [Santa Fe MPO](https://santafempo.org/resources/traffic-counts/) operates 17
-  permanent stations inside its planning area, and the
-  [NMDOT Data Management Bureau](https://www.dot.nm.gov/planning-research-multimodal-and-safety/planning-division/data-management-bureau/)
-  publishes volume, classification, and speed for the state highway segments
-  beyond it.
+- **Validation comes from NMDOT's published counts.** Their
+  [AADT layer](https://services.arcgis.com/hOpd7wfnKm16p9D9/arcgis/rest/services/Annual_Average_Daily_Traffic_2026/FeatureServer)
+  gives annual average daily traffic per highway segment with the K and D
+  factors needed to turn it into a directional peak hour — 7,149 segments
+  intersect the study area, with 2025 counts. It is open, and no key or request
+  form is needed, despite the Data Management Bureau's page offering only an
+  emailed PDF request form.
+  The [Santa Fe MPO](https://santafempo.org/resources/traffic-counts/)'s 17
+  permanent stations are **not** wired in yet; they would add in-town coverage
+  where NMDOT's state-highway focus is thinnest.
 - **Validation is against held-out stations.** The model is fit on some of them
   and its error is reported on the rest. A simulation that reports its own
   error against ground truth it did not see is a different object from one that
@@ -77,6 +81,7 @@ otowi demand      # LODES + ACS, reported without simulating   (~1 min)
 otowi trips       # commute flows → individual vehicles         (~30 s)
 otowi route       # duarouter: trips → paths                    (~30 s)
 otowi simulate    # SUMO: the microscopic run                   (~5 min)
+otowi calibrate   # compare against NMDOT counts                (~1 min)
 
 otowi run         # all of the above, skipping what is done
 ```
@@ -143,14 +148,44 @@ Things this will say about itself, and keep saying:
 - **Uncalibrated output is not a result.** Until the validation error is
   reported, this repository will say so at the top.
 
+## What the calibration says
+
+`otowi calibrate` compares modelled edge volumes against NMDOT's published
+AADT, converted to a directional peak hour with the K and D factors NMDOT
+publishes alongside it. 7,149 count segments intersect the study area; 4,904
+match an edge; 1,894 of those carry modelled traffic to compare.
+
+On the held-out half of the segments — split by a hash of the station ID, so it
+is the same split on every run and cannot be reshuffled until it flatters:
+
+| | |
+|---|---|
+| Median GEH | 6.15 |
+| Links with GEH < 5 | 31% |
+| **Median modelled ÷ observed** | **0.079** |
+
+The conventional bar is 85% of links under GEH 5. This is nowhere near it.
+
+**The 8% is the finding, and no constant will fix it.** The model contains
+commuting between two points *both inside the study area* and nothing else.
+Dropping trips with one end outside the box removes essentially all through
+traffic — on I-25 the ratio is 0.02, because almost everything on it is going
+to Albuquerque or beyond. Freight, shopping, school runs and tourism are absent
+by construction.
+
+So the shortfall is not uniform, which is the useful part: it is worst exactly
+where through traffic dominates and least bad on the in-town Santa Fe streets
+where a commute model should do best. That is a map of what to build next,
+which is what a calibration is supposed to produce.
+
 ### What is wrong with the current numbers, specifically
 
 The pipeline runs. That is not the same as the answers being right, and these
 are the three reasons no travel time from it is quoted here:
 
-1. **Nothing is calibrated.** No edge volume has been compared against an MPO
-   or NMDOT count station. This is the next piece of work and the one that
-   turns output into a result.
+1. **The model carries 8% of measured volume**, for the structural reason
+   above. Travel times from a network loaded to a twelfth of reality are not
+   the travel times of that network.
 2. **Routing is single-pass on free-flow times.** `duarouter` gives every
    driver the path that would be fastest on an empty road, so all of them
    choose the same one and the busiest corridors are overloaded in a way real
