@@ -247,6 +247,26 @@ def build_network(*, force: bool = False) -> Path:
         "--tls.guess-signals",
         "--tls.discard-simple",
         "--tls.join",
+        # Actuated signals, not fixed-time. This is the single largest
+        # correction in this file and it was found by looking at why the model
+        # gridlocked.
+        #
+        # netconvert's default is a static program: a fixed cycle with equal
+        # green splits and offset=0 at every junction. On an arterial that is
+        # catastrophic. Cerrillos Road carries 43 signalised junctions, and
+        # with static timing every one of them turned green at the same instant
+        # regardless of where traffic actually was -- there is no green wave,
+        # no coordination, and no response to demand. The result was 0.3 m/s
+        # sustained on a road posted at 27.8, which is not congestion but
+        # deadlock.
+        #
+        # Real arterials here are coordinated, and we do not have the signal
+        # timing plans that would let us reproduce that. Actuated control is
+        # the standard substitute when the plans are unavailable: green is
+        # extended while vehicles are still arriving and ends when they stop,
+        # so a junction adapts to demand instead of enforcing a cycle nobody
+        # chose. It is an approximation of coordination, not coordination.
+        "--tls.default-type", "actuated",
         "--roundabouts.guess",
         "--remove-edges.isolated",
         "--keep-edges.by-vclass", "passenger",
