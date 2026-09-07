@@ -1,5 +1,7 @@
 # otowi
 
+[![tests](https://github.com/deknapp/otowi/actions/workflows/tests.yml/badge.svg)](https://github.com/deknapp/otowi/actions/workflows/tests.yml)
+
 Traffic simulation for northern New Mexico: Santa Fe, the Los Alamos commute
 over Otowi Bridge, and US-84 north to Abiquiu Lake.
 
@@ -35,8 +37,14 @@ beautifully and mean nothing, because the demand is invented.
 The demand here is not invented, and the model is not trusted on its own word:
 
 - **Origin–destination flows come from [LEHD LODES](https://lehd.ces.census.gov/data/)**
-  (v8.4, data through 2023) — census-block-level counts of where workers live
-  and where they work, published by the Census Bureau.
+  (LODES8, 2022 vintage) — census-block-level counts of where workers live and
+  where they work, built from unemployment-insurance wage records covering
+  roughly 95% of private employment. LODES lags by a couple of years, so this
+  is not a current-conditions model and the provenance says which year it is.
+- **Departure times come from [ACS table B08302](https://data.census.gov/table/ACSDT5Y2022.B08302)**,
+  the survey question asking what time people left home for work. LODES has no
+  time in it at all, and a fabricated departure curve would move every
+  congestion number while looking entirely plausible.
 - **Calibration and validation come from real count stations.** The
   [Santa Fe MPO](https://santafempo.org/resources/traffic-counts/) operates 17
   permanent stations inside its planning area, and the
