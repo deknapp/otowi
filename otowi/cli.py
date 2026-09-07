@@ -154,6 +154,28 @@ def cmd_route(args) -> None:
     print(json.dumps({"routes": str(path), "bytes": path.stat().st_size}, indent=2))
 
 
+def cmd_assign(args) -> None:
+    """Iteratively route and simulate until routes and travel times agree."""
+    window = tuple(args.window)
+    source = trips.trips_path(window)
+    if not source.exists():
+        raise SystemExit(f"No trips at {source}.\nRun:  otowi trips")
+
+    routes, history = simulate.assign_iteratively(
+        source, window=window, iterations=args.iterations,
+        end_padding_s=args.end_padding,
+    )
+    print(json.dumps({"routes": str(routes), "history": history}, indent=2))
+
+    if len(history) > 1 and history[-1]["relative_change"] > 0.05:
+        print(
+            f"\nNot converged: total travel time still moved "
+            f"{100 * history[-1]['relative_change']:.1f}% on the last round. "
+            "Run more iterations before trusting these travel times.",
+            file=sys.stderr,
+        )
+
+
 def cmd_simulate(args) -> None:
     """Run SUMO and summarize what happened."""
     window = tuple(args.window)
@@ -301,6 +323,8 @@ def build_parser() -> argparse.ArgumentParser:
         ("trips", cmd_trips, "Generate vehicles from the demand."),
         ("route", cmd_route, "Route the trips with duarouter."),
         ("simulate", cmd_simulate, "Run SUMO on the routes."),
+        ("assign", cmd_assign,
+         "Iterate routing against measured congestion (user equilibrium)."),
         ("calibrate", cmd_calibrate, "Compare modelled volumes against NMDOT counts."),
         ("web", cmd_web, "Serve an interactive map of the model and its error."),
         ("run", cmd_run, "Do every stage that has not been done."),
@@ -318,6 +342,8 @@ def build_parser() -> argparse.ArgumentParser:
         sub.add_argument("--force", action="store_true")
         sub.add_argument("--top", type=int, default=15,
                          help="How many busiest edges to report.")
+        sub.add_argument("--iterations", type=int, default=5,
+                         help="Assignment rounds for `otowi assign`.")
         sub.add_argument("--internal-only", action="store_true",
                          help="Drop trips with one end outside the study area, as "
                               "the model did before gateways existed.")

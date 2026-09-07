@@ -96,6 +96,96 @@ def build_routes(
     return out
 
 
+def assign_iteratively(
+    trips_file: Path,
+    *,
+    window: tuple[int, int] = AM_PEAK,
+    iterations: int = 5,
+    end_padding_s: int = 10800,
+) -> tuple[Path, list[dict]]:
+    """Route, simulate, re-route against the resulting congestion, repeat.
+
+    Single-pass routing on free-flow times gives every driver the path that
+    would be fastest on an empty road. They all choose the same one, it fills
+    up, and the model produces a jam that real drivers avoid by spreading
+    across alternatives. The symptom is severe: with the full demand, 45% of
+    vehicles failed to finish, and adding traffic barely raised the volume the
+    model carried because throughput had collapsed.
+
+    The standard remedy is an iterative assignment approaching a user
+    equilibrium -- the state where no driver can improve their own journey by
+    switching route. Each round:
+
+    1. route the trips using the previous round's *measured* edge travel times,
+    2. simulate,
+    3. keep the travel times that came out, and go again.
+
+    Convergence is measured by how much total travel time moves between
+    rounds. It is reported rather than assumed, because an assignment that has
+    not converged is not an equilibrium and its travel times mean little.
+
+    This is deliberately a simple fixed-point iteration rather than SUMO's
+    ``duaIterate.py``. That script does the same thing with more options, but
+    it wants to own the whole directory layout and its interface is a moving
+    target across versions; the loop itself is twenty lines and doing it here
+    keeps the file naming and the convergence report under our control.
+    """
+    duarouter = find_tool("duarouter")
+    if duarouter is None:
+        raise RuntimeError("duarouter not found. pip install -e '.[fast,dev]'")
+
+    history: list[dict] = []
+    weights: Path | None = None
+    routes = routes_path(window)
+
+    for step in range(iterations):
+        cmd = [
+            duarouter,
+            "--net-file", str(network_path()),
+            "--route-files", str(trips_file),
+            "--output-file", str(routes),
+            "--ignore-errors", "--no-warnings",
+            "--routing-threads", "4",
+        ]
+        if weights is not None:
+            # Route on what the last simulation actually measured.
+            cmd += ["--weight-files", str(weights),
+                    "--weight-attribute", "traveltime"]
+        log.info("assignment round %d/%d: routing", step + 1, iterations)
+        subprocess.run(cmd, check=True, capture_output=True, text=True)
+
+        log.info("assignment round %d/%d: simulating", step + 1, iterations)
+        outputs = run(routes, window=window, end_padding_s=end_padding_s)
+        summary = summarize_tripinfo(outputs["tripinfo"], routes)
+        weights = outputs["intervals"]
+
+        total = summary.get("mean_duration_s", 0.0) * summary.get("vehicles_arrived", 0)
+        if history:
+            previous = history[-1]["total_travel_time_s"]
+            change = abs(total - previous) / previous if previous else 1.0
+        else:
+            change = 1.0
+
+        record = {
+            "round": step + 1,
+            "arrived": summary.get("vehicles_arrived", 0),
+            "unfinished_fraction": summary.get("unfinished_fraction"),
+            "mean_duration_s": summary.get("mean_duration_s"),
+            "mean_time_loss_s": summary.get("mean_time_loss_s"),
+            "total_travel_time_s": total,
+            "relative_change": round(change, 4),
+        }
+        history.append(record)
+        log.info(
+            "round %d: %d arrived, %.1f%% unfinished, mean %.0f s, change %.1f%%",
+            step + 1, record["arrived"],
+            100 * (record["unfinished_fraction"] or 0),
+            record["mean_duration_s"] or 0, 100 * change,
+        )
+
+    return routes, history
+
+
 def routing_loss(trips_file: Path, routes_file: Path) -> dict:
     """How many trips duarouter silently discarded.
 
