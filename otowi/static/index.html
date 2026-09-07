@@ -72,6 +72,31 @@
   }
   .warn b { color: #ffc078; }
 
+  .triptitle { font-weight: 600; margin-bottom: 8px; font-size: 12.5px; }
+  .odrow { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+  .odrow select {
+    flex: 1; min-width: 0; padding: 6px 7px; font-size: 11.5px;
+    background: #182029; color: var(--text);
+    border: 1px solid var(--border); border-radius: 5px; font-family: inherit;
+  }
+  .arrow { color: var(--muted); }
+  #go {
+    width: 100%; padding: 7px; font-size: 12px; cursor: pointer; font-family: inherit;
+    background: var(--accent); color: #0b1017; font-weight: 600;
+    border: none; border-radius: 6px;
+  }
+  #go:disabled { opacity: .55; cursor: default; }
+
+  .bars { margin-top: 10px; }
+  .barrow { display: flex; align-items: center; gap: 6px; margin-bottom: 2px; font-size: 11px; }
+  .barrow .t { width: 36px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .barrow .b { height: 11px; border-radius: 3px; background: #2e6fb8; min-width: 2px; }
+  .barrow .m { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .barrow.best .b { background: #4ade80; }
+  .barrow.best .t, .barrow.best .m { color: #86efac; font-weight: 600; }
+  .verdict { margin-top: 9px; font-size: 11.5px; line-height: 1.5; }
+  .verdict b { color: #86efac; }
+
   #detail h2 { font-size: 13px; margin: 0 0 8px; }
   #detail .road { color: var(--muted); font-size: 11.5px; margin-bottom: 8px; word-break: break-word; }
   .hint { color: var(--muted); font-size: 11px; margin-top: 10px; }
@@ -100,6 +125,21 @@
     <div class="bar" id="legend-bar"></div>
     <div class="ends"><span id="legend-lo"></span><span id="legend-hi"></span></div>
   </div>
+
+  <div class="rule"></div>
+
+  <div class="trip">
+    <div class="triptitle">When should I leave?</div>
+    <div class="odrow">
+      <select id="from"></select>
+      <span class="arrow">&rarr;</span>
+      <select id="to"></select>
+    </div>
+    <button id="go">Check departure times</button>
+    <div id="trip-out"></div>
+  </div>
+
+  <div class="rule"></div>
 
   <table id="stats"></table>
 
@@ -295,6 +335,80 @@
       row("Mean delay per trip", s.mean_time_loss_s != null
             ? Math.round(s.mean_time_loss_s / 60) + " min" : "—", true);
   });
+
+  // ------------------------------------------------------- trip planner
+
+  var fromSel = document.getElementById("from"),
+      toSel   = document.getElementById("to"),
+      goBtn   = document.getElementById("go"),
+      tripOut = document.getElementById("trip-out");
+
+  fetch("places.json").then(function (r) { return r.json(); }).then(function (places) {
+    places.forEach(function (p) {
+      [fromSel, toSel].forEach(function (sel) {
+        var o = document.createElement("option");
+        o.value = p.key; o.textContent = p.name;
+        sel.appendChild(o);
+      });
+    });
+    fromSel.value = "santa_fe";
+    toSel.value = "los_alamos";
+  });
+
+  goBtn.addEventListener("click", function () {
+    if (fromSel.value === toSel.value) {
+      tripOut.innerHTML = '<div class="verdict">Pick two different places.</div>';
+      return;
+    }
+    goBtn.disabled = true;
+    goBtn.textContent = "Routing…";
+    tripOut.innerHTML = "";
+
+    fetch("plan.json?from=" + encodeURIComponent(fromSel.value) +
+          "&to=" + encodeURIComponent(toSel.value))
+      .then(function (r) { return r.json(); })
+      .then(function (plan) {
+        if (plan.error) { throw new Error(plan.error); }
+        renderPlan(plan);
+      })
+      .catch(function (e) {
+        tripOut.innerHTML = '<div class="verdict">' + e.message + "</div>";
+      })
+      .finally(function () {
+        goBtn.disabled = false;
+        goBtn.textContent = "Check departure times";
+      });
+  });
+
+  function renderPlan(plan) {
+    var max = Math.max.apply(null, plan.options.map(function (o) { return o.duration_min; }));
+    var html = '<div class="bars">';
+
+    plan.options.forEach(function (o) {
+      var isBest = o.depart === plan.best_departure;
+      html += '<div class="barrow' + (isBest ? " best" : "") + '">' +
+                '<span class="t">' + o.depart + "</span>" +
+                '<span class="b" style="width:' +
+                  Math.max(2, Math.round((o.duration_min / max) * 120)) + 'px"></span>' +
+                '<span class="m">' + o.duration_min.toFixed(0) + " min</span>" +
+              "</div>";
+    });
+    html += "</div>";
+
+    // The spread is the actionable number. If leaving an hour earlier saves
+    // four minutes, the honest advice is that it does not matter.
+    if (plan.spread_min < 3) {
+      html += '<div class="verdict">Departure time barely matters on this ' +
+              "trip — only <b>" + plan.spread_min.toFixed(0) +
+              " min</b> between the best and worst option.</div>";
+    } else {
+      html += '<div class="verdict">Leave at <b>' + plan.best_departure + "</b> — " +
+              plan.best_duration_min.toFixed(0) + " min. Leaving at " +
+              plan.worst_departure + " costs <b>" + plan.spread_min.toFixed(0) +
+              " min</b> more.</div>";
+    }
+    tripOut.innerHTML = html;
+  }
 
   fetch("data.geojson").then(function (r) { return r.json(); }).then(function (d) {
     geo = d;

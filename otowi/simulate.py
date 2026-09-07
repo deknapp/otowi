@@ -123,20 +123,49 @@ def routing_loss(trips_file: Path, routes_file: Path) -> dict:
     }
 
 
+#: Length of each reporting interval, in seconds. Fifteen minutes is short
+#: enough that the build and clearance of the peak are visible -- which is the
+#: whole question when someone asks what time to leave -- and long enough that
+#: an edge carrying a handful of vehicles still has a stable mean speed.
+INTERVAL_S = 900
+
+
+def intervals_path(window: tuple[int, int] = AM_PEAK) -> Path:
+    return CACHE_DIR / f"intervals-am-{window[0]:02d}{window[1]:02d}.xml"
+
+
 def _write_edgedata_config(path: Path, out_file: Path, window: tuple[int, int]) -> Path:
     """An additional-file asking SUMO for per-edge aggregates.
 
-    One interval covering the whole window. Finer intervals are what the
-    count-station comparison will need, since stations report hourly, but that
-    belongs with the calibration rather than here.
+    Two collectors, because two different questions are being asked.
+
+    The first is one interval spanning the window, which is what the
+    count-station comparison wants: a single volume per edge to set beside a
+    single measured volume.
+
+    The second is fifteen-minute intervals, which is what "when should I
+    leave?" wants. A whole-window average cannot answer it -- averaging 06:00
+    and 08:00 together produces a road that is moderately busy all morning and
+    never actually congested, so every departure time looks equally good and
+    the model has nothing to say.
     """
+    duration = (window[1] - window[0]) * 3600
     root = etree.Element("additional")
     etree.SubElement(
         root, "edgeData",
         id="edges",
         file=str(out_file),
         begin="0",
-        end=str((window[1] - window[0]) * 3600),
+        end=str(duration),
+        excludeEmpty="true",
+    )
+    etree.SubElement(
+        root, "edgeData",
+        id="intervals",
+        file=str(intervals_path(window)),
+        begin="0",
+        end=str(duration),
+        period=str(INTERVAL_S),
         excludeEmpty="true",
     )
     etree.ElementTree(root).write(str(path), encoding="utf-8", xml_declaration=True)
@@ -191,7 +220,8 @@ def run(
     ]
     log.info("simulating %d s of the %02d:00-%02d:00 window", duration, *window)
     subprocess.run(cmd, check=True, capture_output=True, text=True)
-    return {"tripinfo": tripinfo, "edgedata": edgedata}
+    return {"tripinfo": tripinfo, "edgedata": edgedata,
+            "intervals": intervals_path(window)}
 
 
 def summarize_tripinfo(path: Path, routes: Path | None = None) -> dict:

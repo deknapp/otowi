@@ -202,6 +202,40 @@ def cmd_calibrate(args) -> None:
         )
 
 
+def cmd_when(args) -> None:
+    """Answer: what time should I leave, for this trip?"""
+    from . import journey, trips as trips_mod
+
+    window = tuple(args.window)
+    intervals = simulate.intervals_path(window)
+    if not intervals.exists():
+        raise SystemExit(
+            f"No interval data at {intervals}.\nRun:  otowi simulate"
+        )
+
+    net = _load_net()
+    times = journey.TravelTimes.load(intervals, net)
+    core = trips_mod.reachable_core(net)
+    result = journey.plan(
+        net, times, core, args.origin, args.destination,
+        window=window, every_minutes=args.every,
+    )
+
+    print(f"\n{result['from']} to {result['to']}  ({result['window']})\n")
+    best = result["best_departure"]
+    for option in result["options"]:
+        marker = " <- best" if option["depart"] == best else ""
+        bar = "#" * int(option["duration_min"] / 2)
+        print(f"  leave {option['depart']}   {option['duration_min']:6.1f} min  "
+              f"arrive {option['arrive']}  {bar}{marker}")
+
+    print(f"\n  Best:  leave {best}, {result['best_duration_min']} min")
+    print(f"  Worst: leave {result['worst_departure']}, "
+          f"{result['worst_duration_min']} min")
+    print(f"  Spread: {result['spread_min']} min between best and worst\n")
+    print(result["caveat"], file=sys.stderr)
+
+
 def cmd_web(args) -> None:
     """Build the map data and serve it on localhost."""
     from . import web
@@ -279,6 +313,15 @@ def build_parser() -> argparse.ArgumentParser:
         sub.add_argument("--end-padding", type=int, default=10800,
                          help="Seconds to keep simulating after the last departure, "
                               "so long trips are not cut off and dropped from the averages.")
+
+    when_parser = add("when", cmd_when,
+                      "What time should I leave, for a given trip?")
+    when_parser.add_argument("origin", help=f"One of: {', '.join(sorted(PLACES))}")
+    when_parser.add_argument("destination", help="Likewise.")
+    when_parser.add_argument("--window", type=int, nargs=2, default=list(AM_PEAK),
+                             metavar=("START", "END"))
+    when_parser.add_argument("--every", type=int, default=15,
+                             help="Minutes between candidate departure times.")
 
     return parser
 

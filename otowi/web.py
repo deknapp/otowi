@@ -154,15 +154,56 @@ def build(window: tuple[int, int] = AM_PEAK, *, force: bool = False) -> tuple[Pa
     return path, summary
 
 
+#: Loaded lazily and kept, because reading a 70 MB network per request would
+#: make the trip planner unusable. Keyed by window so switching windows is
+#: still correct.
+_PLANNER_CACHE: dict[tuple[int, int], tuple] = {}
+
+
+def _planner(window: tuple[int, int]):
+    """The network, travel times and routable core, built once per window."""
+    if window in _PLANNER_CACHE:
+        return _PLANNER_CACHE[window]
+
+    import sumolib
+
+    from . import journey, simulate, trips
+    from .network import network_path
+
+    intervals = simulate.intervals_path(window)
+    if not intervals.exists():
+        raise SystemExit(
+            "No interval travel times yet. Re-run:  otowi simulate"
+        )
+
+    log.info("loading network and travel times for the trip planner")
+    net = sumolib.net.readNet(str(network_path()))
+    times = journey.TravelTimes.load(intervals, net)
+    core = trips.reachable_core(net)
+
+    _PLANNER_CACHE[window] = (net, times, core)
+    return _PLANNER_CACHE[window]
+
+
 class _Handler(http.server.SimpleHTTPRequestHandler):
     """Serves the page from the package and the data from the cache."""
 
     data_path: Path
     summary: dict
+    window: tuple[int, int]
 
     def do_GET(self):  # noqa: N802 - stdlib naming
         if self.path.startswith("/data.geojson"):
             return self._send_file(self.data_path, "application/json")
+        if self.path.startswith("/places.json"):
+            from .config import PLACES
+
+            return self._send_json([
+                {"key": key, "name": place.name, "note": place.note}
+                for key, place in PLACES.items()
+            ])
+        if self.path.startswith("/plan.json"):
+            return self._plan()
         if self.path.startswith("/summary.json"):
             body = json.dumps(self.summary).encode()
             self.send_response(200)
@@ -174,6 +215,43 @@ class _Handler(http.server.SimpleHTTPRequestHandler):
         if self.path in ("/", "/index.html"):
             return self._send_file(STATIC_DIR / "index.html", "text/html; charset=utf-8")
         self.send_error(404)
+        return None
+
+    def _plan(self):
+        """Route one trip across every candidate departure time.
+
+        The network, travel times and routable core are loaded once and cached
+        on the class: reading a 70 MB network per request would make the button
+        take twenty seconds, and none of it changes between requests.
+        """
+        from urllib.parse import parse_qs, urlparse
+
+        query = parse_qs(urlparse(self.path).query)
+        origin = (query.get("from") or [""])[0]
+        destination = (query.get("to") or [""])[0]
+
+        try:
+            from . import journey
+
+            net, times, core = _planner(self.window)
+            result = journey.plan(
+                net, times, core, origin, destination, window=self.window
+            )
+        except SystemExit as exc:
+            return self._send_json({"error": str(exc)}, status=400)
+        except Exception as exc:  # pragma: no cover - surfaced to the page
+            log.exception("plan failed")
+            return self._send_json({"error": f"{type(exc).__name__}: {exc}"}, status=500)
+
+        return self._send_json(result)
+
+    def _send_json(self, payload, status: int = 200):
+        body = json.dumps(payload).encode()
+        self.send_response(status)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
         return None
 
     def _send_file(self, path: Path, content_type: str):
@@ -203,7 +281,8 @@ def serve(
     """Build the data if needed, then serve the map on localhost."""
     data_path, summary = build(window, force=force)
 
-    handler = type("Handler", (_Handler,), {"data_path": data_path, "summary": summary})
+    handler = type("Handler", (_Handler,),
+                   {"data_path": data_path, "summary": summary, "window": window})
 
     # Without this a restart inside the TIME_WAIT window fails with "Address
     # already in use", which for a tool you stop and start constantly is the
