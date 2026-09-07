@@ -17,6 +17,11 @@ rather than estimating.
 > That number is reported rather than tuned away, because it is not a tuning
 > error — see [What the calibration says](#what-the-calibration-says).
 
+![The modelled morning peak](docs/map-modelled.png)
+
+*`otowi web` — the modelled 06:00–09:00 peak. The bright corridor is US-84/285
+north out of Santa Fe, branching west over Otowi Bridge to Los Alamos.*
+
 ## What it is for
 
 Two questions, one model:
@@ -82,6 +87,7 @@ otowi trips       # commute flows → individual vehicles         (~30 s)
 otowi route       # duarouter: trips → paths                    (~30 s)
 otowi simulate    # SUMO: the microscopic run                   (~5 min)
 otowi calibrate   # compare against NMDOT counts                (~1 min)
+otowi web         # interactive map on localhost                (instant)
 
 otowi run         # all of the above, skipping what is done
 ```
@@ -165,6 +171,12 @@ is the same split on every run and cannot be reshuffled until it flatters:
 | **Median modelled ÷ observed** | **0.079** |
 
 The conventional bar is 85% of links under GEH 5. This is nowhere near it.
+
+![Where the model is missing traffic](docs/map-ratio.png)
+
+*The ratio layer. Red is where the model carries far less than NMDOT measured;
+grey would be a match. Almost nothing is grey, and the red is densest on the
+highways — which is the shape of the error, not just its size.*
 
 **The 8% is the finding, and no constant will fix it.** The model contains
 commuting between two points *both inside the study area* and nothing else.

@@ -202,6 +202,18 @@ def cmd_calibrate(args) -> None:
         )
 
 
+def cmd_web(args) -> None:
+    """Build the map data and serve it on localhost."""
+    from . import web
+
+    web.serve(
+        tuple(args.window),
+        port=args.port,
+        open_browser=not args.no_browser,
+        force=args.force,
+    )
+
+
 def cmd_run(args) -> None:
     """Everything, skipping stages whose output already exists."""
     window = tuple(args.window)
@@ -244,6 +256,7 @@ def build_parser() -> argparse.ArgumentParser:
         ("route", cmd_route, "Route the trips with duarouter."),
         ("simulate", cmd_simulate, "Run SUMO on the routes."),
         ("calibrate", cmd_calibrate, "Compare modelled volumes against NMDOT counts."),
+        ("web", cmd_web, "Serve an interactive map of the model and its error."),
         ("run", cmd_run, "Do every stage that has not been done."),
     ]:
         sub = add(name, handler, help_text)
@@ -259,6 +272,10 @@ def build_parser() -> argparse.ArgumentParser:
         sub.add_argument("--force", action="store_true")
         sub.add_argument("--top", type=int, default=15,
                          help="How many busiest edges to report.")
+        sub.add_argument("--port", type=int, default=8814,
+                         help="Port for the local map server.")
+        sub.add_argument("--no-browser", action="store_true",
+                         help="Do not open a browser window.")
         sub.add_argument("--end-padding", type=int, default=10800,
                          help="Seconds to keep simulating after the last departure, "
                               "so long trips are not cut off and dropped from the averages.")

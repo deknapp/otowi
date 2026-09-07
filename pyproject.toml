@@ -30,5 +30,8 @@ otowi = "otowi.cli:main"
 [tool.setuptools.packages.find]
 include = ["otowi*"]
 
+[tool.setuptools.package-data]
+otowi = ["static/*.html"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
