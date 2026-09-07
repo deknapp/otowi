@@ -32,11 +32,24 @@ from .network import find_tool, network_path
 
 log = logging.getLogger(__name__)
 
-#: Vehicles that cannot reach their destination are removed rather than
-#: teleported. SUMO's default teleporting hides exactly the gridlock this
-#: project exists to measure: a jammed vehicle vanishes, the jam clears, and
-#: the model reports a travel time nobody experienced.
-NO_TELEPORT = "-1"
+#: Seconds a vehicle may be stuck before SUMO moves it past the blockage.
+#:
+#: This was ``-1`` -- teleporting disabled entirely -- on the reasoning that
+#: teleporting hides the gridlock this project exists to measure. That concern
+#: was right and the fix was wrong, and it cost a lot of wrong conclusions.
+#:
+#: With teleporting off, a vehicle that cannot move never recovers. Jams became
+#: permanent, cascaded into the junctions feeding them, and eventually blocked
+#: insertion so far upstream that vehicles queued two hours to get onto the
+#: network at all. Measured: 45.9% of vehicles failed to finish with ``-1``,
+#: against 23.1% at the value below. Nearly half the shortfall was an artifact
+#: of the setting.
+#:
+#: The honest treatment is to let SUMO resolve deadlock the way real traffic
+#: does, and then *report the teleports*, because a jam teleport is precisely
+#: the gridlock signal worth having. :func:`summarize_tripinfo` surfaces the
+#: count rather than letting it disappear into the log.
+TELEPORT_S = "300"
 
 
 def routes_path(window: tuple[int, int] = AM_PEAK) -> Path:
@@ -224,6 +237,44 @@ def intervals_path(window: tuple[int, int] = AM_PEAK) -> Path:
     return CACHE_DIR / f"intervals-am-{window[0]:02d}{window[1]:02d}.xml"
 
 
+def stats_path(window: tuple[int, int] = AM_PEAK) -> Path:
+    return CACHE_DIR / f"stats-am-{window[0]:02d}{window[1]:02d}.xml"
+
+
+def read_teleports(path: Path) -> dict:
+    """Teleport counts from SUMO's statistics file.
+
+    A teleport is SUMO moving a vehicle past a blockage it could not clear.
+    ``jam`` is the one that matters: it means the network genuinely deadlocked
+    there and had to be rescued. A model with many jam teleports is telling you
+    it is over-saturated, and that is a finding rather than a nuisance -- so
+    these are reported next to the travel times rather than left in a file
+    nobody opens.
+    """
+    if not path.exists():
+        return {}
+    try:
+        root = etree.parse(str(path)).getroot()
+    except etree.ParseError:
+        return {}
+
+    result: dict = {}
+    vehicles = root.find("vehicles")
+    if vehicles is not None:
+        result["loaded"] = int(vehicles.get("loaded", 0))
+        result["inserted"] = int(vehicles.get("inserted", 0))
+        result["running_at_end"] = int(vehicles.get("running", 0))
+        result["never_inserted"] = int(vehicles.get("waiting", 0))
+
+    teleports = root.find("teleports")
+    if teleports is not None:
+        result["teleports_total"] = int(teleports.get("total", 0))
+        result["teleports_jam"] = int(teleports.get("jam", 0))
+        result["teleports_yield"] = int(teleports.get("yield", 0))
+        result["teleports_wrong_lane"] = int(teleports.get("wrongLane", 0))
+    return result
+
+
 def _write_edgedata_config(path: Path, out_file: Path, window: tuple[int, int]) -> Path:
     """An additional-file asking SUMO for per-edge aggregates.
 
@@ -289,6 +340,7 @@ def run(
 
     tripinfo = tripinfo_path(window)
     edgedata = edgedata_path(window)
+    statistics = stats_path(window)
     additional = _write_edgedata_config(
         CACHE_DIR / "edgedata.add.xml", edgedata, window
     )
@@ -300,10 +352,13 @@ def run(
         "--route-files", str(routes),
         "--additional-files", str(additional),
         "--tripinfo-output", str(tripinfo),
+        # Teleports live only here. Without this file the single most useful
+        # gridlock diagnostic the simulation produces is thrown away.
+        "--statistic-output", str(statistics),
         "--begin", "0",
         "--end", str(duration),
         "--step-length", str(step_length),
-        "--time-to-teleport", NO_TELEPORT,
+        "--time-to-teleport", TELEPORT_S,
         "--no-step-log",
         "--no-warnings",
         "--ignore-route-errors",
@@ -311,10 +366,11 @@ def run(
     log.info("simulating %d s of the %02d:00-%02d:00 window", duration, *window)
     subprocess.run(cmd, check=True, capture_output=True, text=True)
     return {"tripinfo": tripinfo, "edgedata": edgedata,
-            "intervals": intervals_path(window)}
+            "intervals": intervals_path(window), "statistics": statistics}
 
 
-def summarize_tripinfo(path: Path, routes: Path | None = None) -> dict:
+def summarize_tripinfo(path: Path, routes: Path | None = None,
+                       statistics: Path | None = None) -> dict:
     """Aggregate travel times out of SUMO's per-vehicle output.
 
     ``timeLoss`` is the measure that matters: seconds lost relative to
@@ -372,6 +428,18 @@ def summarize_tripinfo(path: Path, routes: Path | None = None) -> dict:
                 "ended. They are absent from every average above. Raise "
                 "--end-padding or check for gridlock.",
                 unfinished, loaded, 100 * unfinished / loaded,
+            )
+
+    if statistics is not None:
+        teleports = read_teleports(statistics)
+        summary.update(teleports)
+        jam = teleports.get("teleports_jam", 0)
+        if jam:
+            log.warning(
+                "%d jam teleports: the network deadlocked that many times and "
+                "SUMO had to rescue a vehicle. This is the gridlock signal, not "
+                "a nuisance -- a model needing many of them is over-saturated.",
+                jam,
             )
 
     return summary

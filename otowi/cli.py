@@ -187,7 +187,8 @@ def cmd_simulate(args) -> None:
     net = _load_net()
     result = {
         "window": f"{window[0]:02d}:00-{window[1]:02d}:00",
-        **simulate.summarize_tripinfo(outputs["tripinfo"], routes),
+        **simulate.summarize_tripinfo(outputs["tripinfo"], routes,
+                                      outputs.get("statistics")),
         "busiest_edges": simulate.busiest_edges(outputs["edgedata"], net, top=args.top),
     }
     print(json.dumps(result, indent=2))
