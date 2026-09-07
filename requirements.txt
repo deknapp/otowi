@@ -7,3 +7,12 @@ eclipse-sumo>=1.27
 httpx>=0.27
 lxml>=5.0
 pytest>=8.0
+
+# Reading the built network back in to attach trips to edges. Ships separately
+# from the eclipse-sumo binaries, and needs pyproj for the lat/lon conversion
+# the network's geo-projection describes.
+sumolib>=1.27
+pyproj>=3.6
+# Spatial index for nearest-edge lookup. Optional -- sumolib falls back to a
+# brute-force scan over 33,000 edges, which turns a minute into an hour.
+rtree>=1.0
