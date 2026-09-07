@@ -111,18 +111,30 @@ def cmd_demand(args) -> None:
 
 def cmd_trips(args) -> None:
     """Generate the vehicles: origin edge, destination edge, departure second."""
+    from . import gateways as gateway_module
+
     window = tuple(args.window)
     net = _load_net()
-    centroids = demand.block_centroids()
-    flows = demand.commute_flows(args.year, centroids)
-    attachment = trips.attach_blocks(net, centroids)
+
+    # Statewide centroids, because an inbound trip's home end is by definition
+    # outside the study area and still has to be located to pick its gateway.
+    all_centroids = demand.block_centroids(bbox=None)
+    flows = demand.commute_flows(args.year, all_centroids,
+                                 include_external=not args.internal_only)
+
+    inside = demand.block_centroids()
+    attachment = trips.attach_blocks(net, inside)
+    core = trips.reachable_core(net)
+    gws = [] if args.internal_only else gateway_module.find(net, core)
+
     profile = departure.blended_profile(_residence_weights(flows))
     weighted = departure.morning_weights(profile, window)
 
     vehicles, stats = trips.generate(
         net, flows, attachment, weighted,
-        window=window, seed=args.seed, scale=args.scale,
+        window=window, seed=args.seed, scale=args.scale, gateways=gws,
     )
+    stats["gateways"] = len(gws)
     path = trips.write_trips(vehicles, window=window)
 
     print(json.dumps({
@@ -306,6 +318,9 @@ def build_parser() -> argparse.ArgumentParser:
         sub.add_argument("--force", action="store_true")
         sub.add_argument("--top", type=int, default=15,
                          help="How many busiest edges to report.")
+        sub.add_argument("--internal-only", action="store_true",
+                         help="Drop trips with one end outside the study area, as "
+                              "the model did before gateways existed.")
         sub.add_argument("--port", type=int, default=8814,
                          help="Port for the local map server.")
         sub.add_argument("--no-browser", action="store_true",

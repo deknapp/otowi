@@ -35,6 +35,7 @@ from pathlib import Path
 from xml.etree import ElementTree as etree
 
 from .config import AM_PEAK, CACHE_DIR
+from . import gateways as gateway_module
 from .demand import Flow, vehicles_on
 
 log = logging.getLogger(__name__)
@@ -263,6 +264,7 @@ def generate(
     window: tuple[int, int] = AM_PEAK,
     seed: int = 0,
     scale: float = 1.0,
+    gateways: list | None = None,
 ) -> tuple[list[dict], dict]:
     """Expand flows into individual vehicles with an origin, destination and time.
 
@@ -276,11 +278,53 @@ def generate(
     trips: list[dict] = []
     dropped_unplaced = 0
     dropped_same_edge = 0
+    dropped_no_gateway = 0
     expected_total = 0.0
+    by_kind = {"internal": 0, "inbound": 0, "outbound": 0}
 
     for flow in flows:
-        origin = attachment.edge_by_block.get(flow.home_block)
-        destination = attachment.edge_by_block.get(flow.work_block)
+        # Where the trip enters and leaves the roads we actually model.
+        external_delay_s = 0.0
+
+        if flow.kind == "internal":
+            origin = attachment.edge_by_block.get(flow.home_block)
+            destination = attachment.edge_by_block.get(flow.work_block)
+
+        elif flow.kind == "inbound":
+            # Lives outside, works inside: appears at a gateway.
+            destination = attachment.edge_by_block.get(flow.work_block)
+            origin = None
+            if destination is not None and gateways:
+                chosen = gateway_module.choose(
+                    gateways, flow.home_lon, flow.home_lat,
+                    flow.work_lon, flow.work_lat, "in",
+                )
+                if chosen is not None:
+                    gateway, outside_m = chosen
+                    origin = gateway.edge_id
+                    # Someone leaving Albuquerque at 06:30 does not reach the
+                    # boundary until roughly 07:00. Putting them on the gateway
+                    # at 06:30 would move the whole inbound peak early.
+                    external_delay_s = gateway_module.external_travel_s(outside_m)
+
+        else:  # outbound -- lives inside, works outside
+            origin = attachment.edge_by_block.get(flow.home_block)
+            destination = None
+            if origin is not None and gateways:
+                chosen = gateway_module.choose(
+                    gateways, flow.work_lon, flow.work_lat,
+                    flow.home_lon, flow.home_lat, "out",
+                )
+                if chosen is not None:
+                    destination = chosen[0].edge_id
+
+        if flow.kind != "internal" and (origin is None or destination is None):
+            if attachment.edge_by_block.get(
+                flow.work_block if flow.kind == "inbound" else flow.home_block
+            ) is not None:
+                dropped_no_gateway += flow.jobs
+                continue
+
         if origin is None or destination is None:
             dropped_unplaced += flow.jobs
             continue
@@ -295,15 +339,24 @@ def generate(
         if count == 0:
             continue
 
+        by_kind[flow.kind] += count
         for second in _sample_departures(count, weighted_bins, window, rng):
-            trips.append({"from": origin, "to": destination, "depart": second})
+            # An inbound vehicle is placed when it reaches the boundary, not
+            # when it left home. Departures pushed past the window are kept at
+            # its end rather than dropped, which slightly over-fills the last
+            # interval and is preferable to deleting long-distance commuters.
+            depart = min(second + external_delay_s,
+                         (window[1] - window[0]) * 3600 - 1)
+            trips.append({"from": origin, "to": destination, "depart": depart})
 
     trips.sort(key=lambda trip: trip["depart"])
     stats = {
         "vehicles": len(trips),
+        "vehicles_by_kind": by_kind,
         "expected_vehicles": round(expected_total, 1),
         "workers_dropped_unplaced_block": dropped_unplaced,
         "workers_dropped_same_edge": dropped_same_edge,
+        "workers_dropped_no_gateway": dropped_no_gateway,
         "scale": scale,
         "seed": seed,
         "window": f"{window[0]:02d}:00-{window[1]:02d}:00",

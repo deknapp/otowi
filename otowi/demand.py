@@ -77,6 +77,10 @@ class Flow:
     work_lat: float
     work_lon: float
     jobs: int
+    #: "internal" -- both ends inside the study area.
+    #: "inbound"  -- lives outside, works inside; enters at a gateway.
+    #: "outbound" -- lives inside, works outside; leaves at a gateway.
+    kind: str = "internal"
 
 
 def _download(url: str, dest: Path) -> Path:
@@ -129,8 +133,15 @@ def fetch_od(year: int = DEFAULT_YEAR) -> Path:
     )
 
 
-def block_centroids(bbox: tuple[float, float, float, float] = BBOX) -> dict[str, tuple[float, float]]:
-    """Census blocks whose centroid falls inside the study area.
+def block_centroids(
+    bbox: tuple[float, float, float, float] | None = BBOX,
+) -> dict[str, tuple[float, float]]:
+    """Census blocks and their centroids, optionally limited to the study area.
+
+    Passing ``bbox=None`` returns every block in the state. That is needed for
+    external trips: to place a commute from Albuquerque at the right gateway we
+    have to know where in Albuquerque it started, and that block is by
+    definition outside the study area.
 
     A block centroid is a point standing in for an area. For the dense blocks
     in Santa Fe that is a fine approximation; for a rural block spanning
@@ -138,7 +149,6 @@ def block_centroids(bbox: tuple[float, float, float, float] = BBOX) -> dict[str,
     lands on the first road the trip is attached to rather than on the route
     as a whole.
     """
-    west, south, east, north = bbox
     path = fetch_crosswalk()
     centroids: dict[str, tuple[float, float]] = {}
 
@@ -151,10 +161,17 @@ def block_centroids(bbox: tuple[float, float, float, float] = BBOX) -> dict[str,
                 # Blocks with no centroid are unusable here; they are a
                 # handful of water and unpopulated blocks.
                 continue
+            if bbox is None:
+                centroids[row["tabblk2020"]] = (lat, lon)
+                continue
+            west, south, east, north = bbox
             if west <= lon <= east and south <= lat <= north:
                 centroids[row["tabblk2020"]] = (lat, lon)
 
-    log.info("%d census blocks inside the study area", len(centroids))
+    if bbox is None:
+        log.info("%d census blocks statewide", len(centroids))
+    else:
+        log.info("%d census blocks inside the study area", len(centroids))
     return centroids
 
 
@@ -163,24 +180,44 @@ def commute_flows(
     centroids: dict[str, tuple[float, float]] | None = None,
     *,
     min_jobs: int = 1,
+    include_external: bool = True,
+    bbox: tuple[float, float, float, float] = BBOX,
 ) -> list[Flow]:
-    """Origin-destination pairs with both ends inside the study area.
+    """Origin-destination pairs that put a vehicle on a road we model.
 
-    Pairs with one end outside are dropped rather than clipped to the
-    boundary. Clipping would put a phantom trip end on the edge of the box and
-    load the boundary roads with traffic that in reality carries on to
-    Albuquerque -- a boundary artefact that looks like congestion.
+    Three cases, and only the third is genuinely out of reach:
 
-    This is a real limitation, not a rounding decision: it removes the
-    Albuquerque and Taos commutes entirely. The count-station calibration is
-    the check that will show how much that matters, because those trips do use
-    the corridors we model even though we cannot see both their ends.
+    * **Both ends inside** -- 39,697 pairs, 52,197 workers. The whole journey
+      is inside the study area.
+    * **One end inside** -- 46,020 pairs, 47,528 workers. Nearly as much again.
+      Someone living in Santa Fe and working in Albuquerque drives the Santa Fe
+      half of that trip on roads we model, and the first version of this
+      function threw all of it away. These are kept, marked ``inbound`` or
+      ``outbound``, and attached to a boundary gateway by
+      :mod:`otowi.gateways` rather than to their real out-of-area end.
+    * **Neither end inside** -- pure through traffic. Not represented here;
+      LODES is home-to-work pairs and cannot see a trip that merely passes
+      through. This remains a known gap.
+
+    The external end keeps its real coordinates so that gateway choice has
+    something to work with; the trip is placed at the boundary later, not here.
     """
-    centroids = centroids if centroids is not None else block_centroids()
-    path = fetch_od(year)
+    # External trips need coordinates for blocks outside the study area, so the
+    # lookup has to be statewide when they are wanted.
+    if centroids is None:
+        centroids = block_centroids(bbox=None if include_external else bbox)
 
+    west, south, east, north = bbox
+
+    def inside(point: tuple[float, float]) -> bool:
+        lat, lon = point
+        return west <= lon <= east and south <= lat <= north
+
+    path = fetch_od(year)
     flows: list[Flow] = []
     total_pairs = 0
+    counts = {"internal": 0, "inbound": 0, "outbound": 0}
+
     with gzip.open(path, "rt", newline="") as handle:
         for row in csv.DictReader(handle):
             total_pairs += 1
@@ -190,6 +227,21 @@ def commute_flows(
             work_point = centroids.get(work)
             if home_point is None or work_point is None:
                 continue
+
+            home_in, work_in = inside(home_point), inside(work_point)
+            if not home_in and not work_in:
+                # Neither end is ours. LODES cannot tell us whether this trip
+                # passes through the study area, so it is left out.
+                continue
+            if home_in and work_in:
+                kind = "internal"
+            elif work_in:
+                kind = "inbound"
+            else:
+                kind = "outbound"
+            if kind != "internal" and not include_external:
+                continue
+
             jobs = int(row["S000"])
             if jobs < min_jobs:
                 continue
@@ -197,6 +249,8 @@ def commute_flows(
                 # Living and working in the same census block is a walk, or a
                 # drive too short to route. Either way it is not network load.
                 continue
+
+            counts[kind] += 1
             flows.append(
                 Flow(
                     home_block=home,
@@ -206,12 +260,15 @@ def commute_flows(
                     work_lat=work_point[0],
                     work_lon=work_point[1],
                     jobs=jobs,
+                    kind=kind,
                 )
             )
 
     log.info(
-        "%d of %d statewide pairs have both ends in the study area (%d workers)",
-        len(flows), total_pairs, sum(f.jobs for f in flows),
+        "%d of %d statewide pairs touch the study area "
+        "(%d internal, %d inbound, %d outbound; %d workers)",
+        len(flows), total_pairs, counts["internal"], counts["inbound"],
+        counts["outbound"], sum(f.jobs for f in flows),
     )
     return flows
 
