@@ -8,9 +8,12 @@ mesa, and there is no redundant route — which is why a small change in demand
 produces a large change in delay, and why the commute is worth simulating
 rather than estimating.
 
-> **Status: early.** The network extraction and the demand model are being
-> built. Nothing here is calibrated yet, and until it is, no number this
-> produces should be believed. See [Honesty](#honesty) below.
+> **Status: it runs end to end, and it is not calibrated.** Network, demand,
+> departure times, routing and simulation are all built — `otowi run` goes from
+> an empty checkout to a finished morning peak. What is missing is the part
+> that would make the output believable: no edge volume has yet been compared
+> against a count station, so the travel times are the model's opinion with no
+> error bar. See [Running it](#running-it) and [Honesty](#honesty).
 
 ## What it is for
 
@@ -44,6 +47,58 @@ The demand here is not invented, and the model is not trusted on its own word:
   and its error is reported on the rest. A simulation that reports its own
   error against ground truth it did not see is a different object from one that
   simply runs.
+
+## Running it
+
+```bash
+python -m venv .venv && source .venv/bin/activate
+pip install -e '.[fast,dev]'
+```
+
+That installs the SUMO toolchain from PyPI — `netconvert`, `duarouter` and
+`sumo` land in `.venv/bin`, so there is no Homebrew tap to trust and no
+XQuartz needed for the command-line tools.
+
+Then, in order. Each stage writes to `data/cache/` and is skipped if its output
+is already there, so re-running is cheap.
+
+```bash
+otowi places      # the study area and corridors — checks nothing has to download
+otowi network     # OpenStreetMap → SUMO network        (~5 min, once, ever)
+otowi demand      # LODES + ACS, reported without simulating   (~1 min)
+otowi trips       # commute flows → individual vehicles         (~30 s)
+otowi route       # duarouter: trips → paths                    (~30 s)
+otowi simulate    # SUMO: the microscopic run                   (~5 min)
+
+otowi run         # all of the above, skipping what is done
+```
+
+`otowi network` is the slow one and it hits Overpass, a donated service. It
+happens once; the extract is cached forever.
+
+### What a run currently produces
+
+On the 06:00–09:00 window, LODES 2022:
+
+| | |
+|---|---|
+| Census blocks in the study area | 5,372 |
+| Commute pairs with both ends inside it | 39,697 |
+| Workers on those pairs | 52,052 |
+| Blocks attached to a routable road | 5,076 (94.5%, median 98 m) |
+| Vehicles generated | 28,442 |
+| Trips lost in routing | 0 |
+
+Useful flags:
+
+- `--scale 0.1` runs a tenth of the demand. Much faster, and **it does not
+  reproduce congestion** — delay is not linear in demand, which is the whole
+  reason this corridor is worth simulating. Use it for development, never for
+  a result.
+- `--window 15 18` runs the afternoon peak instead.
+- `--seed N` — trip generation is Poisson, so a different seed is a different
+  morning.
+- `--end-padding N` — seconds to keep simulating after the last departure.
 
 ## Built on
 
@@ -79,6 +134,41 @@ Things this will say about itself, and keep saying:
   they will be estimated separately and labelled as estimates.
 - **Uncalibrated output is not a result.** Until the validation error is
   reported, this repository will say so at the top.
+
+### What is wrong with the current numbers, specifically
+
+The pipeline runs. That is not the same as the answers being right, and these
+are the three reasons no travel time from it is quoted here:
+
+1. **Nothing is calibrated.** No edge volume has been compared against an MPO
+   or NMDOT count station. This is the next piece of work and the one that
+   turns output into a result.
+2. **Routing is single-pass on free-flow times.** `duarouter` gives every
+   driver the path that would be fastest on an empty road, so all of them
+   choose the same one and the busiest corridors are overloaded in a way real
+   drivers avoid by spreading out. The fix is iterative assignment
+   (`duaIterate`), which is not wired up yet. Until it is, congestion on the
+   single best path is overstated and congestion on the alternatives is
+   understated.
+3. **Some vehicles do not finish.** Any that are still travelling when the
+   clock stops are absent from every average, which biases travel times
+   *downward* exactly where the network is worst. The run reports
+   `vehicles_unfinished` for this reason rather than leaving it to be inferred
+   from a missing row.
+
+Two bugs found by building this are worth recording, because both reported
+success while being wrong:
+
+- **netconvert built 911 edges from 11,710 ways** and called it a success — no
+  I-25, no US-84/285, no traffic lights — because the tile merge interleaved
+  nodes and ways. Fixed; the network is now 33,138 usable edges.
+- **duarouter silently discarded 30% of trips.** `--ignore-errors` turns an
+  unroutable trip into a warning nobody reads, and the missing vehicles looked
+  exactly like congestion. The cause was that only 23,209 of 33,138 edges are
+  mutually reachable — a bounding box severs frontage roads and one-way stubs —
+  and trips were being attached to fragments. Trip endpoints are now restricted
+  to the largest strongly-connected component, and every run compares input
+  trips against output routes so this cannot be silent again.
 
 ## License
 

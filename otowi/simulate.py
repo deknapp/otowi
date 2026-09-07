@@ -147,7 +147,7 @@ def run(
     routes: Path,
     *,
     window: tuple[int, int] = AM_PEAK,
-    end_padding_s: int = 3600,
+    end_padding_s: int = 10800,
     step_length: float = 1.0,
 ) -> dict[str, Path]:
     """Run the microscopic simulation and collect its outputs.
@@ -156,6 +156,13 @@ def run(
     vehicles still travelling are not cut off mid-trip; truncating them would
     remove the longest journeys from every average, which are exactly the ones
     congestion produces.
+
+    The default is three hours rather than one because one was not enough: a
+    run with 60 minutes of padding finished with 28% of vehicles still on the
+    network, and their absence from the averages biased every reported travel
+    time *downward* -- the model looked faster precisely where it was most
+    congested. :func:`summarize_tripinfo` now reports the unfinished count so
+    the same mistake is visible rather than inferred.
     """
     tool = find_tool("sumo")
     if tool is None:
@@ -187,7 +194,7 @@ def run(
     return {"tripinfo": tripinfo, "edgedata": edgedata}
 
 
-def summarize_tripinfo(path: Path) -> dict:
+def summarize_tripinfo(path: Path, routes: Path | None = None) -> dict:
     """Aggregate travel times out of SUMO's per-vehicle output.
 
     ``timeLoss`` is the measure that matters: seconds lost relative to
@@ -214,7 +221,7 @@ def summarize_tripinfo(path: Path) -> dict:
         ordered = sorted(values)
         return ordered[min(len(ordered) - 1, int(fraction * len(ordered)))]
 
-    return {
+    summary = {
         "vehicles_arrived": len(durations),
         "mean_duration_s": round(sum(durations) / len(durations), 1),
         "median_duration_s": round(percentile(durations, 0.5), 1),
@@ -223,6 +230,31 @@ def summarize_tripinfo(path: Path) -> dict:
         "p90_time_loss_s": round(percentile(time_losses, 0.9), 1),
         "mean_waiting_s": round(sum(waiting) / len(waiting), 1),
     }
+
+    # Vehicles still travelling when the clock stopped never appear in
+    # tripinfo, so every average above is computed only over trips that
+    # finished. That biases travel time *downward* exactly where congestion is
+    # worst, which is the opposite of a conservative error, so the count is
+    # reported rather than left to be inferred from a missing row.
+    if routes is not None and routes.exists():
+        loaded = 0
+        for _, element in etree.iterparse(str(routes), events=("end",)):
+            if element.tag == "vehicle":
+                loaded += 1
+            element.clear()
+        unfinished = max(0, loaded - len(durations))
+        summary["vehicles_loaded"] = loaded
+        summary["vehicles_unfinished"] = unfinished
+        summary["unfinished_fraction"] = round(unfinished / loaded, 4) if loaded else 0.0
+        if unfinished:
+            log.warning(
+                "%d of %d vehicles (%.1f%%) had not arrived when the simulation "
+                "ended. They are absent from every average above. Raise "
+                "--end-padding or check for gridlock.",
+                unfinished, loaded, 100 * unfinished / loaded,
+            )
+
+    return summary
 
 
 def busiest_edges(path: Path, net, top: int = 15) -> list[dict]:

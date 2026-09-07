@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "otowi"
+version = "0.1.0"
+description = "Traffic simulation for northern New Mexico: Santa Fe, the Los Alamos commute over Otowi Bridge, and US-84 north to Abiquiu Lake."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = [
+    "eclipse-sumo>=1.27",
+    "sumolib>=1.27",
+    "pyproj>=3.6",
+    "httpx>=0.27",
+    "lxml>=5.0",
+]
+
+[project.optional-dependencies]
+# rtree turns the nearest-edge lookup from a brute-force scan over 33,000
+# edges into an index query. Optional because sumolib falls back without it,
+# and the fallback turns a minute into an hour.
+fast = ["rtree>=1.0"]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+otowi = "otowi.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["otowi*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

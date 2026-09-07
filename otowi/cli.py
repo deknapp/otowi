@@ -149,11 +149,11 @@ def cmd_simulate(args) -> None:
     if not routes.exists():
         raise SystemExit(f"No routes at {routes}.\nRun:  otowi route")
 
-    outputs = simulate.run(routes, window=window)
+    outputs = simulate.run(routes, window=window, end_padding_s=args.end_padding)
     net = _load_net()
     result = {
         "window": f"{window[0]:02d}:00-{window[1]:02d}:00",
-        **simulate.summarize_tripinfo(outputs["tripinfo"]),
+        **simulate.summarize_tripinfo(outputs["tripinfo"], routes),
         "busiest_edges": simulate.busiest_edges(outputs["edgedata"], net, top=args.top),
     }
     print(json.dumps(result, indent=2))
@@ -220,6 +220,9 @@ def build_parser() -> argparse.ArgumentParser:
         sub.add_argument("--force", action="store_true")
         sub.add_argument("--top", type=int, default=15,
                          help="How many busiest edges to report.")
+        sub.add_argument("--end-padding", type=int, default=10800,
+                         help="Seconds to keep simulating after the last departure, "
+                              "so long trips are not cut off and dropped from the averages.")
 
     return parser
 
