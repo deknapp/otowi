@@ -165,6 +165,43 @@ def cmd_simulate(args) -> None:
     )
 
 
+def cmd_calibrate(args) -> None:
+    """Compare modelled edge volumes against NMDOT counts."""
+    from . import counts
+
+    window = tuple(args.window)
+    edgedata = simulate.edgedata_path(window)
+    if not edgedata.exists():
+        raise SystemExit(f"No simulation output at {edgedata}.\nRun:  otowi simulate")
+
+    net = _load_net()
+    segments = counts.parse_segments(counts.fetch_aadt(force=args.force))
+    matched = counts.match_to_edges(net, segments)
+    modelled = counts.simulated_hourly(edgedata, window_hours=window[1] - window[0])
+    result = counts.compare(matched, modelled)
+
+    worst = sorted(result["links"], key=lambda row: -row["observed_veh_per_h"])[: args.top]
+    print(json.dumps({
+        "count_segments": len(segments),
+        "edges_matched": len(matched),
+        "all": result["all"],
+        "fit": result["fit"],
+        "held_out": result["held_out"],
+        "busiest_measured_links": worst,
+    }, indent=2))
+
+    ratio = result["held_out"].get("median_ratio_modelled_over_observed")
+    if ratio is not None and ratio < 0.8:
+        print(
+            f"\nThe model carries {ratio:.0%} of measured peak-hour volume. It contains "
+            "commuting between two points inside the study area and nothing else -- no "
+            "freight, no shopping, no tourism, and no trip with one end outside the box, "
+            "which is most of I-25 and US-84. This number is the size of that decision, "
+            "not a tuning error.",
+            file=sys.stderr,
+        )
+
+
 def cmd_run(args) -> None:
     """Everything, skipping stages whose output already exists."""
     window = tuple(args.window)
@@ -175,6 +212,7 @@ def cmd_run(args) -> None:
     if not simulate.routes_path(window).exists():
         cmd_route(args)
     cmd_simulate(args)
+    cmd_calibrate(args)
 
 
 # ---------------------------------------------------------------------- parser
@@ -205,6 +243,7 @@ def build_parser() -> argparse.ArgumentParser:
         ("trips", cmd_trips, "Generate vehicles from the demand."),
         ("route", cmd_route, "Route the trips with duarouter."),
         ("simulate", cmd_simulate, "Run SUMO on the routes."),
+        ("calibrate", cmd_calibrate, "Compare modelled volumes against NMDOT counts."),
         ("run", cmd_run, "Do every stage that has not been done."),
     ]:
         sub = add(name, handler, help_text)
