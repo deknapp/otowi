@@ -337,6 +337,21 @@ def _parse_clock(text: str) -> float:
     return float(value)
 
 
+def _risk_words(x) -> str:
+    """A bare "0.78x" says nothing without a referent. These are the words."""
+    if x is None:
+        return "not assessed"
+    if x < 0.5:
+        return "safest time of day"
+    if x < 0.8:
+        return "below average risk"
+    if x < 1.25:
+        return "about average risk"
+    if x < 2:
+        return "above average risk"
+    return "well above average risk"
+
+
 def cmd_when(args) -> None:
     """Answer: what time should I leave, for this trip?"""
     from . import journey, trips as trips_mod
@@ -394,6 +409,11 @@ def cmd_when(args) -> None:
     ]
     print(f"\n{result['from']} to {result['to']}  "
           f"({result['window'] or 'no options in that range'})\n")
+    if args.risk:
+        print("  Drive time is simulated and optimistic -- this model carries 14%")
+        print("  of real traffic. Risk is measured: fatal crashes recorded on these")
+        print("  roads since 2018 per kilometre driven on them. The multiplier")
+        print("  compares one hour against an average hour of the day.\n")
 
     good = set(result.get("good_departures", ()))
     longest = max((o["duration_min"] for o in inside), default=1) or 1
@@ -412,15 +432,44 @@ def cmd_when(args) -> None:
     safest = min(scored, key=lambda o: o["risk_x"]) if scored else None
     riskiest = max(scored, key=lambda o: o["risk_x"]) if scored else None
 
+    # "Best" needs a defined trade-off or it is a preference dressed as a fact,
+    # and the order of the two tests is the whole trade-off. Filtering on time
+    # first and then taking the safest survivor recommends midnight -- the
+    # second-deadliest hour of the day -- because it is ninety seconds quicker.
+    # Risk is the binding constraint and time is the tie-breaker: take the
+    # departures that are genuinely among the safest, then the quickest of them.
+    fastest = min(inside, key=lambda o: o["duration_min"])
+    balanced = fastest
+    if scored and safest is not None:
+        ceiling = safest["risk_x"] * 1.25
+        safe_enough = [o for o in scored if o["risk_x"] <= ceiling]
+        balanced = (min(safe_enough, key=lambda o: o["duration_min"])
+                    if safe_enough else safest)
+    chosen = {"speed": fastest, "safety": safest or fastest,
+              "both": balanced}[args.prefer]
+
+    if scored:
+        print("  %-9s %-7s %-9s %s" % ("", "leave", "drive", "risk"))
+        for tag, option in (("fastest", fastest), ("safest", safest),
+                            ("best", balanced)):
+            if option is None:
+                continue
+            star = " *" if option["depart"] == chosen["depart"] else "  "
+            print("%s %-9s %-7s %-9s %s" % (
+                star, tag, option["depart"],
+                f"{option['duration_min']:.0f} min",
+                _risk_words(option.get("risk_x"))))
+        print()
+
     for option in inside:
         # Once risk is on the table the journey-time band is noise: it marks
         # departures as equally good on the dimension that moves by a minute
         # while ignoring the one that moves by a factor of nineteen.
         if safest is not None:
-            mark = " <- safest" if option["depart"] == safest["depart"] else ""
+            mark = " <- " + args.prefer if option["depart"] == chosen["depart"] else ""
         else:
             mark = " <- as good as it gets" if option["depart"] in good else ""
-        bar = "#" * max(1, int(option["duration_min"] / longest * 26))
+        bar = "#" * max(1, int(option["duration_min"] / longest * 22))
         risk_col = (f"  {option['risk_x']:4.1f}x" if option.get("risk_x") is not None
                     else "")
         print(f"  leave {option['depart']}   {option['duration_min']:6.1f} min  "
@@ -456,17 +505,17 @@ def cmd_when(args) -> None:
                   f"traffic count, so it")
             print("  could not be assessed and is left out of that figure.")
 
-        if safest is not None and riskiest is not None and riskiest["risk_x"] > 0:
-            cost = safest["duration_min"] - min(o["duration_min"] for o in inside)
-            factor = riskiest["risk_x"] / safest["risk_x"]
-            print(f"\n  Leave at {safest['depart']}. It is the safest departure in "
-                  f"this window,")
-            print(f"  about {factor:.1f} times safer per kilometre than leaving at "
-                  f"{riskiest['depart']},")
-            if cost > 0.5:
-                print(f"  and it costs {cost:.0f} min more driving.")
-            else:
-                print("  and it costs nothing in journey time.")
+        if riskiest is not None and chosen.get("risk_x"):
+            cost = chosen["duration_min"] - fastest["duration_min"]
+            factor = riskiest["risk_x"] / chosen["risk_x"]
+            print(f"\n  Leave at {chosen['depart']} -- {chosen['duration_min']:.0f} "
+                  f"min, {_risk_words(chosen['risk_x'])}.")
+            if args.prefer != "speed" and factor > 1.3:
+                print(f"  About {factor:.1f} times safer per kilometre than leaving "
+                      f"at {riskiest['depart']},")
+                print("  and it costs %s." % (
+                    f"{cost:.0f} min more driving" if cost > 0.5
+                    else "nothing in driving time"))
 
     print()
     print(result["caveat"], file=sys.stderr)
@@ -834,6 +883,13 @@ def build_parser() -> argparse.ArgumentParser:
                                   "inside the simulated window; defaults to "
                                   "all of it.")
     when_parser.add_argument("--json", action="store_true")
+    when_parser.add_argument("--prefer", choices=("both", "speed", "safety"),
+                             default="both",
+                             help="Which axis to optimise. Journey times here "
+                                  "differ by about a minute across a day and "
+                                  "risk by a factor of nineteen, so 'both' "
+                                  "takes the safest departure that costs no "
+                                  "meaningful extra driving.")
     when_parser.add_argument("--risk", action="store_true",
                              help="Also report the fatal-crash record of the "
                                   "roads this drive uses, and how the hour of "

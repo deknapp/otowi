@@ -293,3 +293,71 @@ def test_clock_parsing_accepts_how_people_write_times():
     for bad in ("half five", "25:00", "-1"):
         with pytest.raises(SystemExit):
             _parse_clock(bad)
+
+
+# ------------------------------------------------- speed against safety
+#
+# The order of the two filters IS the trade-off, and getting it backwards is
+# not a subtle error: filtering on time first and taking the safest survivor
+# recommends midnight, the second-deadliest hour of the day, because it is
+# ninety seconds quicker than anything else.
+
+
+def balanced(options, risk_tolerance=1.25):
+    """The rule the planner uses: safe enough first, then quickest."""
+    scored = [o for o in options if o.get("risk_x") is not None]
+    if not scored:
+        return min(options, key=lambda o: o["duration_min"])
+    safest = min(scored, key=lambda o: o["risk_x"])
+    ceiling = safest["risk_x"] * risk_tolerance
+    safe_enough = [o for o in scored if o["risk_x"] <= ceiling]
+    return (min(safe_enough, key=lambda o: o["duration_min"])
+            if safe_enough else safest)
+
+
+def options():
+    # Midnight is quickest and nearly the deadliest; the morning is slowest
+    # and safest; 09:00 is nearly as safe and a little quicker.
+    return [
+        {"depart": "00:00", "duration_min": 36.3, "risk_x": 2.07},
+        {"depart": "03:00", "duration_min": 37.8, "risk_x": 4.76},
+        {"depart": "08:00", "duration_min": 41.5, "risk_x": 0.25},
+        {"depart": "09:00", "duration_min": 39.8, "risk_x": 0.26},
+        {"depart": "12:00", "duration_min": 38.6, "risk_x": 2.68},
+    ]
+
+
+def test_balanced_does_not_recommend_the_deadly_fast_hour():
+    assert balanced(options())["depart"] != "00:00"
+
+
+def test_balanced_takes_the_quickest_of_the_safe_ones():
+    """08:00 is the safest and 09:00 is within a quarter of it and 1.7 min
+    quicker, so the compromise is 09:00."""
+    assert balanced(options())["depart"] == "09:00"
+
+
+def test_time_first_would_have_picked_the_deadly_hour():
+    """Pins the bug rather than only the fix, so the filters cannot quietly
+    swap back."""
+    fastest = min(options(), key=lambda o: o["duration_min"])
+    affordable = [o for o in options()
+                  if o["duration_min"] <= fastest["duration_min"] + 2.0]
+    wrong = min(affordable, key=lambda o: o["risk_x"])
+    assert wrong["depart"] == "00:00"
+    assert wrong["risk_x"] > balanced(options())["risk_x"] * 5
+
+
+def test_the_three_answers_are_allowed_to_coincide():
+    """When one departure is both quickest and safest there is no trade-off,
+    and the tool must not invent one."""
+    single = [{"depart": "08:00", "duration_min": 30.0, "risk_x": 0.25},
+              {"depart": "03:00", "duration_min": 40.0, "risk_x": 4.0}]
+    assert balanced(single)["depart"] == "08:00"
+    assert min(single, key=lambda o: o["duration_min"])["depart"] == "08:00"
+
+
+def test_no_risk_data_falls_back_to_the_quickest():
+    plain = [{"depart": "07:00", "duration_min": 30.0},
+             {"depart": "08:00", "duration_min": 25.0}]
+    assert balanced(plain)["depart"] == "08:00"
