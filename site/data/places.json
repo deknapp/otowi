@@ -1,0 +1,32 @@
+[
+  {
+    "key": "santa_fe",
+    "name": "Santa Fe",
+    "note": "the southern anchor, and the in-town network"
+  },
+  {
+    "key": "pojoaque",
+    "name": "Pojoaque",
+    "note": "where the Los Alamos traffic leaves US-84/285 onto NM-502"
+  },
+  {
+    "key": "otowi",
+    "name": "Otowi Bridge",
+    "note": "NM-502 crosses the Rio Grande here, then climbs to the mesa; the hard bottleneck on the Los Alamos commute"
+  },
+  {
+    "key": "los_alamos",
+    "name": "Los Alamos",
+    "note": "the destination that makes the morning peak tidal"
+  },
+  {
+    "key": "espanola",
+    "name": "Espanola",
+    "note": "the junction: US-84/285 splits toward Abiquiu and Taos"
+  },
+  {
+    "key": "abiquiu_lake",
+    "name": "Abiquiu Lake",
+    "note": "weekend recreational demand, a different regime entirely from the weekday commute"
+  }
+]

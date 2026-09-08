@@ -364,7 +364,11 @@ def cmd_export(args) -> None:
     # places is thirty pairs; a pair that cannot be routed is left out and
     # reported rather than written as an empty answer.
     net = _load_net()
-    times = journey.TravelTimes.load(simulate.edgedata_path(window), net)
+    # intervals_path, not edgedata_path. edgedata is the whole window
+    # aggregated into one bucket, so every departure time would return an
+    # identical duration and the departure curve -- the entire point of the
+    # planner -- would come out flat. cmd_when loads the same file.
+    times = journey.TravelTimes.load(simulate.intervals_path(window), net)
     core = trips.reachable_core(net)
     plans, unroutable = {}, []
     for origin in PLACES:

@@ -1,0 +1,27 @@
+{
+  "window": "06:00-09:00",
+  "drawn_edges": 11335,
+  "measured_links": 2306,
+  "held_out": {
+    "links": 1128,
+    "median_geh": 5.78,
+    "share_geh_under_5": 0.386,
+    "median_ratio_modelled_over_observed": 0.163
+  },
+  "fit": {
+    "links": 1178,
+    "median_geh": 5.78,
+    "share_geh_under_5": 0.386,
+    "median_ratio_modelled_over_observed": 0.173
+  },
+  "vehicles_arrived": 54428,
+  "mean_duration_s": 2026.7,
+  "median_duration_s": 1168.0,
+  "p90_duration_s": 5478.0,
+  "mean_time_loss_s": 592.7,
+  "p90_time_loss_s": 1757.6,
+  "mean_waiting_s": 167.5,
+  "vehicles_loaded": 54656,
+  "vehicles_unfinished": 228,
+  "unfinished_fraction": 0.0042
+}
