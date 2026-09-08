@@ -17,6 +17,7 @@ from collections import Counter
 import pytest
 
 from otowi import config, trips
+from otowi import gateways as gateway_module
 from otowi.demand import Flow
 
 
@@ -480,3 +481,79 @@ def test_a_night_shift_drives_home_through_the_morning_peak():
     assert morning, "the night shift's drive home is real traffic at 06:30"
     assert all(t["from"] == "b" and t["to"] == "a" for t in morning)
     assert stats["return_trips"] == len(morning)
+
+
+def test_the_drive_home_is_spread_like_the_drive_to_work():
+    """A census block is hundreds of houses, not one address.
+
+    The first version of return trips reasoned from "home is one address" and
+    sent every returning commuter in a block onto the single edge the block
+    was attached to. 7,958 vehicles a day ended on one link, the top twenty
+    links took 27% of all arrivals, and the assignment gridlocked: 15,094 jam
+    teleports and 7.3% of trips never finishing, against 63 and 0.0% at a
+    tenth of the demand. Workplace arrivals were already spread for exactly
+    this reason; the return needed the same treatment.
+    """
+    edges = [FakeEdge(name) for name in ("h1", "h2", "h3", "w1")]
+    for other in edges[1:]:
+        two_way(edges[0], other)
+    net = FakeNet(edges)
+
+    attachment = trips.Attachment(
+        edge_by_block={"home": "h1", "work": "w1"},
+        destinations_by_block={
+            "home": [("h1", 1.0), ("h2", 1.0), ("h3", 1.0)],
+            "work": [("w1", 1.0)],
+        },
+    )
+    flows = [Flow("home", "work", 35.7, -106.0, 35.8, -106.1, jobs=600)]
+
+    day, _ = trips.generate(net, flows, attachment, [(MorningBin(), 1.0)],
+                            window=(0, 24), seed=3)
+    going_home = [t["to"] for t in day if t["from"] == "w1"]
+
+    assert len(set(going_home)) == 3, (
+        "every returning commuter in the block funnelled onto one edge"
+    )
+
+
+def test_a_return_trip_never_goes_the_wrong_way_through_a_gateway():
+    """An entry gateway has no incoming edges, so nothing can arrive there; an
+    exit gateway has no outgoing edges, so nothing placed on it can move.
+
+    The first version of return trips reused the gateway the outbound leg had
+    chosen, which pointed every gateway return the wrong way through a one-way
+    door. duarouter discarded them -- about 25,000 vehicles, a quarter of the
+    demand, gone without an error -- and the assignment gridlocked around the
+    ones that remained: 15,094 jam teleports and 7.3% of trips never finishing.
+    """
+    inside_home, inside_work = FakeEdge("h1"), FakeEdge("w1")
+    two_way(inside_home, inside_work)
+    entry, exit_ = FakeEdge("gw-in"), FakeEdge("gw-out")
+    net = FakeNet([inside_home, inside_work, entry, exit_])
+
+    gateways = [
+        gateway_module.Gateway("gw-in", -106.2, 35.6, "primary", "in"),
+        gateway_module.Gateway("gw-out", -106.2, 35.6, "primary", "out"),
+    ]
+    attachment = trips.Attachment(edge_by_block={"h1": "h1", "w1": "w1"})
+
+    # Lives outside, works inside: in through the entry, home via the exit.
+    inbound = [Flow("out-of-box", "w1", 35.2, -106.6, 35.8, -106.1,
+                    jobs=200, kind="inbound")]
+    day, _ = trips.generate(net, inbound, attachment, [(MorningBin(), 1.0)],
+                            window=(0, 24), seed=5, gateways=gateways)
+    assert day
+    assert all(t["from"] != "gw-out" for t in day), "started on an exit gateway"
+    assert all(t["to"] != "gw-in" for t in day), "ended on an entry gateway"
+    assert any(t["to"] == "gw-out" for t in day), "nobody left the study area"
+
+    # Lives inside, works outside: out through the exit, home via the entry.
+    outbound = [Flow("h1", "out-of-box", 35.8, -106.1, 35.2, -106.6,
+                     jobs=200, kind="outbound")]
+    day, _ = trips.generate(net, outbound, attachment, [(MorningBin(), 1.0)],
+                            window=(0, 24), seed=5, gateways=gateways)
+    assert day
+    assert all(t["from"] != "gw-out" for t in day)
+    assert all(t["to"] != "gw-in" for t in day)
+    assert any(t["from"] == "gw-in" for t in day), "nobody came back into the box"

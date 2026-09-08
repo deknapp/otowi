@@ -404,6 +404,10 @@ def generate(
         return_origin: str | None = None
         return_destination: str | None = None
         return_delay_s = 0.0
+        # Set when the drive home ends at a home inside the study area, so the
+        # arrival can be spread over the block's streets the same way a
+        # workplace arrival is.
+        return_block: str | None = None
 
         # ``destination_block`` is set when the trip ends at a workplace inside
         # the study area. It is resolved to an edge once per *vehicle* below
@@ -415,9 +419,8 @@ def generate(
             origin = attachment.edge_by_block.get(flow.home_block)
             destination = attachment.edge_by_block.get(flow.work_block)
             destination_block = flow.work_block
-            # Home is one address, so the return has a single destination and
-            # gets no spreading -- the reverse of the arrival case below.
             return_destination = origin
+            return_block = flow.home_block
 
         elif flow.kind == "inbound":
             # Lives outside, works inside: appears at a gateway.
@@ -436,10 +439,19 @@ def generate(
                     # boundary until roughly 07:00. Putting them on the gateway
                     # at 06:30 would move the whole inbound peak early.
                     external_delay_s = gateway_module.external_travel_s(outside_m)
-                    # Going home they leave work and cross the boundary shortly
-                    # after, so the outside leg comes *after* the modelled part
-                    # and adds no delay to the departure.
-                    return_destination = gateway.edge_id
+                    # Going home they leave by an EXIT gateway, not back out of
+                    # the entry one. An entry gateway is defined by having no
+                    # incoming edges -- nothing inside the network feeds it --
+                    # so a vehicle can never arrive there. Sending returns to
+                    # it made them unroutable, and the ~25,000 that vanished
+                    # took the assignment with them: 15,094 jam teleports.
+                    leaving = gateway_module.choose(
+                        gateways, flow.home_lon, flow.home_lat,
+                        flow.work_lon, flow.work_lat, "out",
+                    )
+                    return_destination = leaving[0].edge_id if leaving else None
+                    # The outside leg is *after* the modelled part on the way
+                    # home, so it adds no delay to the departure.
 
         else:  # outbound -- lives inside, works outside
             origin = attachment.edge_by_block.get(flow.home_block)
@@ -452,12 +464,21 @@ def generate(
                 if chosen is not None:
                     gateway, outside_m = chosen
                     destination = gateway.edge_id
-                    # Mirror of the inbound case: they set off from a workplace
-                    # outside the box and only appear at the boundary after the
-                    # outside leg, so the return departure is delayed.
-                    return_origin = gateway.edge_id
-                    return_delay_s = gateway_module.external_travel_s(outside_m)
+                    # Mirror of the inbound case, and with the same trap: an
+                    # exit gateway has no outgoing edges, so a vehicle placed
+                    # on it cannot move. Coming home they arrive through an
+                    # ENTRY gateway, and only reach it after the outside leg,
+                    # so the return departure is delayed.
+                    entering = gateway_module.choose(
+                        gateways, flow.work_lon, flow.work_lat,
+                        flow.home_lon, flow.home_lat, "in",
+                    )
+                    if entering is not None:
+                        return_origin = entering[0].edge_id
+                        return_delay_s = gateway_module.external_travel_s(
+                            entering[1])
             return_destination = origin
+            return_block = flow.home_block
 
         if flow.kind != "internal" and (origin is None or destination is None):
             if attachment.edge_by_block.get(
@@ -508,11 +529,28 @@ def generate(
             # --- and the drive home --------------------------------------
             if not include_returns:
                 continue
-            back_from = return_origin or arrival
+            back_from = return_origin if flow.kind == "outbound" else arrival
             back_to = return_destination
-            if back_to is None:
+            if back_from is None or back_to is None:
+                # No gateway for the way home. Counted rather than dropped in
+                # silence -- a return that cannot be built is demand missing
+                # from the evening, which is exactly what nobody would notice.
                 dropped_no_return += 1
                 continue
+            # Spread the arrival home across the block's streets, exactly as
+            # the arrival at work is spread. A census block is hundreds of
+            # houses, not one address -- the first version of this reasoned
+            # from "home is one address" and sent every returning commuter in
+            # a block onto a single edge. 7,958 vehicles a day ended on one
+            # link, the top twenty links took 27% of all arrivals, and the
+            # assignment gridlocked: 15,094 jam teleports and 7.3% of trips
+            # never finishing, against 63 and 0.0% at a tenth of the demand.
+            # A funnel is invisible in the vehicle count and obvious in
+            # distinct_destination_edges, which is why that is reported.
+            if return_block is not None:
+                spread_home = attachment.choose_destination(return_block, rng)
+                if spread_home is not None:
+                    back_to = spread_home
             if back_from == back_to:
                 dropped_same_edge += 1
                 continue
