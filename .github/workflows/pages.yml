@@ -26,7 +26,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # enablement turns Pages on for the repository the first time this
+      # runs. Without it the deploy fails with a bare 404 from the Pages API,
+      # which reads like a broken workflow rather than an unset setting.
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
