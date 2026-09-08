@@ -185,6 +185,136 @@ def fetch_osm(*, force: bool = False) -> Path:
     return path
 
 
+#: OSM ``surface`` values that are not sealed road.
+UNPAVED_SURFACES = {
+    "dirt", "unpaved", "ground", "gravel", "earth", "sand", "compacted",
+    "fine_gravel", "grass", "mud", "rock", "woodchips",
+}
+
+#: ``access`` / ``motor_vehicle`` values that mean the public may not drive it.
+RESTRICTED_ACCESS = {
+    "private", "no", "customers", "delivery", "forestry", "agricultural",
+    "permit", "military",
+}
+
+#: Speed for an unpaved road that is otherwise open, in km/h. netconvert gives
+#: an ``unclassified`` or ``residential`` way 50 km/h whatever it is made of,
+#: which turns a graded dirt road into a routing shortcut. This is a modelling
+#: assumption and a blunt one, but a dirt road is unambiguously slower than the
+#: asphalt netconvert was pricing it as.
+UNPAVED_SPEED_KMH = 30
+
+
+def _is_unpaved(tags: dict[str, str]) -> bool:
+    return tags.get("surface") in UNPAVED_SURFACES or bool(tags.get("tracktype"))
+
+
+def _undrivable_reason(tags: dict[str, str]) -> str | None:
+    """Why this way is not a route for a commuter car, or None if it is one.
+
+    Deliberately narrow, and it took two attempts to get there. Restriction
+    alone is far too blunt in this region: OSM tags Diamond Drive and West
+    Jemez Road ``access=private`` because they cross LANL property, and those
+    are the arterials carrying the exact commute the model exists to
+    reproduce -- dropping them on the tag would have been a much worse bug than
+    the one being fixed. Surface alone is no better: plenty of people in
+    northern New Mexico drive to work from an unpaved street, and deleting
+    those deletes trip origins.
+
+    It is the **combination** that identifies a track: unsealed *and* either
+    4WD-only or closed to the public. That is a locked forest road, not a
+    commuter route, and it is the only rule here that drops one.
+    """
+    if not _is_unpaved(tags):
+        return None
+    if tags.get("4wd_only") == "yes":
+        return "4wd_only"
+    if tags.get("motor_vehicle") in RESTRICTED_ACCESS:
+        return "motor_vehicle=" + tags["motor_vehicle"]
+    # An explicit motor_vehicle=yes overrides a general access restriction --
+    # standard OSM precedence, and how a road closed to through cycling but not
+    # to driving is tagged.
+    if (tags.get("access") in RESTRICTED_ACCESS
+            and tags.get("motor_vehicle") not in ("yes", "designated", "permissive")):
+        return "access=" + tags["access"]
+    return None
+
+
+def drivable_path() -> Path:
+    return CACHE_DIR / "study-area.drivable.osm"
+
+
+def filter_drivable(*, force: bool = False) -> Path:
+    """Drop the ways a passenger car may not drive, before netconvert sees them.
+
+    This exists because of a road that is not a road. FR 289 Dome Road is a
+    dirt Forest Service track over the Jemez, tagged in OSM as ``residential``
+    with ``surface=dirt``, one segment ``4wd_only=yes`` and another
+    ``access=private``. netconvert does not read any of those tags: it saw
+    "residential", gave it a lane and 50 km/h, and the router got a paved-
+    equivalent shortcut from Cochiti to Los Alamos -- 55 km against the ~97 km
+    the drive actually takes -- and put 400 to 835 vehicles an hour on it.
+
+    Nothing failed. The network built, the assignment converged, the map drew a
+    road across country where there is a washed-out track, and the calibration
+    was being asked to explain traffic the model had invented a corridor for.
+    That is the fourth bug on this project with the same shape.
+
+    Kept separate from ``fetch_osm`` on purpose: the Overpass download is
+    expensive and should happen approximately never, while what counts as
+    drivable is a modelling opinion worth revising. Re-running this costs a few
+    seconds and never touches the network.
+    """
+    out = drivable_path()
+    src = fetch_osm()
+    if out.exists() and not force and out.stat().st_mtime >= src.stat().st_mtime:
+        return out
+
+    from lxml import etree
+
+    tree = etree.parse(str(src))
+    root = tree.getroot()
+    dropped: dict[str, list[str]] = {}
+    slowed = 0
+    for way in root.findall("way"):
+        tags = {t.get("k"): t.get("v") for t in way.findall("tag")}
+        reason = _undrivable_reason(tags)
+        if reason is not None:
+            dropped.setdefault(reason.split("=")[0], []).append(
+                tags.get("name") or tags.get("ref") or way.get("id"))
+            root.remove(way)
+            continue
+        # An unpaved road that anyone may drive stays in the network, but it
+        # stops being priced as asphalt. Without this, every graded dirt road
+        # is a 50 km/h alternative to the paved route beside it, and the
+        # assignment cheerfully uses it. Only ever lowers a speed: an explicit
+        # maxspeed, where a mapper has said what the road actually runs at, is
+        # better evidence than this assumption.
+        if _is_unpaved(tags) and not tags.get("maxspeed"):
+            etree.SubElement(way, "tag", k="maxspeed",
+                             v=f"{UNPAVED_SPEED_KMH}")
+            slowed += 1
+
+    # Nodes are left in place. netconvert ignores nodes no way references, and
+    # keeping them means this pass never has to reason about which nodes are
+    # shared with a way it kept -- the bug that would silently sever a road.
+    tmp = out.with_suffix(".partial")
+    etree.ElementTree(root).write(str(tmp), encoding="utf-8", xml_declaration=True)
+    tmp.replace(out)
+
+    total = sum(len(v) for v in dropped.values())
+    log.info("dropped %d undrivable ways (%s)", total,
+             ", ".join(f"{k}: {len(v)}" for k, v in sorted(dropped.items())))
+    for reason, names in sorted(dropped.items()):
+        sample = sorted({n for n in names if not n.isdigit()})[:6]
+        if sample:
+            log.info("  %s -- e.g. %s", reason, ", ".join(sample))
+    print(f"kept {len(root.findall('way'))} drivable ways, "
+          f"dropped {total} track{'' if total == 1 else 's'}, "
+          f"slowed {slowed} unpaved to {UNPAVED_SPEED_KMH} km/h")
+    return out
+
+
 def find_tool(name: str) -> str | None:
     """Locate a SUMO binary.
 
@@ -236,7 +366,7 @@ def build_network(*, force: bool = False) -> Path:
             "netconvert not found. Install the SUMO toolchain with:\n"
             "  pip install -r requirements.txt")
 
-    osm = fetch_osm()
+    osm = filter_drivable()
     cmd = [
         tool,
         "--osm-files", str(osm),
@@ -270,6 +400,16 @@ def build_network(*, force: bool = False) -> Path:
         "--roundabouts.guess",
         "--remove-edges.isolated",
         "--keep-edges.by-vclass", "passenger",
+        # Keep only the largest connected component. With the Dome Road track
+        # removed there is no longer any way to drive from Cochiti to anywhere
+        # else in the study area, because the road that actually serves it --
+        # NM-22 down to I-25 -- crosses the southern boundary of BBOX and is
+        # not in the network. That is the truth, and the model should carry it
+        # as a gap rather than route around it over a forest track. Without
+        # this option that corner survives as an island, duarouter fails on
+        # every trip touching it, and the failures are easy to miss among the
+        # ones we expect.
+        "--keep-edges.components", "1",
         "--no-turnarounds",
         # Off by default, and needed here: counts.py has to match NMDOT and MPO
         # count stations to edges, and CORRIDORS is defined in terms of road
