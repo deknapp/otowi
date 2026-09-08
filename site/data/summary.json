@@ -1,27 +1,31 @@
 {
-  "window": "06:00-09:00",
-  "drawn_edges": 11335,
-  "measured_links": 2306,
+  "window": "00:00-24:00",
+  "basis": "AADT / 2 (daily, one direction)",
+  "unit": "veh/day",
+  "drawn_edges": 8248,
+  "measured_links": 2567,
   "held_out": {
-    "links": 1128,
-    "median_geh": 5.78,
-    "share_geh_under_5": 0.386,
-    "median_ratio_modelled_over_observed": 0.163
+    "links": 1253,
+    "median_geh": 16.14,
+    "median_ratio_modelled_over_observed": 0.142,
+    "geh_bar_applies": false,
+    "geh_note": "GEH < 5 is an hourly convention and does not transfer to daily totals; compare the ratio instead, or re-run a peak window for a GEH that can be read against the bar."
   },
   "fit": {
-    "links": 1178,
-    "median_geh": 5.78,
-    "share_geh_under_5": 0.386,
-    "median_ratio_modelled_over_observed": 0.173
+    "links": 1314,
+    "median_geh": 16.45,
+    "median_ratio_modelled_over_observed": 0.139,
+    "geh_bar_applies": false,
+    "geh_note": "GEH < 5 is an hourly convention and does not transfer to daily totals; compare the ratio instead, or re-run a peak window for a GEH that can be read against the bar."
   },
-  "vehicles_arrived": 54428,
-  "mean_duration_s": 2026.7,
-  "median_duration_s": 1168.0,
-  "p90_duration_s": 5478.0,
-  "mean_time_loss_s": 592.7,
-  "p90_time_loss_s": 1757.6,
-  "mean_waiting_s": 167.5,
-  "vehicles_loaded": 54656,
-  "vehicles_unfinished": 228,
-  "unfinished_fraction": 0.0042
+  "vehicles_arrived": 107901,
+  "mean_duration_s": 1238.4,
+  "median_duration_s": 935.0,
+  "p90_duration_s": 2670.0,
+  "mean_time_loss_s": 206.1,
+  "p90_time_loss_s": 380.3,
+  "mean_waiting_s": 80.3,
+  "vehicles_loaded": 107901,
+  "vehicles_unfinished": 0,
+  "unfinished_fraction": 0.0
 }

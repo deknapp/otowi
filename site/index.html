@@ -39,6 +39,15 @@
   h1 { font-size: 15px; margin: 0 0 2px; letter-spacing: .3px; }
   .sub { color: var(--muted); font-size: 11.5px; margin-bottom: 12px; }
 
+  .whenrow { margin-top: 7px; }
+  .whenrow label { color: var(--muted); font-size: 11.5px; }
+  .whenrow input[type="time"] {
+    flex: 1; min-width: 0; padding: 5px 6px; font: inherit; font-size: 11.5px;
+    background: #182029; color: var(--text); border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+  .outside { opacity: .32; }
+
   .layers { display: flex; gap: 5px; margin-bottom: 12px; }
   .layers button {
     flex: 1; padding: 7px 4px; font-size: 11.5px; cursor: pointer;
@@ -135,6 +144,12 @@
       <select id="from"></select>
       <span class="arrow">&rarr;</span>
       <select id="to"></select>
+    </div>
+    <div class="odrow whenrow">
+      <label for="after">between</label>
+      <input id="after" type="time" step="900" value="06:00">
+      <span class="arrow">&ndash;</span>
+      <input id="before" type="time" step="900" value="09:00">
     </div>
     <button id="go">Check departure times</button>
     <div id="trip-out"></div>
@@ -337,7 +352,18 @@
   var fromSel = document.getElementById("from"),
       toSel   = document.getElementById("to"),
       goBtn   = document.getElementById("go"),
-      tripOut = document.getElementById("trip-out");
+      afterInput  = document.getElementById("after"),
+      beforeInput = document.getElementById("before"),
+      tripOut = document.getElementById("trip-out"),
+      lastPlan = null;
+
+  // Changing the window re-slices the curve already in memory. No fetch, no
+  // routing -- that is the point of shipping the whole day in plans.json.
+  [afterInput, beforeInput].forEach(function (el) {
+    el.addEventListener("change", function () {
+      if (lastPlan) { renderPlan(lastPlan); }
+    });
+  });
 
   fetch(DATA + "places.json").then(function (r) { return r.json(); }).then(function (places) {
     places.forEach(function (p) {
@@ -384,6 +410,7 @@
       .then(function (r) { return r.json ? r.json() : r; })
       .then(function (plan) {
         if (plan.error) { throw new Error(plan.error); }
+        lastPlan = plan;
         renderPlan(plan);
       })
       .catch(function (e) {
@@ -395,13 +422,69 @@
       });
   });
 
-  function renderPlan(plan) {
-    var max = Math.max.apply(null, plan.options.map(function (o) { return o.duration_min; }));
-    var html = '<div class="bars">';
+  function toMinutes(clock) {
+    var bits = String(clock).split(":");
+    return parseInt(bits[0], 10) * 60 + parseInt(bits[1] || "0", 10);
+  }
 
+  // Slicing a curve that was computed once, rather than routing again. A run
+  // of this model takes hours, so nothing here can be computed per visitor --
+  // plans.json carries the whole day and the window is applied in the browser.
+  function summarise(options, from, to) {
+    var inside = options.filter(function (o) {
+      var m = toMinutes(o.depart);
+      return m >= from && m < to;
+    });
+    if (!inside.length) { return null; }
+    var best = inside.reduce(function (a, b) {
+      return b.duration_min < a.duration_min ? b : a;
+    });
+    var worst = inside.reduce(function (a, b) {
+      return b.duration_min > a.duration_min ? b : a;
+    });
+    // The model carries a fraction of real traffic, so it cannot tell 06:15
+    // from 06:30 when they differ by forty seconds. Recommending one of them
+    // would imply a precision it does not have.
+    var tol = Math.max(1, best.duration_min * 0.05);
+    var good = inside.filter(function (o) {
+      return o.duration_min <= best.duration_min + tol;
+    });
+    return {
+      inside: inside, best: best, worst: worst, good: good,
+      goodSet: good.reduce(function (acc, o) { acc[o.depart] = true; return acc; }, {}),
+      spread: worst.duration_min - best.duration_min,
+      tol: tol
+    };
+  }
+
+  function renderPlan(plan) {
+    var from = toMinutes(afterInput.value || "00:00");
+    var to = toMinutes(beforeInput.value || "24:00");
+    if (to <= from) {
+      tripOut.innerHTML = '<div class="verdict">The end of the window has to ' +
+        "be after its start.</div>";
+      return;
+    }
+    var s = summarise(plan.options, from, to);
+    if (!s) {
+      tripOut.innerHTML = '<div class="verdict">The model has no departures ' +
+        "in that range. It covers " + (plan.simulated || "the morning peak") +
+        ".</div>";
+      return;
+    }
+
+    // Scale the bars against the whole day, not the window, so a window is
+    // visibly better or worse than the rest of the day rather than always
+    // filling the panel.
+    var max = Math.max.apply(null, plan.options.map(function (o) {
+      return o.duration_min;
+    }));
+    var html = '<div class="bars">';
     plan.options.forEach(function (o) {
-      var isBest = o.depart === plan.best_departure;
-      html += '<div class="barrow' + (isBest ? " best" : "") + '">' +
+      var m = toMinutes(o.depart);
+      var within = m >= from && m < to;
+      html += '<div class="barrow' + (s.goodSet[o.depart] ? " best" : "") +
+                (within ? "" : " outside") + '">' +
                 '<span class="t">' + o.depart + "</span>" +
                 '<span class="b" style="width:' +
                   Math.max(2, Math.round((o.duration_min / max) * 120)) + 'px"></span>' +
@@ -412,17 +495,28 @@
 
     // The spread is the actionable number. If leaving an hour earlier saves
     // four minutes, the honest advice is that it does not matter.
-    if (plan.spread_min < 3) {
+    if (s.spread < 3) {
       html += '<div class="verdict">Departure time barely matters on this ' +
-              "trip — only <b>" + plan.spread_min.toFixed(0) +
-              " min</b> between the best and worst option.</div>";
+              "trip between " + fmt(from) + " and " + fmt(to) + " — only <b>" +
+              s.spread.toFixed(0) + " min</b> between the best and worst option.</div>";
+    } else if (s.good.length > 1) {
+      html += '<div class="verdict">Leave any time between <b>' +
+              s.good[0].depart + "</b> and <b>" + s.good[s.good.length - 1].depart +
+              "</b> — about " + s.best.duration_min.toFixed(0) +
+              " min. Leaving at " + s.worst.depart + " costs <b>" +
+              s.spread.toFixed(0) + " min</b> more.</div>";
     } else {
-      html += '<div class="verdict">Leave at <b>' + plan.best_departure + "</b> — " +
-              plan.best_duration_min.toFixed(0) + " min. Leaving at " +
-              plan.worst_departure + " costs <b>" + plan.spread_min.toFixed(0) +
+      html += '<div class="verdict">Leave at <b>' + s.best.depart + "</b> — " +
+              s.best.duration_min.toFixed(0) + " min. Leaving at " +
+              s.worst.depart + " costs <b>" + s.spread.toFixed(0) +
               " min</b> more.</div>";
     }
     tripOut.innerHTML = html;
+  }
+
+  function fmt(minutes) {
+    var h = Math.floor(minutes / 60), m = minutes % 60;
+    return (h < 10 ? "0" : "") + h + ":" + (m < 10 ? "0" : "") + m;
   }
 
   fetch(DATA + (STATIC ? "map.geojson" : "data.geojson")).then(function (r) { return r.json(); }).then(function (d) {
