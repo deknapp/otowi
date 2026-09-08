@@ -12,6 +12,7 @@ So the tests here are mostly about *not losing things quietly*.
 from __future__ import annotations
 
 import random
+from collections import Counter
 
 import pytest
 
@@ -26,13 +27,24 @@ from otowi.demand import Flow
 
 
 class FakeEdge:
-    def __init__(self, edge_id, kind="residential", special=False, allows=True):
+    def __init__(self, edge_id, kind="residential", special=False, allows=True,
+                 lanes=1, speed=13.9):
         self._id = edge_id
         self._kind = kind
         self._special = special
         self._allows = allows
+        # Lanes and speed only matter to how arriving traffic is split between
+        # a block's edges; every real edge has both.
+        self._lanes = lanes
+        self._speed = speed
         self.outgoing: list[FakeEdge] = []
         self.incoming: list[FakeEdge] = []
+
+    def getLaneNumber(self):
+        return self._lanes
+
+    def getSpeed(self):
+        return self._speed
 
     def getID(self):
         return self._id
@@ -289,3 +301,64 @@ def test_written_trips_declare_a_passenger_vehicle_type(tmp_path):
         [{"from": "a", "to": "b", "depart": 1.0}], path=tmp_path / "t.trips.xml"
     )
     assert 'vClass="passenger"' in path.read_text()
+
+
+# ------------------------------------------------- arrivals are not a funnel
+
+
+def test_one_employer_block_does_not_deliver_everyone_to_one_street():
+    """A block holding a whole laboratory must not arrive on a single edge.
+
+    This is the bug this test exists for: LODES reports jobs by census block,
+    Los Alamos National Laboratory sits in a couple of blocks, and attaching a
+    block to one edge put 6,080 of the 9,387 vehicles arriving in Los Alamos
+    onto 6th Street. It deadlocked, and the delay propagated back down East
+    Road and Diamond Drive onto NM-502 -- so the commute the model exists to
+    measure became the worst-served trip in it.
+
+    The vehicle count does not change when this regresses, which is why it
+    needs a test rather than an eyeball on the summary.
+    """
+    arterial = FakeEdge("west_jemez", kind="secondary", lanes=2, speed=24.6)
+    diamond = FakeEdge("diamond", kind="secondary", lanes=2, speed=15.7)
+    side = FakeEdge("6th", kind="residential", lanes=1, speed=11.2)
+    home = FakeEdge("home", kind="residential", lanes=1, speed=11.2)
+    edges = [arterial, diamond, side, home]
+    net = FakeNet(edges, positions={
+        "west_jemez": (10.0, 0.0), "diamond": (12.0, 0.0),
+        "6th": (5.0, 0.0), "home": (5000.0, 0.0),
+    })
+    core = {edge.getID() for edge in edges}
+
+    attachment = trips.attach_blocks(
+        net, {"work": (0.0, 0.0), "home": (0.0, 0.045)},
+        max_distance_m=2000, core=core)
+
+    rng = random.Random(0)
+    picked = [attachment.choose_destination("work", rng) for _ in range(2000)]
+    counts = Counter(picked)
+
+    assert len(counts) >= 3, f"arrivals funnelled onto {list(counts)}"
+    top = counts.most_common(1)[0][1] / len(picked)
+    assert top < 0.75, f"one edge took {top:.0%} of arrivals"
+    # Capacity decides the split, so the two-lane arterials outrank the
+    # residential street they sit beside.
+    assert counts["west_jemez"] > counts["6th"]
+
+
+def test_a_block_with_one_usable_road_still_works():
+    """Spreading must not require somewhere to spread to."""
+    only = FakeEdge("only", kind="residential")
+    net = FakeNet([only], positions={"only": (5.0, 0.0)})
+    attachment = trips.attach_blocks(
+        net, {"blk": (0.0, 0.0)}, max_distance_m=100, core={"only"})
+
+    rng = random.Random(0)
+    assert attachment.choose_destination("blk", rng) == "only"
+
+
+def test_choose_destination_falls_back_to_the_single_attached_edge():
+    """An Attachment built by hand has no spread and must not raise."""
+    attachment = trips.Attachment(edge_by_block={"w": "b"})
+    assert attachment.choose_destination("w", random.Random(0)) == "b"
+    assert attachment.choose_destination("missing", random.Random(0)) is None

@@ -58,6 +58,31 @@ ORIGIN_PREFERENCE = (
 #: Classes never used as an endpoint at all, at any distance.
 NEVER_ENDPOINT = ("motorway", "motorway_link", "trunk_link")
 
+#: How many edges a block's *destinations* may be spread over.
+#:
+#: Origins do not need this and do not get it: homes are spread across
+#: thousands of blocks already, and ORIGIN_PREFERENCE deliberately starts a
+#: driver on a local street so the journey pays the cost of reaching the
+#: arterial. Workplaces are the opposite shape. LODES reports jobs by census
+#: block, one block can hold an entire national laboratory, and attaching that
+#: block to a single edge delivers the whole workforce to one street. In this
+#: model that was 6th Street in Los Alamos, which received 6,080 of the 9,387
+#: vehicles arriving in the town -- 65% of them, onto a residential street --
+#: and deadlocked, backing traffic down East Road and Diamond Drive and out
+#: onto NM-502. The commute the project exists to measure was the worst-served
+#: trip in it as a result.
+MAX_DESTINATION_EDGES = 8
+
+
+#: Arriving traffic is split between a block's edges in proportion to what each
+#: can carry, so a laboratory is reached mostly by the arterials that serve it
+#: -- in Los Alamos, West Jemez Road, Diamond Drive and Canyon Road -- and only
+#: incidentally by the side streets. Lanes times speed limit is a crude
+#: capacity, and crude is the right precision here: the claim being made is
+#: only that a four-lane road takes more of the morning than a cul-de-sac.
+def _capacity(edge) -> float:
+    return max(1.0, edge.getLaneNumber() * edge.getSpeed())
+
 
 def reachable_core(net) -> set[str]:
     """Edge IDs in the largest mutually-reachable part of the network.
@@ -151,8 +176,29 @@ class Attachment:
     """The block-to-edge mapping, and an account of what failed."""
 
     edge_by_block: dict[str, str] = field(default_factory=dict)
+    #: block -> [(edge id, weight)], for trip *ends* only. See
+    #: :data:`MAX_DESTINATION_EDGES`.
+    destinations_by_block: dict[str, list[tuple[str, float]]] = field(default_factory=dict)
     unplaced: list[str] = field(default_factory=list)
     distances: list[float] = field(default_factory=list)
+
+    def choose_destination(self, block: str, rng: random.Random) -> str | None:
+        """One arrival edge for one vehicle, weighted by road capacity.
+
+        Falls back to the single attached edge when a block has no spread --
+        which is the case for anything constructed by hand, and for a block
+        whose only usable road is one edge.
+        """
+        options = self.destinations_by_block.get(block)
+        if not options:
+            return self.edge_by_block.get(block)
+        total = sum(weight for _, weight in options)
+        draw = rng.random() * total
+        for edge_id, weight in options:
+            draw -= weight
+            if draw <= 0:
+                return edge_id
+        return options[-1][0]
 
     def summary(self) -> dict:
         placed = len(self.edge_by_block)
@@ -227,6 +273,15 @@ def attach_blocks(
         result.edge_by_block[block] = edge.getID()
         result.distances.append(distance)
 
+        # Destinations get the whole neighbourhood, not just the best-ranked
+        # edge, and they are not filtered by ORIGIN_PREFERENCE: someone driving
+        # to work arrives *on* the arterial that serves the site, which is the
+        # opposite of how they left home.
+        nearby = sorted(candidates, key=lambda pair: pair[1])[:MAX_DESTINATION_EDGES]
+        result.destinations_by_block[block] = [
+            (candidate.getID(), _capacity(candidate)) for candidate, _ in nearby
+        ]
+
     log.info(
         "attached %d of %d blocks to edges (%d unplaced)",
         len(result.edge_by_block), len(centroids), len(result.unplaced),
@@ -281,18 +336,27 @@ def generate(
     dropped_no_gateway = 0
     expected_total = 0.0
     by_kind = {"internal": 0, "inbound": 0, "outbound": 0}
+    destination_edges: set[str] = set()
 
     for flow in flows:
         # Where the trip enters and leaves the roads we actually model.
         external_delay_s = 0.0
 
+        # ``destination_block`` is set when the trip ends at a workplace inside
+        # the study area. It is resolved to an edge once per *vehicle* below
+        # rather than once per flow, because a flow can be hundreds of jobs at
+        # one laboratory and they do not all arrive on the same street.
+        destination_block = None
+
         if flow.kind == "internal":
             origin = attachment.edge_by_block.get(flow.home_block)
             destination = attachment.edge_by_block.get(flow.work_block)
+            destination_block = flow.work_block
 
         elif flow.kind == "inbound":
             # Lives outside, works inside: appears at a gateway.
             destination = attachment.edge_by_block.get(flow.work_block)
+            destination_block = flow.work_block
             origin = None
             if destination is not None and gateways:
                 chosen = gateway_module.choose(
@@ -347,7 +411,20 @@ def generate(
             # interval and is preferable to deleting long-distance commuters.
             depart = min(second + external_delay_s,
                          (window[1] - window[0]) * 3600 - 1)
-            trips.append({"from": origin, "to": destination, "depart": depart})
+
+            arrival = destination
+            if destination_block is not None:
+                spread = attachment.choose_destination(destination_block, rng)
+                if spread is not None:
+                    arrival = spread
+            if arrival == origin:
+                # Spreading can land a vehicle back on the edge it started on.
+                # Counted, not silently kept as a trip with no network extent.
+                dropped_same_edge += 1
+                continue
+
+            trips.append({"from": origin, "to": arrival, "depart": depart})
+            destination_edges.add(arrival)
 
     trips.sort(key=lambda trip: trip["depart"])
     stats = {
@@ -357,6 +434,8 @@ def generate(
         "workers_dropped_unplaced_block": dropped_unplaced,
         "workers_dropped_same_edge": dropped_same_edge,
         "workers_dropped_no_gateway": dropped_no_gateway,
+        # A funnel is invisible in the vehicle count and obvious here.
+        "distinct_destination_edges": len(destination_edges),
         "scale": scale,
         "seed": seed,
         "window": f"{window[0]:02d}:00-{window[1]:02d}:00",
