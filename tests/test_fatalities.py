@@ -120,3 +120,107 @@ class TestCrashParsing:
         west, south, east, north = BBOX
         assert fatalities._in_bbox((west + east) / 2, (south + north) / 2)
         assert not fatalities._in_bbox(-104.7, 34.9)   # Guadalupe County, I-40
+
+
+class TestWhenNotJustWhere:
+    """"When do crashes happen" and "when is driving dangerous" are different
+    questions. Most crashes happen when most people are driving, which is a
+    fact about traffic and not about risk."""
+
+    def test_the_busy_hour_is_not_the_dangerous_one(self):
+        # 20 deaths at 08:00 against 5 at 03:00 -- but eighty times the driving.
+        crashes = ([crash(hour=8) for _ in range(20)] +
+                   [crash(hour=3) for _ in range(5)])
+        travel = {h: 1.0 for h in range(24)}
+        travel[8] = 800.0
+        travel[3] = 10.0
+
+        rows = {r["hour"]: r for r in fatalities.by_hour(crashes, travel)}
+        assert rows[3]["relative_risk"] > rows[8]["relative_risk"], (
+            "counting crashes without dividing by travel ranks by busyness"
+        )
+
+    def test_an_hour_with_no_crashes_is_not_declared_safe(self):
+        """One quiet hour in a six-year window is a small number, not a fact."""
+        crashes = [crash(hour=h) for h in (2, 4)] * 3      # nothing at 03:00
+        travel = {h: 1.0 for h in range(24)}
+        rows = {r["hour"]: r for r in fatalities.by_hour(crashes, travel)}
+        assert rows[3]["deaths"] == 0
+        assert rows[3]["relative_risk"] > 0, "smoothing must carry its neighbours"
+
+    def test_smoothing_wraps_around_midnight(self):
+        values = [0.0] * 24
+        values[23] = 3.0
+        smoothed = fatalities._smooth(values)
+        assert smoothed[0] > 0, "23:00 and 00:00 are an hour apart"
+
+    def test_relative_risk_is_scaled_so_average_is_one(self):
+        crashes = [crash(hour=h) for h in range(24)]
+        travel = {h: 1.0 for h in range(24)}
+        rows = fatalities.by_hour(crashes, travel)
+        assert all(r["relative_risk"] == pytest.approx(1.0, abs=0.01) for r in rows)
+
+
+class TestOneDrive:
+    """A regional ranking says which road is dangerous. A person wants to know
+    whether the drive they actually make is."""
+
+    class FakeEdge:
+        def __init__(self, eid, metres):
+            self._id, self._m = eid, metres
+        def getLength(self):
+            return self._m
+
+    class FakeNet:
+        def __init__(self, edges):
+            self._e = {e._id: e for e in edges}
+        def getEdge(self, eid):
+            return self._e[eid]
+
+    def _net(self):
+        return self.FakeNet([self.FakeEdge("a", 10000), self.FakeEdge("b", 2000),
+                             self.FakeEdge("c", 8000)])
+
+    def test_distance_on_a_road_weights_its_rate(self):
+        risks = {
+            "NM68P": risk(road_id="NM68P", name="NM-68", fatalities=3,
+                          vehicle_km=1.9e8, length_km=15.5),
+            "NM502P": risk(road_id="NM502P", name="NM-502", fatalities=1,
+                           vehicle_km=4.0e8, length_km=6.5),
+        }
+        out = fatalities.along_route(
+            self._net(), ["a", "c"], risks,
+            {"a": "NM68P", "c": "NM502P"})
+        assert out["assessed_km"] == pytest.approx(18.0)
+        # 10 km of the bad road and 8 of the good one lands between them.
+        low = risks["NM502P"].per_billion_veh_km
+        high = risks["NM68P"].per_billion_veh_km
+        assert low < out["per_billion_veh_km"] < high
+
+    def test_unassessable_distance_is_reported_not_hidden(self):
+        """On a drive that is mostly city streets, most of it cannot be scored.
+        Quietly averaging over the rest would overstate what is known."""
+        risks = {"NM68P": risk(road_id="NM68P", name="NM-68", vehicle_km=1.9e8)}
+        out = fatalities.along_route(
+            self._net(), ["a", "b", "c"], risks, {"a": "NM68P"})
+        assert out["assessed_km"] == pytest.approx(10.0)
+        assert out["total_km"] == pytest.approx(20.0)
+        assert out["assessed_share"] == pytest.approx(0.5)
+
+    def test_a_drive_on_roads_with_no_counts_says_so(self):
+        out = fatalities.along_route(self._net(), ["a", "b"], {}, {})
+        assert out["per_billion_veh_km"] is None
+        assert out["assessed_share"] == 0.0
+
+    def test_the_reference_is_local_not_national(self):
+        """Telling somebody their commute is above the US average when every
+        road around them is would be true and useless."""
+        risks = {"A": risk(fatalities=4, vehicle_km=1e9),
+                 "B": risk(road_id="B", fatalities=6, vehicle_km=1e9)}
+        assert fatalities.regional_average(risks) == pytest.approx(5.0)
+
+    def test_unrankable_corridors_do_not_move_the_reference(self):
+        risks = {"A": risk(fatalities=4, vehicle_km=1e9),
+                 "tiny": risk(road_id="tiny", fatalities=50, vehicle_km=1e6,
+                              length_km=0.3)}
+        assert fatalities.regional_average(risks) == pytest.approx(4.0)

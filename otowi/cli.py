@@ -370,6 +370,21 @@ def cmd_when(args) -> None:
         simulated=simulated, window=asked, every_minutes=args.every,
     )
 
+    # What the drive is made of, and what has happened on it. A regional
+    # ranking says which road is dangerous; this says whether the drive you
+    # actually make is.
+    if args.risk:
+        from . import counts, fatalities
+        _, crashes, risks, _ = _risk_inputs(args, simulated)
+        route_of = fatalities.corridors_from_counts(
+            counts.match_to_edges(net, counts.parse_segments(counts.fetch_aadt())))
+        result["risk"] = fatalities.along_route(
+            net, result.get("route_edges", []), risks, route_of)
+        result["risk"]["regional_average"] = round(
+            fatalities.regional_average(risks), 1)
+        travel = fatalities.hourly_travel(net, intervals)
+        result["risk"]["by_hour"] = fatalities.by_hour(crashes, travel)
+
     if args.json:
         print(json.dumps(result, indent=2))
         return
@@ -399,6 +414,34 @@ def cmd_when(args) -> None:
         print(f"  Worst: leave {result['worst_departure']}, "
               f"{result['worst_duration_min']} min")
         print(f"  Spread: {result['spread_min']} min between best and worst\n")
+    risk = result.get("risk")
+    if risk and risk.get("per_billion_veh_km") is not None:
+        average = risk["regional_average"]
+        rate = risk["per_billion_veh_km"]
+        comparison = ("about average for this region" if 0.8 <= rate / average <= 1.25
+                      else ("%.1f times the regional average" % (rate / average)
+                            if rate > average
+                            else "%.0f%% of the regional average" % (100 * rate / average)))
+        print(f"\n  On the roads this drive uses, {rate:.1f} people have died per")
+        print(f"  billion kilometres driven -- {comparison}.")
+        for stretch in risk["stretches"][:3]:
+            print(f"    {stretch['km']:>5.1f} km on {stretch['road']:<8} "
+                  f"{stretch['per_billion_veh_km']:>5.1f} per billion "
+                  f"({stretch['deaths']} died there since 2018)")
+        if risk["assessed_share"] < 0.95:
+            print(f"  {1 - risk['assessed_share']:.0%} of the drive is on roads with no "
+                  f"traffic count, so it")
+            print("  could not be assessed and is left out of that figure.")
+
+        rows = risk["by_hour"]
+        best = min(rows, key=lambda r: r["relative_risk"])
+        worst = max(rows, key=lambda r: r["relative_risk"])
+        print(f"\n  When matters more than where: a kilometre driven at "
+              f"{worst['hour']:02d}:00 is about")
+        print(f"  {worst['relative_risk'] / best['relative_risk']:.0f} times as "
+              f"likely to kill someone as one driven at {best['hour']:02d}:00.")
+
+    print()
     print(result["caveat"], file=sys.stderr)
 
 
@@ -435,8 +478,11 @@ def cmd_risk(args) -> None:
             f"No simulation output for {window}.\nRun:  otowi run --window "
             f"{window[0]} {window[1]}")
 
-    _, crashes, risks, carries = _risk_inputs(args, window)
+    net, crashes, risks, carries = _risk_inputs(args, window)
     summary = fatalities.summarise(crashes, risks)
+    travel = fatalities.hourly_travel(net, simulate.intervals_path(window))
+    summary["by_hour"] = fatalities.by_hour(crashes, travel)
+    summary["regional_average"] = round(fatalities.regional_average(risks), 1)
 
     if args.json:
         print(json.dumps(summary, indent=2))
@@ -454,6 +500,24 @@ def cmd_risk(args) -> None:
               f"{row['veh_per_day']:>9}"
               f"{row['per_billion_veh_km']:>10.1f} ({row['lower_bound']:.1f})"
               f"{row['counted_share']:>9.0%}")
+
+    rows = summary["by_hour"]
+    worst = fatalities.worst_hours(rows, 1)[0]
+    safest = fatalities.safest_hours(rows, 1)[0]
+    print("\n  When, per kilometre driven\n")
+    for row in rows:
+        bar = "#" * int(min(row["relative_risk"], 5.0) * 8)
+        mark = ""
+        if row["hour"] == worst["hour"]:
+            mark = "  worst"
+        elif row["hour"] == safest["hour"]:
+            mark = "  safest"
+        print(f"  {row['hour']:02d}:00 {row['relative_risk']:5.2f}x  {bar}{mark}")
+    print(f"\n  1.00x is an ordinary hour. Driving at {worst['hour']:02d}:00 is about"
+          f" {worst['relative_risk'] / safest['relative_risk']:.0f} times more")
+    print(f"  dangerous per kilometre than driving at {safest['hour']:02d}:00 --"
+          f" the rush hour is")
+    print("  the safest time to be on these roads, not the most dangerous.\n")
 
     print("\n  The bracketed figure is a Poisson lower bound, and it is the one to")
     print("  rank on: three deaths and thirty deaths are not equally good evidence")
@@ -699,6 +763,10 @@ def build_parser() -> argparse.ArgumentParser:
                                   "inside the simulated window; defaults to "
                                   "all of it.")
     when_parser.add_argument("--json", action="store_true")
+    when_parser.add_argument("--risk", action="store_true",
+                             help="Also report the fatal-crash record of the "
+                                  "roads this drive uses, and how the hour of "
+                                  "day changes it.")
     when_parser.add_argument("--every", type=int, default=15,
                              help="Minutes between candidate departure times.")
 

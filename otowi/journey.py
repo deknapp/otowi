@@ -356,9 +356,14 @@ def plan(
         for j in arrived
     ]
 
+    # The edges of the best departure's route, so a caller can ask what the
+    # drive is made of -- which roads, and what has happened on them.
+    best = min(arrived, key=lambda j: j.duration_s)
+
     return {
         "from": start.name,
         "to": end.name,
+        "route_edges": [leg.edge_id for leg in best.legs],
         "simulated": f"{simulated[0]:02d}:00-{simulated[1]:02d}:00",
         "every_minutes": every_minutes,
         "options": options,

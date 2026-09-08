@@ -436,3 +436,172 @@ def summarise(crashes: list[Crash], risks: dict[str, RoadRisk]) -> dict:
         "years": next(iter(risks.values())).years if risks else 0,
         "worst": [r.as_dict() for r in ranked[:15]],
     }
+
+
+# ------------------------------------------------------------- time of day
+
+
+#: Crash counts per hour are small -- a handful each, and one hour of this
+#: window recorded none at all. A three-hour centred average keeps the shape
+#: and stops a single quiet hour reading as a safe one.
+SMOOTH_HOURS = 3
+
+
+def hourly_travel(net, intervals: Path) -> dict[int, float]:
+    """Vehicle-kilometres the model puts on the network in each hour.
+
+    This is the denominator that turns "when do crashes happen" into "when is
+    driving dangerous", and the two are not the same question. Most crashes
+    happen when most people are driving; that tells you about traffic, not
+    about risk.
+
+    Only the *shape* of this curve is used, never its level -- the comparison
+    below is a ratio of shares, so the model's known undercount cancels out.
+    The shape is also the part of the model the calibration says is most
+    trustworthy.
+    """
+    from xml.etree import ElementTree as etree
+
+    length_km = {edge.getID(): edge.getLength() / 1000.0
+                 for edge in net.getEdges()}
+    travel: dict[int, float] = {hour: 0.0 for hour in range(24)}
+    for _, element in etree.iterparse(str(intervals), events=("end",)):
+        if element.tag != "interval":
+            continue
+        hour = int(float(element.get("begin", 0.0)) // 3600) % 24
+        for edge in element.findall("edge"):
+            entered = edge.get("entered")
+            if entered:
+                travel[hour] += float(entered) * length_km.get(edge.get("id"), 0.0)
+        element.clear()
+    return travel
+
+
+def _smooth(values: list[float], window: int = SMOOTH_HOURS) -> list[float]:
+    """Centred rolling mean that wraps around midnight, because the day does."""
+    half = window // 2
+    out = []
+    for i in range(len(values)):
+        picked = [values[(i + d) % len(values)] for d in range(-half, half + 1)]
+        out.append(sum(picked) / len(picked))
+    return out
+
+
+def by_hour(crashes: list[Crash], travel: dict[int, float]) -> list[dict]:
+    """How much more dangerous each hour is than an average hour, per kilometre.
+
+    Deaths per hour divided by travel per hour, scaled so that 1.0 is an
+    ordinary hour. A value of 4 means that driving a kilometre then is about
+    four times as likely to kill someone as driving a kilometre at a typical
+    time.
+
+    **The known bias, because it runs the same way as the headline.** The
+    exposure curve comes from a model containing commuting and nothing else, so
+    it overstates how much of the day's driving happens at 08:00 and understates
+    the shopping, errands and freight that fill the middle of the day. That
+    pushes the commute hours down and the off-peak hours up -- exactly the
+    direction of the result. It cannot account for the size of it: the swing
+    here is roughly twentyfold, and the published figure for night driving
+    being about three times more dangerous per mile than daytime sits inside
+    the range this produces, which is the sanity check worth having.
+    """
+    counted = [sum(c.fatalities for c in crashes if c.hour == hour)
+               for hour in range(24)]
+    total_deaths = sum(counted) or 1
+    total_travel = sum(travel.values()) or 1.0
+
+    death_share = _smooth([n / total_deaths for n in counted])
+    travel_share = _smooth([travel.get(h, 0.0) / total_travel for h in range(24)])
+
+    rows = []
+    for hour in range(24):
+        share_t = travel_share[hour]
+        relative = (death_share[hour] / share_t) if share_t > 0 else 0.0
+        rows.append({
+            "hour": hour,
+            "deaths": counted[hour],
+            "share_of_deaths": round(death_share[hour], 4),
+            "share_of_travel": round(share_t, 4),
+            "relative_risk": round(relative, 2),
+        })
+    return rows
+
+
+def worst_hours(rows: list[dict], count: int = 3) -> list[dict]:
+    return sorted(rows, key=lambda r: -r["relative_risk"])[:count]
+
+
+def safest_hours(rows: list[dict], count: int = 3) -> list[dict]:
+    return sorted(rows, key=lambda r: r["relative_risk"])[:count]
+
+
+# --------------------------------------------------------------- one journey
+
+
+def along_route(net, edge_ids: list[str], risks: dict[str, RoadRisk],
+                route_of: dict[str, str]) -> dict:
+    """The fatality record of the roads one particular drive uses.
+
+    A regional ranking answers "which road is dangerous". This answers "is the
+    drive I actually make dangerous", which is the question a person has. The
+    trip's rate is its corridors' rates weighted by how far the drive goes on
+    each -- ten kilometres of a bad road matters more than one kilometre of it.
+
+    Roads with no measured traffic count contribute distance but no rate, and
+    the share of the drive they make up is returned so the answer can say how
+    much of the trip it could not assess. On a drive that is mostly city
+    streets that share is most of it, and hiding that would be the whole error
+    this module exists to avoid.
+    """
+    stretches: dict[str, float] = {}
+    assessed_km = 0.0
+    total_km = 0.0
+
+    for edge_id in edge_ids:
+        try:
+            km = net.getEdge(edge_id).getLength() / 1000.0
+        except Exception:                                       # noqa: BLE001
+            continue
+        total_km += km
+        corridor = route_of.get(undirected(edge_id))
+        risk = risks.get(corridor) if corridor else None
+        if risk is None or not risk.rankable:
+            continue
+        stretches[corridor] = stretches.get(corridor, 0.0) + km
+        assessed_km += km
+
+    if assessed_km <= 0:
+        return {"total_km": round(total_km, 1), "assessed_km": 0.0,
+                "assessed_share": 0.0, "per_billion_veh_km": None,
+                "stretches": []}
+
+    weighted = sum(risks[c].per_billion_veh_km * km for c, km in stretches.items())
+    listed = sorted(
+        ({"road": risks[c].name or c,
+          "km": round(km, 1),
+          "per_billion_veh_km": risks[c].per_billion_veh_km,
+          "deaths": risks[c].fatalities}
+         for c, km in stretches.items()),
+        key=lambda s: -s["per_billion_veh_km"] * s["km"],
+    )
+    return {
+        "total_km": round(total_km, 1),
+        "assessed_km": round(assessed_km, 1),
+        "assessed_share": round(assessed_km / total_km, 2) if total_km else 0.0,
+        "per_billion_veh_km": round(weighted / assessed_km, 1),
+        "stretches": listed,
+    }
+
+
+def regional_average(risks: dict[str, RoadRisk]) -> float:
+    """Deaths per billion vehicle-km across every corridor that can be ranked.
+
+    The reference a single drive is compared against. Deliberately local: the
+    US average is about 7, New Mexico is among the worst states, and telling
+    somebody their commute is above the national average when every road
+    around them is would be true and useless.
+    """
+    ranked = [r for r in risks.values() if r.rankable]
+    deaths = sum(r.fatalities for r in ranked)
+    vehicle_km = sum(r.vehicle_km for r in ranked)
+    return (deaths / vehicle_km * 1e9) if vehicle_km > 0 else 0.0
