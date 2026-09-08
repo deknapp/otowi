@@ -47,24 +47,21 @@ beautifully and mean nothing, because the demand is invented.
 
 The demand here is not invented, and the model is not trusted on its own word:
 
-- **Origin–destination flows come from [LEHD LODES](https://lehd.ces.census.gov/data/)**
-  (LODES8, 2022 vintage) — census-block-level counts of where workers live and
+- **Who commutes where comes from [LODES](https://lehd.ces.census.gov/data/)**
+  — the Census Bureau's Longitudinal Employer-Household Dynamics Origin-Destination Employment Statistics (LODES8, 2022 vintage) — census-block-level counts of where workers live and
   where they work, built from unemployment-insurance wage records covering
   roughly 95% of private employment. LODES lags by a couple of years, so this
   is not a current-conditions model and the provenance says which year it is.
-- **Departure times come from [ACS table B08302](https://data.census.gov/table/ACSDT5Y2022.B08302)**,
-  the survey question asking what time people left home for work. LODES has no
+- **What time they leave comes from the American Community Survey**, [table B08302](https://data.census.gov/table/ACSDT5Y2022.B08302) — the question asking what time people usually left home for work. LODES has no
   time in it at all, and a fabricated departure curve would move every
   congestion number while looking entirely plausible.
-- **Validation comes from NMDOT's published counts.** Their
+- **Ground truth comes from the New Mexico Department of Transportation's published traffic counts.** Their
   [AADT layer](https://services.arcgis.com/hOpd7wfnKm16p9D9/arcgis/rest/services/Annual_Average_Daily_Traffic_2026/FeatureServer)
-  gives annual average daily traffic per highway segment with the K and D
-  factors needed to turn it into a directional peak hour — 7,149 segments
+  gives the annual average daily traffic (AADT) on each highway segment, plus the two factors needed to turn a daily total into one direction of the busiest hour — 7,149 segments
   intersect the study area, with 2025 counts. It is open, and no key or request
   form is needed, despite the Data Management Bureau's page offering only an
   emailed PDF request form.
-  The [Santa Fe MPO](https://santafempo.org/resources/traffic-counts/)'s 17
-  permanent stations are **not** wired in yet; they would add in-town coverage
+  The 17 permanent counting stations run by the [Santa Fe Metropolitan Planning Organization](https://santafempo.org/resources/traffic-counts/) are **not** wired in yet; they would add in-town coverage
   where NMDOT's state-highway focus is thinnest.
 - **Validation is against held-out stations.** The model is fit on some of them
   and its error is reported on the rest. A simulation that reports its own
@@ -134,6 +131,22 @@ Useful flags:
   morning.
 - `--end-padding N` — seconds to keep simulating after the last departure.
 
+## A note on the jargon
+
+Road engineering runs on abbreviations. The ones that survive in this README
+are explained where they first appear, and the map and dashboard avoid them
+entirely — a person checking their commute should not have to learn a
+vocabulary first.
+
+| | |
+|---|---|
+| **AADT** | Annual average daily traffic: how many vehicles use a road on a typical day, both directions. The basic unit of a traffic count. |
+| **GEH** | Not an acronym — the initials of Geoffrey E. Havers. A goodness-of-fit score for comparing a modelled traffic volume against a counted one; under 5 is a good match on one road, and 85% of roads under 5 is the usual bar for accepting a model. |
+| **LODES** | The Census Bureau's record of how many people commute between each pair of census blocks, built from unemployment-insurance wage records. |
+| **FARS** | NHTSA's Fatality Analysis Reporting System: a census of every crash on a US public road that killed someone within 30 days. |
+| **SUMO** | Simulation of Urban MObility, the open-source traffic simulator this is built on. |
+| **K and D factors** | Published alongside a traffic count: K is the share of a day's traffic in its busiest hour, D the share of that hour going the busier way. |
+
 ## Where people have actually been killed
 
 Everything else here models what *would* happen. `otowi risk`, and the **Risk**
@@ -179,6 +192,47 @@ died in 147 crashes here between 2018 and 2023; 20 of those deaths were on
 corridors NMDOT counts, which is what a rate needs. The rest are drawn on the
 map as points and deliberately left unranked, because there is nothing honest
 to rank them by. 45% of all of them happened after dark.
+
+### When, which turns out to matter more than where
+
+"When do crashes happen" and "when is driving dangerous" are different
+questions, and only the second is useful — most crashes happen when most people
+are driving, which is a fact about traffic. Dividing deaths per hour by *travel*
+per hour turns it into a fact about risk, and the answer is not what a commuter
+expects:
+
+    03:00  4.76x an ordinary hour   ######################################
+    08:00  0.25x                    ##
+    21:00  2.51x                    ####################
+
+**A kilometre driven at 3am is about nineteen times more likely to kill someone
+than a kilometre driven at 8am.** The rush hour is the safest time to be on
+these roads, not the worst.
+
+This is the one place the simulation is doing indispensable work in the safety
+numbers: nobody counts traffic by hour on every road, and the model supplies
+that denominator. Only the *shape* of its daily curve is used, never the level,
+since the comparison is a ratio of shares and the undercount cancels. The bias
+runs the same way as the result and is stated with it: a commute-only model
+overstates how much driving happens at 08:00 and understates midday shopping
+and freight. It cannot account for a nineteenfold swing, and the published
+figure of roughly three times worse at night sits inside the range this
+produces.
+
+### A quarter of the people killed here were not in a car
+
+40 of the 161 deaths were people on foot or on a bike — **26% of all fatal
+crashes**, and they are not on the highways. **64% of them died after dark**,
+against 38% of the people killed inside vehicles. The single worst road for it
+is Cerrillos Road, with ten.
+
+That is a different problem from the rest of this page, with different fixes: a
+rollover on a rural highway is about speed and geometry, and somebody killed
+crossing a city arterial at night is about lighting, crossings, and a road built
+too wide. Averaging the two describes neither, so they are counted separately
+and drawn in a different colour. It is also the one finding here that no
+per-kilometre corridor rate would ever surface, because the people it describes
+were not driving.
 
 **What the unit of analysis had to be.** Per SUMO edge — a couple of hundred
 metres — every road in the study area returns exactly one crash at 300 to 800
@@ -231,10 +285,12 @@ AADT. 7,149 count segments intersect the study area; 4,775 match an edge; 2,567
 of those carry modelled traffic to compare.
 
 **Which AADT figure depends on the window, and it is not a detail.** A
-peak-window run is scored against `AADT × K × D`, the directional design-hour
-volume NMDOT's own factors produce. A whole-day run is scored against `AADT / 2`
-— the measured daily total, halved because AADT is two-way and the split really
-is close to even over a day, by conservation. That drops both K and D, which
+peak-window run is scored against **daily traffic × K × D**, where K is the
+share of a day's traffic falling in its busiest hour (about 9–15% here) and D
+is the share of that hour travelling in the busier direction (55–75%). Both are
+published alongside the count. A whole-day run is scored against **half the
+daily total** — halved because the count is two-way and the split really is
+close to even over a day, by conservation. That drops both K and D, which
 are factors published *alongside* the count rather than the count itself, so a
 24-hour model is checked against the measurement instead of something derived
 from it.
@@ -244,8 +300,8 @@ is the same split on every run and cannot be reshuffled until it flatters:
 
 | | held out | the other half |
 |---|---|---|
-| Links | 1,253 | 1,314 |
-| **Median modelled ÷ observed** | **0.142** | 0.139 |
+| Roads compared | 1,253 | 1,314 |
+| **Share of real traffic explained** | **14.2%** | 13.9% |
 | Median GEH | 16.14 | 16.45 |
 
 The two columns agree to within a third of a percent, which is the least
@@ -253,8 +309,17 @@ interesting result here and the one most worth stating: nothing was fitted, so
 there was nothing to overfit. The held-out half exists to make that checkable
 rather than asserted.
 
-**GEH does not mean what it usually means in that table, and the report says
-so.** GEH is defined for hourly flows, and the conventional bar — 85% of links
+**A word on GEH, since it is the one bit of jargon here that cannot be
+expanded.** It is not an acronym — it is the initials of Geoffrey E. Havers,
+who proposed it — and it is the goodness-of-fit statistic traffic engineers use
+to compare a modelled traffic volume against a counted one. It behaves like a
+chi-square: near zero is a match, and a model is conventionally accepted when
+85% of its links score under 5. Everywhere a general reader is the audience —
+the map, the dashboard — this project says "share of real traffic explained"
+instead, which is the same news in words.
+
+**And GEH does not mean what it usually means in that table, and the report
+says so.** GEH is defined for hourly flows, and the conventional bar — 85% of links
 under 5 — is calibrated for them. The statistic scales with the size of the
 numbers: multiply modelled and observed by *k* and GEH scales by √*k*. Daily
 volumes here are about eight times hourly ones, so the *same model* scores
@@ -265,7 +330,7 @@ grade, so a whole-day comparison omits the figure and says why.
 The way to get a number that can be read against the bar is to score the
 morning out of the whole-day run, which `otowi calibrate` does automatically:
 
-| scored on | links | median GEH | GEH < 5 | ratio |
+| scored on | links | median GEH | GEH < 5 | share of real traffic |
 |---|---|---|---|---|
 | this run, 06:00–09:00 slice | 1,108 | **5.93** | 35.6% | 0.130 |
 | the previous morning-only model | 1,234 | 5.92 | 37.8% | 0.163 |

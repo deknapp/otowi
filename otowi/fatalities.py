@@ -104,6 +104,19 @@ class Crash:
     def is_dark(self) -> bool:
         return self.light.lower().startswith("dark")
 
+    @property
+    def on_foot(self) -> bool:
+        """Whether the person killed was outside a vehicle.
+
+        Worth separating from everything else, because it is a different
+        problem with different fixes. A rollover on a rural highway is about
+        speed and geometry; someone killed crossing a city arterial after dark
+        is about lighting, crossings and the road being too wide. Averaging the
+        two produces a number that describes neither.
+        """
+        harm = self.harm.lower()
+        return "pedestrian" in harm or "pedalcyclist" in harm or "cyclist" in harm
+
 
 def cache_path(years: tuple[int, int]) -> Path:
     return CACHE_DIR / f"fars_{years[0]}_{years[1]}.json"
@@ -417,6 +430,14 @@ def summarise(crashes: list[Crash], risks: dict[str, RoadRisk]) -> dict:
     dark = sum(1 for c in crashes if c.is_dark)
     ranked_deaths = sum(r.fatalities for r in ranked)
     total_deaths = sum(c.fatalities for c in crashes)
+    on_foot = [c for c in crashes if c.on_foot]
+    in_vehicles = [c for c in crashes if not c.on_foot]
+    foot_dark = sum(1 for c in on_foot if c.is_dark)
+    vehicle_dark = sum(1 for c in in_vehicles if c.is_dark)
+    foot_roads = {}
+    for c in on_foot:
+        if c.road:
+            foot_roads[c.road] = foot_roads.get(c.road, 0) + 1
     return {
         "crashes": len(crashes),
         "fatalities": total_deaths,
@@ -431,6 +452,20 @@ def summarise(crashes: list[Crash], risks: dict[str, RoadRisk]) -> dict:
         "share_of_deaths_ranked": (round(ranked_deaths / total_deaths, 3)
                                    if total_deaths else 0.0),
         "share_after_dark": round(dark / len(crashes), 3) if crashes else 0.0,
+        # People on foot are a quarter of the dying here and almost none of the
+        # road network, so they never surface in a per-kilometre corridor rate.
+        # They get their own count or they disappear.
+        "on_foot": {
+            "crashes": len(on_foot),
+            "deaths": sum(c.fatalities for c in on_foot),
+            "share_of_crashes": (round(len(on_foot) / len(crashes), 3)
+                                 if crashes else 0.0),
+            "share_after_dark": (round(foot_dark / len(on_foot), 3)
+                                 if on_foot else 0.0),
+            "vehicle_share_after_dark": (round(vehicle_dark / len(in_vehicles), 3)
+                                         if in_vehicles else 0.0),
+            "worst_roads": sorted(foot_roads.items(), key=lambda kv: -kv[1])[:5],
+        },
         "min_exposure_veh_km": MIN_EXPOSURE_VEH_KM,
         "min_corridor_km": MIN_CORRIDOR_KM,
         "years": next(iter(risks.values())).years if risks else 0,

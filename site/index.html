@@ -48,6 +48,29 @@
   }
   .outside { opacity: .32; }
 
+  #hours { display: flex; align-items: flex-end; gap: 1px; height: 54px; margin: 8px 0 4px; }
+  #hours .h { flex: 1; background: #2f6b3a; border-radius: 1px 1px 0 0; min-height: 2px; position: relative; }
+  #hours .h.bad { background: #c0392b; }
+  #hours .h.mid { background: #c9a227; }
+  .hourax { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); }
+  .footrow { display: flex; align-items: center; gap: 6px; margin-top: 10px; font-size: 11.5px; color: var(--muted); cursor: pointer; }
+
+  /* Phones. The controls are a fixed side panel on a desktop and a sheet at
+     the bottom on a phone, because a 288px panel over a map on a 390px screen
+     leaves no map. */
+  @media (max-width: 620px) {
+    #controls {
+      top: auto; bottom: 0; left: 0; right: 0; width: auto;
+      max-height: 62%; border-radius: 12px 12px 0 0;
+      border-left: 0; border-right: 0; border-bottom: 0;
+    }
+    #detail { bottom: auto; top: 10px; right: 10px; left: 10px; width: auto; }
+    .layers { flex-wrap: wrap; }
+    .layers button { flex: 1 1 44%; padding: 9px 4px; font-size: 12.5px; }
+    .odrow select, .whenrow input[type="time"] { font-size: 16px; }
+    #hours { height: 44px; }
+  }
+
   .layers { display: flex; gap: 5px; margin-bottom: 12px; }
   .layers button {
     flex: 1; padding: 7px 4px; font-size: 11.5px; cursor: pointer;
@@ -121,16 +144,26 @@
 
 <div id="controls" class="panel">
   <h1>otowi</h1>
-  <div class="sub">Northern New Mexico · morning peak <span id="window"></span></div>
+  <div class="sub">Northern New Mexico · where and when driving here kills people
+    <span id="window"></span></div>
 
   <div class="layers">
-    <button data-layer="modelled" class="on">Modelled</button>
-    <button data-layer="observed">Measured</button>
-    <button data-layer="ratio">Ratio</button>
-    <button data-layer="risk">Risk</button>
+    <button data-layer="risk" class="on">Risk</button>
+    <button data-layer="modelled">Traffic</button>
+    <button data-layer="observed">Counted</button>
+    <button data-layer="ratio">Coverage</button>
   </div>
 
   <div class="explain" id="explain"></div>
+
+  <div id="riskpanel" style="display:none">
+    <div class="rule"></div>
+    <div class="triptitle">When, not just where</div>
+    <div class="sub" id="hourlead"></div>
+    <div id="hours"></div>
+    <label class="footrow"><input type="checkbox" id="footonly">
+      <span id="footlabel">Only people on foot or bike</span></label>
+  </div>
 
   <div class="legend">
     <div class="bar" id="legend-bar"></div>
@@ -189,7 +222,7 @@
   L.tileLayer(
     "https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}",
     {
-      attribution: '&copy; Esri · counts: NMDOT · demand: LEHD LODES · departures: ACS B08302',
+      attribution: '&copy; Esri · traffic counts: NM Dept. of Transportation · commute flows: US Census LODES · departure times: American Community Survey · crashes: NHTSA',
       maxZoom: 16
     }
   ).addTo(map);
@@ -204,8 +237,8 @@
 
   var LAYERS = {
     modelled: {
-      label: "Modelled vehicles per hour",
-      explain: "What the simulation put on each road. Commute trips only.",
+      label: "Simulated vehicles per hour",
+      explain: "What the simulation put on each road. Commute trips only, so it is well below real traffic — see the Ratio tab.",
       lo: "0", hi: "1500+",
       gradient: ["#10233b", "#1c4a7a", "#2e86c1", "#5dade2", "#a9d6f5"],
       value: function (p) { return p.modelled; },
@@ -213,8 +246,8 @@
       has:   function ()  { return true; }
     },
     observed: {
-      label: "Measured vehicles per hour",
-      explain: "NMDOT AADT × K × D — the directional peak hour they actually counted. Only state highway segments are measured.",
+      label: "Counted vehicles per hour",
+      explain: "What the New Mexico Dept. of Transportation actually counted, converted to one direction of the busiest hour. Only state highways are counted.",
       lo: "0", hi: "1500+",
       gradient: ["#2b1a10", "#6b3a12", "#b45f1a", "#e08e3c", "#f7c98b"],
       value: function (p) { return p.observed; },
@@ -222,7 +255,7 @@
       has:   function (p) { return p.observed != null; }
     },
     risk: {
-      label: "Deaths per billion vehicle-km",
+      label: "Deaths per billion km driven",
       explain: "Fatal crashes NHTSA recorded here, divided by the travel that produced them. Points are the crashes; colour is the corridor's rate. The US average is about 7.",
       lo: "0", hi: "20+",
       gradient: ["#1b3a2a", "#2f6b3a", "#c9a227", "#d9743a", "#c0392b"],
@@ -235,8 +268,8 @@
       points: true
     },
     ratio: {
-      label: "Modelled ÷ measured",
-      explain: "Where the model is missing traffic. Red is far too little; grey would be right. Almost nothing is grey — see below.",
+      label: "Share of real traffic explained",
+      explain: "How much of the real traffic the simulation accounts for. Red is far too little; grey would be a match. Almost nothing is grey.",
       lo: "0 (nothing modelled)", hi: "1+ (matches)",
       gradient: ["#7a1420", "#c0392b", "#e67e22", "#95a5a6", "#dfe6e9"],
       value: function (p) { return p.ratio; },
@@ -273,8 +306,11 @@
     return Math.max(1.1, Math.min(7, Math.sqrt(v) / 7));
   }
 
-  var current = "modelled", geo = null, layer = null;
-  var risk = null, crashLayer = null;
+  // Opens on risk, not on the simulation. The modelled layer's honest caption
+  // is "this is 14% of reality"; the risk layer is measured, and it is the
+  // thing a person opening this page has a reason to care about.
+  var current = "risk", geo = null, layer = null;
+  var risk = null, crashLayer = null, footOnly = false;
 
   // Risk is loaded separately: 147 points against 8,000 lines, on a different
   // cadence, and a reader looking at traffic volumes should not pay for it.
@@ -307,12 +343,20 @@
   function drawCrashes(show) {
     if (crashLayer) { map.removeLayer(crashLayer); crashLayer = null; }
     if (!show || !risk || !risk.crashes) { return; }
-    crashLayer = L.layerGroup(risk.crashes.map(function (c) {
+    var shown = risk.crashes.filter(function (c) {
+      return !footOnly || c.foot;
+    });
+    crashLayer = L.layerGroup(shown.map(function (c) {
       return L.circleMarker([c.lat, c.lon], {
         radius: 3 + Math.min(4, c.n),
         color: c.dark ? "#f0c674" : "#e8e8e8",
-        weight: 1.2, fillColor: "#c0392b", fillOpacity: 0.85
+        weight: 1.2,
+        // People on foot are a different problem with different fixes, so
+        // they are a different colour rather than an average.
+        fillColor: c.foot ? "#8e6bc7" : "#c0392b",
+        fillOpacity: 0.85
       }).bindTooltip(
+        (c.foot ? "On foot or bike &middot; " : "") +
         c.n + (c.n === 1 ? " death" : " deaths") + " &middot; " + c.year +
         (c.road ? " &middot; " + c.road : "") +
         (c.hour != null ? " &middot; " + String(c.hour).padStart(2, "0") + ":00" : "") +
@@ -355,10 +399,47 @@
       explain = "Crash data unavailable in this export.";
     }
     document.getElementById("explain").textContent = explain;
+    renderRisk(!!spec.points);
     document.getElementById("legend-bar").style.background =
       "linear-gradient(90deg," + spec.gradient.join(",") + ")";
     document.getElementById("legend-lo").textContent = spec.lo;
     document.getElementById("legend-hi").textContent = spec.hi;
+  }
+
+  function renderRisk(show) {
+    var panel = document.getElementById("riskpanel");
+    panel.style.display = (show && risk && risk.summary) ? "block" : "none";
+    if (!show || !risk || !risk.summary) { return; }
+
+    var rows = risk.summary.by_hour || [];
+    if (!rows.length) { return; }
+    var top = Math.max.apply(null, rows.map(function (r) { return r.relative_risk; }));
+    var best = rows.reduce(function (a, b) { return b.relative_risk < a.relative_risk ? b : a; });
+    var worst = rows.reduce(function (a, b) { return b.relative_risk > a.relative_risk ? b : a; });
+
+    document.getElementById("hours").innerHTML = rows.map(function (r) {
+      var cls = r.relative_risk >= 2 ? "bad" : (r.relative_risk >= 1 ? "mid" : "");
+      return '<div class="h ' + cls + '" style="height:' +
+        Math.max(4, Math.round(r.relative_risk / top * 100)) + '%" title="' +
+        String(r.hour).padStart(2, "0") + ':00 — ' + r.relative_risk.toFixed(2) +
+        '× an ordinary hour"></div>';
+    }).join("") ;
+
+    var ratio = best.relative_risk > 0
+      ? Math.round(worst.relative_risk / best.relative_risk) : null;
+    document.getElementById("hourlead").innerHTML =
+      "Per kilometre driven. " + (ratio ? "Driving at <b>" +
+      String(worst.hour).padStart(2, "0") + ":00</b> is about <b>" + ratio +
+      "×</b> as likely to kill someone as driving at <b>" +
+      String(best.hour).padStart(2, "0") + ":00</b> — the rush hour is the " +
+      "safest time on these roads, not the worst." : "");
+
+    var foot = risk.summary.on_foot || {};
+    document.getElementById("footlabel").innerHTML =
+      "Only people on foot or bike — <b>" + foot.deaths + "</b> of " +
+      risk.summary.fatalities + " deaths, " +
+      Math.round((foot.share_after_dark || 0) * 100) + "% after dark against " +
+      Math.round((foot.vehicle_share_after_dark || 0) * 100) + "% for people in cars";
   }
 
   function row(label, value, muted) {
@@ -373,19 +454,19 @@
   function showDetail(p) {
     document.getElementById("d-name").textContent = p.name || "(unnamed road)";
     document.getElementById("d-road").textContent =
-      (p.route ? "NMDOT route " + p.route + " · " : "") + "limit " + p.limit_kmh + " km/h";
+      (p.route ? "Route " + p.route + " · " : "") + "limit " + p.limit_kmh + " km/h";
 
-    var html = row("Modelled veh/h", num(p.modelled));
+    var html = row("Simulated vehicles/hour", num(p.modelled));
     if (p.observed != null) {
-      html += row("Measured veh/h", num(p.observed));
-      html += row("Ratio", p.ratio != null ? p.ratio.toFixed(2) : "—");
-      html += row("AADT " + (p.aadt_year || ""), num(p.aadt), true);
+      html += row("Counted vehicles/hour", num(p.observed));
+      html += row("Share explained", p.ratio != null ? Math.round(p.ratio*100) + "%" : "—");
+      html += row("Vehicles per day, " + (p.aadt_year || "") + " count", num(p.aadt), true);
     } else {
-      html += row("Measured", "not a count segment", true);
+      html += row("Counted", "no traffic count on this road", true);
     }
     if (p.risk != null) {
       html += row("Corridor", p.risk_road, true);
-      html += row("Deaths / bn veh-km",
+      html += row("Deaths per billion km",
                   p.risk_rate.toFixed(1) + " <span class='muted'>(" +
                   p.risk.toFixed(1) + " lower bound)</span>");
       html += row("Deaths on it", p.risk_deaths + " over " +
@@ -394,6 +475,11 @@
     document.getElementById("d-table").innerHTML = html;
     document.getElementById("detail").style.display = "block";
   }
+
+  document.getElementById("footonly").addEventListener("change", function (e) {
+    footOnly = e.target.checked;
+    drawCrashes(true);
+  });
 
   map.on("click", function () { document.getElementById("detail").style.display = "none"; });
 
@@ -420,13 +506,17 @@
 
     document.getElementById("stats").innerHTML =
       row("Vehicles simulated", num(s.vehicles_loaded || s.vehicles_arrived)) +
-      row("Measured links", num(s.measured_links)) +
+      row("Roads with a traffic count", num(s.measured_links)) +
       '<tr><td colspan="2"><div class="rule"></div></td></tr>' +
-      row("Median GEH (held out)", held.median_geh != null ? held.median_geh.toFixed(2) : "—") +
-      row("Links GEH &lt; 5", held.share_geh_under_5 != null
-            ? Math.round(held.share_geh_under_5 * 100) + "%" : "—") +
-      row("Bar for acceptance", "85%", true) +
-      row("Mean delay per trip", s.mean_time_loss_s != null
+      // "GEH" is not an acronym -- it is one traffic engineer's initials -- so
+      // there is nothing to expand and no reason to put it in front of a
+      // reader who is here to find out about their commute. The share of real
+      // traffic the model explains says the same thing in words.
+      row("Real traffic explained",
+          held.median_ratio_modelled_over_observed != null
+            ? Math.round(held.median_ratio_modelled_over_observed * 100) + "%" : "—") +
+      row("Checked against roads it was not fitted on", "yes", true) +
+      row("Average delay per trip", s.mean_time_loss_s != null
             ? Math.round(s.mean_time_loss_s / 60) + " min" : "—", true);
   });
 

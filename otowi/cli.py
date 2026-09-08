@@ -519,6 +519,18 @@ def cmd_risk(args) -> None:
           f" the rush hour is")
     print("  the safest time to be on these roads, not the most dangerous.\n")
 
+    foot = summary["on_foot"]
+    print(f"\n  {foot['deaths']} of the {summary['fatalities']} people killed "
+          f"here were on foot or on a bike")
+    print(f"  -- {foot['share_of_crashes']:.0%} of all fatal crashes, and they are "
+          f"not on the")
+    print(f"  highways. {foot['share_after_dark']:.0%} of them died after dark, "
+          f"against {foot['vehicle_share_after_dark']:.0%} of the")
+    print("  people killed inside vehicles.")
+    if foot["worst_roads"]:
+        worst_road, worst_n = foot["worst_roads"][0]
+        print(f"  The worst single road for it is {worst_road}, with {worst_n}.")
+
     print("\n  The bracketed figure is a Poisson lower bound, and it is the one to")
     print("  rank on: three deaths and thirty deaths are not equally good evidence")
     print("  of a rate, and sorting on the point estimate puts whichever quiet road")
@@ -576,8 +588,14 @@ def cmd_export(args) -> None:
         net_r, crashes, risks, carries = _risk_inputs(args, window)
         route_of = fatalities.corridors_from_counts(
             counts.match_to_edges(net_r, counts.parse_segments(counts.fetch_aadt())))
+        risk_net_travel = fatalities.hourly_travel(
+            net_r, simulate.intervals_path(window))
+        risk_summary = fatalities.summarise(crashes, risks)
+        risk_summary["by_hour"] = fatalities.by_hour(crashes, risk_net_travel)
+        risk_summary["regional_average"] = round(
+            fatalities.regional_average(risks), 1)
         (data / "risk.json").write_text(json.dumps({
-            "summary": fatalities.summarise(crashes, risks),
+            "summary": risk_summary,
             "model_carries": round(carries, 3),
             # edge -> corridor, so the map can colour a line by its road's rate
             "corridor_of": route_of,
@@ -585,7 +603,8 @@ def cmd_export(args) -> None:
             "crashes": [
                 {"lat": round(c.lat, 5), "lon": round(c.lon, 5),
                  "n": c.fatalities, "year": c.year, "hour": c.hour,
-                 "road": c.road, "dark": c.is_dark, "harm": c.harm}
+                 "road": c.road, "dark": c.is_dark, "harm": c.harm,
+                 "foot": c.on_foot}
                 for c in crashes
             ],
         }, separators=(",", ":")))
