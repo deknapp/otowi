@@ -221,3 +221,42 @@ def test_compare_reports_which_basis_it_used():
     # Same segment, different question, each scored against the right target.
     assert day["links"][0]["ratio"] == pytest.approx(0.9, abs=0.01)
     assert hour["links"][0]["ratio"] == pytest.approx(0.9, abs=0.01)
+
+
+def test_the_geh_bar_is_not_applied_to_daily_totals():
+    """GEH is defined for hourly flows and its 85%-under-5 convention is
+    calibrated for them.
+
+    The statistic scales with the size of the numbers: multiply modelled and
+    observed by k and GEH scales by sqrt(k). This model's morning run scores a
+    median GEH of 5.92 on an hourly basis; the same model on a daily basis
+    scores 16.3, which is 5.92 * sqrt(10000/1200) almost exactly. Reporting
+    that against a bar of 5 would be a units error presented as a failing
+    grade.
+    """
+    matched = {"e1": segment()}
+    hour = counts.compare(matched, {"e1": 200.0}, window_hours=3)
+    day = counts.compare(matched, {"e1": 1400.0}, window_hours=24)
+
+    assert "share_geh_under_5" in hour["all"]
+    assert "share_geh_under_5" not in day["all"]
+    assert day["all"]["geh_bar_applies"] is False
+    assert "hourly" in day["all"]["geh_note"]
+    # GEH is still computed -- it ranks links against each other within a run.
+    assert day["all"]["median_geh"] > 0
+
+
+def test_the_same_shortfall_scores_worse_on_a_daily_basis():
+    """Pins the arithmetic the note above rests on, so nobody re-reads the
+    daily GEH as a regression."""
+    matched = {"e1": segment()}
+    ratio = 0.142
+    hour = counts.compare(matched, {"e1": 1200.0 * ratio}, window_hours=3)
+    day = counts.compare(matched, {"e1": 10000.0 * ratio}, window_hours=24)
+
+    assert hour["all"]["median_ratio_modelled_over_observed"] == pytest.approx(
+        day["all"]["median_ratio_modelled_over_observed"], abs=0.01
+    ), "identical shortfall"
+    assert day["all"]["median_geh"] > 2 * hour["all"]["median_geh"], (
+        "and yet a much worse GEH, purely from the basis"
+    )

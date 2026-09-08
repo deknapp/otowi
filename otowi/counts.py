@@ -359,7 +359,11 @@ def compare(
 ) -> dict:
     """Model against measurement, reported separately for fit and held-out.
 
-    The headline is GEH, the statistic traffic engineers actually use for this:
+    The headline is GEH *for a peak window*, the statistic traffic engineers
+    actually use for this -- but only there. See the note beside ``stats``
+    below: GEH is an hourly measure, and a whole-day run is reported on the
+    ratio instead, because scoring daily totals against a threshold built for
+    hourly flows is a units error that reads as a failing grade.
 
         GEH = sqrt( 2 * (m - c)^2 / (m + c) )
 
@@ -396,17 +400,39 @@ def compare(
             "aadt_year": segment.aadt_year,
         })
 
+    # GEH is defined for *hourly* flows and its conventional bar -- 85% of links
+    # under 5 -- is calibrated for them. The statistic scales with the size of
+    # the numbers: multiply modelled and observed by k and GEH scales by
+    # sqrt(k), so the same model scored on daily totals looks far worse without
+    # having changed. This model's morning-peak run scores a median GEH of 5.92
+    # on an hourly basis; the identical model on a daily basis scores 16.3,
+    # which is 5.92 * sqrt(10000/1200) almost exactly. Reporting that against a
+    # bar of 5 would be a units error presented as a failing grade.
+    hourly_basis = window_hours < 24
+
     def stats(subset: list[dict]) -> dict:
         if not subset:
             return {"links": 0}
         gehs = sorted(row["geh"] for row in subset)
         ratios = sorted(row["ratio"] for row in subset)
-        return {
+        out = {
             "links": len(subset),
             "median_geh": round(gehs[len(gehs) // 2], 2),
-            "share_geh_under_5": round(sum(1 for g in gehs if g < 5) / len(gehs), 3),
             "median_ratio_modelled_over_observed": round(ratios[len(ratios) // 2], 3),
         }
+        if hourly_basis:
+            out["share_geh_under_5"] = round(
+                sum(1 for g in gehs if g < 5) / len(gehs), 3)
+        else:
+            # Still useful for ranking links against each other within this
+            # run; just not against a threshold meant for hourly flows.
+            out["geh_bar_applies"] = False
+            out["geh_note"] = (
+                "GEH < 5 is an hourly convention and does not transfer to "
+                "daily totals; compare the ratio instead, or re-run a peak "
+                "window for a GEH that can be read against the bar."
+            )
+        return out
 
     unit = "veh/day" if window_hours >= 24 else "veh/h"
     return {
