@@ -246,6 +246,54 @@ def sweep(
     ]
 
 
+def _clock(total_s: float) -> str:
+    total = int(total_s) % (24 * 3600)
+    return f"{total // 3600:02d}:{total % 3600 // 60:02d}"
+
+
+def summarise(options: list[dict], window: tuple[float, float] | None) -> dict:
+    """Best and worst departure inside ``window``, over a curve already built.
+
+    Separated from :func:`plan` so that a whole-day curve can be computed once
+    and asked about many times -- which is the whole point of the planner. A
+    user says "I have to be there some time this evening"; the answer is a
+    slice of a curve, not another simulation.
+
+    The recommendation is a *band*, not a minute. This model carries a fraction
+    of real traffic, so every duration is optimistic; the shape survives that
+    better than the absolute numbers, but not well enough to distinguish 06:15
+    from 06:30 when they differ by forty seconds. Reporting a single best time
+    would imply a precision the model does not have. Anything within a minute,
+    or 5%, of the best is reported as equally good.
+    """
+    inside = options if window is None else [
+        o for o in options if window[0] <= o["depart_s"] < window[1]
+    ]
+    if not inside:
+        return {"window": None, "options_in_window": 0}
+
+    best = min(inside, key=lambda o: o["duration_min"])
+    worst = max(inside, key=lambda o: o["duration_min"])
+    tolerance = max(1.0, best["duration_min"] * 0.05)
+    good = [o for o in inside if o["duration_min"] <= best["duration_min"] + tolerance]
+
+    return {
+        "window": f"{_clock(window[0])}-{_clock(window[1])}" if window else "all day",
+        "options_in_window": len(inside),
+        "best_departure": best["depart"],
+        "best_duration_min": best["duration_min"],
+        "worst_departure": worst["depart"],
+        "worst_duration_min": worst["duration_min"],
+        "spread_min": round(worst["duration_min"] - best["duration_min"], 1),
+        # Every departure that is as good as the best, within the model's
+        # ability to tell them apart.
+        "good_departures": [o["depart"] for o in good],
+        "good_from": good[0]["depart"],
+        "good_to": good[-1]["depart"],
+        "tolerance_min": round(tolerance, 1),
+    }
+
+
 def plan(
     net,
     times: TravelTimes,
@@ -253,16 +301,23 @@ def plan(
     origin: str,
     destination: str,
     *,
-    window: tuple[int, int] = AM_PEAK,
+    simulated: tuple[int, int] = AM_PEAK,
+    window: tuple[float, float] | None = None,
     every_minutes: int = 15,
 ) -> dict:
     """Answer "when should I leave" for two named places.
 
-    Returns every option rather than only the best one. The recommendation is
-    the shortest journey, but the difference between the best and the worst is
-    the more useful number: if leaving an hour earlier saves four minutes, the
-    honest advice is that it does not matter when you leave, and a tool that
-    only ever emits a single recommended time cannot say that.
+    ``simulated`` is the span the simulation actually covers, and the curve is
+    built across all of it. ``window`` is the range the *user* asked about and
+    only selects which part of that curve to recommend from -- so a whole-day
+    run answers "some time between 17:00 and 20:00" without re-running
+    anything, and the curve outside the window is still returned so the caller
+    can show what was passed over.
+
+    Returns every option rather than only the best one. The difference between
+    best and worst is the more useful number: if leaving an hour earlier saves
+    four minutes, the honest advice is that it does not matter when you leave,
+    and a tool that only ever emits a single recommended time cannot say that.
     """
     for key in (origin, destination):
         if key not in PLACES:
@@ -282,24 +337,21 @@ def plan(
 
     journeys = sweep(
         net, times, origin_edge.getID(), destination_edge.getID(),
-        window=window, every_minutes=every_minutes,
+        window=simulated, every_minutes=every_minutes,
     )
     arrived = [j for j in journeys if j.arrived]
     if not arrived:
         raise SystemExit(f"No route found from {origin} to {destination}.")
 
-    best = min(arrived, key=lambda j: j.duration_s)
-    worst = max(arrived, key=lambda j: j.duration_s)
-
-    def clock(offset_s: float) -> str:
-        total = window[0] * 3600 + offset_s
-        return f"{int(total // 3600):02d}:{int(total % 3600 // 60):02d}"
-
+    # Simulation seconds are offsets from the start of the simulated span, so
+    # for a whole-day run they are already clock times.
+    base_s = simulated[0] * 3600
     options = [
         {
-            "depart": clock(j.depart_s),
+            "depart": _clock(base_s + j.depart_s),
+            "depart_s": base_s + j.depart_s,
             "duration_min": round(j.duration_s / 60, 1),
-            "arrive": clock(j.depart_s + j.duration_s),
+            "arrive": _clock(base_s + j.depart_s + j.duration_s),
         }
         for j in arrived
     ]
@@ -307,13 +359,10 @@ def plan(
     return {
         "from": start.name,
         "to": end.name,
-        "window": f"{window[0]:02d}:00-{window[1]:02d}:00",
-        "best_departure": clock(best.depart_s),
-        "best_duration_min": round(best.duration_s / 60, 1),
-        "worst_departure": clock(worst.depart_s),
-        "worst_duration_min": round(worst.duration_s / 60, 1),
-        "spread_min": round((worst.duration_s - best.duration_s) / 60, 1),
+        "simulated": f"{simulated[0]:02d}:00-{simulated[1]:02d}:00",
+        "every_minutes": every_minutes,
         "options": options,
+        **summarise(options, window),
         "caveat": (
             "Modelled, not measured. This network carries a fraction of real "
             "traffic, so these durations are optimistic. The shape of the curve "

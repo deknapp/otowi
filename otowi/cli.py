@@ -290,37 +290,88 @@ def cmd_calibrate(args) -> None:
         )
 
 
+def _parse_clock(text: str) -> float:
+    """"17:30", "17.5" or "17" -> seconds since midnight.
+
+    Accepting all three because the question is asked in clock time and typing
+    a decimal hour to describe half past five is not how anyone thinks.
+    """
+    text = text.strip()
+    try:
+        if ":" in text:
+            hours, _, minutes = text.partition(":")
+            value = int(hours) * 3600 + int(minutes) * 60
+        else:
+            value = float(text) * 3600
+    except ValueError:
+        raise SystemExit(f"Could not read {text!r} as a time. Try 17:30 or 17.")
+    if not 0 <= value <= 24 * 3600:
+        raise SystemExit(f"{text!r} is not a time between 00:00 and 24:00.")
+    return float(value)
+
+
 def cmd_when(args) -> None:
     """Answer: what time should I leave, for this trip?"""
     from . import journey, trips as trips_mod
 
-    window = tuple(args.window)
-    intervals = simulate.intervals_path(window)
+    simulated = tuple(args.window)
+    intervals = simulate.intervals_path(simulated)
     if not intervals.exists():
         raise SystemExit(
-            f"No interval data at {intervals}.\nRun:  otowi simulate"
+            f"No interval data at {intervals}.\n"
+            f"Run:  otowi run --window {simulated[0]} {simulated[1]}"
         )
+
+    asked = None
+    if args.between:
+        asked = (_parse_clock(args.between[0]), _parse_clock(args.between[1]))
+        if asked[1] <= asked[0]:
+            raise SystemExit("The end of --between must be after its start.")
+        sim_span = (simulated[0] * 3600.0, simulated[1] * 3600.0)
+        if asked[0] < sim_span[0] or asked[1] > sim_span[1]:
+            raise SystemExit(
+                f"Asked about {args.between[0]}-{args.between[1]}, but the "
+                f"simulation only covers {simulated[0]:02d}:00-{simulated[1]:02d}:00.\n"
+                f"Run:  otowi run --window 0 24   for a whole day."
+            )
 
     net = _load_net()
     times = journey.TravelTimes.load(intervals, net)
     core = trips_mod.reachable_core(net)
     result = journey.plan(
         net, times, core, args.origin, args.destination,
-        window=window, every_minutes=args.every,
+        simulated=simulated, window=asked, every_minutes=args.every,
     )
 
-    print(f"\n{result['from']} to {result['to']}  ({result['window']})\n")
-    best = result["best_departure"]
-    for option in result["options"]:
-        marker = " <- best" if option["depart"] == best else ""
-        bar = "#" * int(option["duration_min"] / 2)
-        print(f"  leave {option['depart']}   {option['duration_min']:6.1f} min  "
-              f"arrive {option['arrive']}  {bar}{marker}")
+    if args.json:
+        print(json.dumps(result, indent=2))
+        return
 
-    print(f"\n  Best:  leave {best}, {result['best_duration_min']} min")
-    print(f"  Worst: leave {result['worst_departure']}, "
-          f"{result['worst_duration_min']} min")
-    print(f"  Spread: {result['spread_min']} min between best and worst\n")
+    inside = result["options"] if asked is None else [
+        o for o in result["options"] if asked[0] <= o["depart_s"] < asked[1]
+    ]
+    print(f"\n{result['from']} to {result['to']}  "
+          f"({result['window'] or 'no options in that range'})\n")
+
+    good = set(result.get("good_departures", ()))
+    longest = max((o["duration_min"] for o in inside), default=1) or 1
+    for option in inside:
+        mark = " <- as good as it gets" if option["depart"] in good else ""
+        bar = "#" * max(1, int(option["duration_min"] / longest * 34))
+        print(f"  leave {option['depart']}   {option['duration_min']:6.1f} min  "
+              f"arrive {option['arrive']}  {bar}{mark}")
+
+    if result.get("options_in_window"):
+        if len(good) > 1:
+            print(f"\n  Leave any time between {result['good_from']} and "
+                  f"{result['good_to']} -- within {result['tolerance_min']} min "
+                  f"of the best the model can tell apart.")
+        else:
+            print(f"\n  Best:  leave {result['best_departure']}, "
+                  f"{result['best_duration_min']} min")
+        print(f"  Worst: leave {result['worst_departure']}, "
+              f"{result['worst_duration_min']} min")
+        print(f"  Spread: {result['spread_min']} min between best and worst\n")
     print(result["caveat"], file=sys.stderr)
 
 
@@ -380,8 +431,18 @@ def cmd_export(args) -> None:
             if origin == destination:
                 continue
             try:
-                plans[f"{origin}>{destination}"] = journey.plan(
-                    net, times, core, origin, destination, window=window)
+                # No window: the whole simulated span, so the page holds the
+                # entire departure curve and can answer "some time between 5
+                # and 8" by slicing it. Nothing here is computed per visitor
+                # and nothing could be -- a run of this model takes hours.
+                plan = journey.plan(
+                    net, times, core, origin, destination, simulated=window)
+                # depart_s is only needed to slice the curve, and the browser
+                # can recompute it from the label; dropping it keeps the file
+                # small enough to ship on a static host.
+                for option in plan["options"]:
+                    option.pop("depart_s", None)
+                plans[f"{origin}>{destination}"] = plan
             except SystemExit as exc:
                 unroutable.append(f"{origin}>{destination}: {exc}")
     (data / "plans.json").write_text(json.dumps(plans, separators=(",", ":")))
@@ -495,6 +556,12 @@ def build_parser() -> argparse.ArgumentParser:
     when_parser.add_argument("destination", help="Likewise.")
     when_parser.add_argument("--window", type=int, nargs=2, default=list(AM_PEAK),
                              metavar=("START", "END"))
+    when_parser.add_argument("--between", nargs=2, metavar=("START", "END"),
+                             help="Only recommend departures in this range, "
+                                  "e.g. --between 17:30 20:00. Any range "
+                                  "inside the simulated window; defaults to "
+                                  "all of it.")
+    when_parser.add_argument("--json", action="store_true")
     when_parser.add_argument("--every", type=int, default=15,
                              help="Minutes between candidate departure times.")
 

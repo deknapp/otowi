@@ -214,3 +214,82 @@ def test_sweep_reflects_a_peak_in_the_middle_of_the_window():
 
     assert durations[1] > durations[0]
     assert durations[1] > durations[2]
+
+
+# ------------------------------------------------------------ window slicing
+#
+# "I have to be there some time this evening -- when should I leave?" is a
+# slice of a curve that has already been computed, not another simulation. A
+# run of this model takes hours, so the curve is built once over the whole
+# simulated day and every question about a range is answered from it.
+
+
+def curve(pairs):
+    """[(clock, minutes)] -> the option list summarise() consumes."""
+    out = []
+    for clock, minutes in pairs:
+        hours, _, mins = clock.partition(":")
+        out.append({
+            "depart": clock,
+            "depart_s": int(hours) * 3600 + int(mins) * 60,
+            "duration_min": minutes,
+            "arrive": clock,
+        })
+    return out
+
+
+def test_a_window_only_recommends_from_inside_itself():
+    options = curve([("06:00", 20.0), ("07:00", 40.0),
+                     ("17:00", 35.0), ("18:00", 25.0)])
+    evening = journey.summarise(options, (17 * 3600, 19 * 3600))
+
+    assert evening["best_departure"] == "18:00"
+    assert evening["worst_departure"] == "17:00"
+    assert evening["options_in_window"] == 2
+    # The global best at 06:00 is not an answer to "when this evening".
+    assert "06:00" not in evening["good_departures"]
+
+
+def test_no_window_considers_the_whole_day():
+    options = curve([("06:00", 20.0), ("18:00", 25.0)])
+    assert journey.summarise(options, None)["best_departure"] == "06:00"
+
+
+def test_an_empty_window_says_so_rather_than_guessing():
+    options = curve([("06:00", 20.0)])
+    result = journey.summarise(options, (17 * 3600, 19 * 3600))
+    assert result["options_in_window"] == 0
+    assert "best_departure" not in result
+
+
+def test_the_recommendation_is_a_band_not_a_minute():
+    """The model carries a fraction of real traffic, so it cannot tell 06:15
+    from 06:30 when they differ by forty seconds. Reporting one of them as
+    'the best time' would imply a precision it does not have."""
+    options = curve([("06:00", 20.0), ("06:15", 20.4), ("06:30", 20.2),
+                     ("07:00", 31.0)])
+    result = journey.summarise(options, None)
+
+    assert result["good_departures"] == ["06:00", "06:15", "06:30"]
+    assert result["good_from"] == "06:00"
+    assert result["good_to"] == "06:30"
+    assert "07:00" not in result["good_departures"]
+
+
+def test_a_flat_curve_recommends_everything():
+    # If it does not matter when you leave, the tool has to be able to say so.
+    options = curve([("06:00", 20.0), ("07:00", 20.1), ("08:00", 20.2)])
+    result = journey.summarise(options, None)
+    assert len(result["good_departures"]) == 3
+    assert result["spread_min"] < 1
+
+
+def test_clock_parsing_accepts_how_people_write_times():
+    from otowi.cli import _parse_clock
+    assert _parse_clock("17:30") == 17.5 * 3600
+    assert _parse_clock("17") == 17 * 3600
+    assert _parse_clock("5.5") == 5.5 * 3600
+    assert _parse_clock(" 06:05 ") == 6 * 3600 + 5 * 60
+    for bad in ("half five", "25:00", "-1"):
+        with pytest.raises(SystemExit):
+            _parse_clock(bad)
