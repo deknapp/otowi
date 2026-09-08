@@ -143,14 +143,6 @@
 
   <table id="stats"></table>
 
-  <div class="warn">
-    <b>This model fails its own validation.</b>
-    It carries <span id="ratio-headline">—</span> of measured peak-hour traffic,
-    because it contains commuting with both ends inside the study area and
-    nothing else — so nearly all through traffic on I-25 and US&#8209;84 is
-    missing. The number is published rather than tuned away.
-  </div>
-
   <div class="hint">Click any road for its numbers.</div>
 </div>
 
@@ -326,10 +318,6 @@
   fetch(DATA + "summary.json").then(function (r) { return r.json(); }).then(function (s) {
     document.getElementById("window").textContent = s.window || "";
     var held = s.held_out || {};
-    var ratio = held.median_ratio_modelled_over_observed;
-
-    document.getElementById("ratio-headline").textContent =
-      ratio != null ? Math.round(ratio * 100) + "%" : "—";
 
     document.getElementById("stats").innerHTML =
       row("Vehicles simulated", num(s.vehicles_loaded || s.vehicles_arrived)) +
