@@ -473,13 +473,22 @@ def cmd_run(args) -> None:
     -- so the default path through this program still had the defect the fix
     was for, and anyone running `otowi run` on a clean checkout got the old
     behaviour without being told.
+
+    Calling cmd_assign is not enough on its own, which cost a whole run to
+    learn. `cmd_route` and `cmd_assign` write the *same* routes file, so a
+    check for its existence cannot tell iteratively-assigned routes from
+    single-pass ones -- and running `otowi route` once by hand, for any reason,
+    silently disarms the fix for every `otowi run` afterwards. That run
+    produced 26,495 teleports against 356 on the published model, because
+    every driver had taken the empty-network path. The skip test now asks
+    whether an *assignment* finished, not whether a file exists.
     """
     window = tuple(args.window)
     if not network.network_path().exists():
         cmd_network(args)
     if not trips.trips_path(window).exists():
         cmd_trips(args)
-    if not simulate.routes_path(window).exists():
+    if not simulate.assignment_is_converged(window):
         cmd_assign(args)
     cmd_simulate(args)
     cmd_calibrate(args)

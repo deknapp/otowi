@@ -47,12 +47,12 @@ def test_run_routes_by_iterative_assignment_not_single_pass(monkeypatch):
     assert called == ["assign", "simulate", "calibrate"]
 
 
-def test_run_skips_routing_when_routes_already_exist(monkeypatch):
+def test_run_skips_routing_when_an_assignment_already_converged(monkeypatch):
     called: list[str] = []
 
     monkeypatch.setattr(cli.network, "network_path", lambda: _Exists(True))
     monkeypatch.setattr(cli.trips, "trips_path", lambda window: _Exists(True))
-    monkeypatch.setattr(cli.simulate, "routes_path", lambda window: _Exists(True))
+    monkeypatch.setattr(cli.simulate, "assignment_is_converged", lambda window: True)
     monkeypatch.setattr(cli, "cmd_assign", lambda args: called.append("assign"))
     monkeypatch.setattr(cli, "cmd_simulate", lambda args: called.append("simulate"))
     monkeypatch.setattr(cli, "cmd_calibrate", lambda args: called.append("calibrate"))
@@ -70,3 +70,52 @@ class _Exists:
 
     def exists(self) -> bool:
         return self._exists
+
+
+def test_run_assigns_when_routes_came_from_the_single_pass_router(monkeypatch):
+    """`otowi route` and `otowi assign` write the same filename.
+
+    Checking whether the routes file exists therefore cannot tell
+    iteratively-assigned routes from single-pass ones, and running `otowi
+    route` once by hand -- to check anything at all -- silently disarmed the
+    assignment for every `otowi run` afterwards. The run that came out of that
+    had 26,495 teleports against 356 on the published model, because every
+    driver was holding the path that is fastest on an empty road and they were
+    all holding the same one.
+    """
+    called: list[str] = []
+    monkeypatch.setattr(cli.network, "network_path", lambda: _Exists(True))
+    monkeypatch.setattr(cli.trips, "trips_path", lambda window: _Exists(True))
+    monkeypatch.setattr(cli.simulate, "assignment_is_converged", lambda window: False)
+    monkeypatch.setattr(cli, "cmd_assign", lambda args: called.append("assign"))
+    monkeypatch.setattr(cli, "cmd_simulate", lambda args: called.append("simulate"))
+    monkeypatch.setattr(cli, "cmd_calibrate", lambda args: called.append("calibrate"))
+
+    cli.cmd_run(_args())
+
+    assert called == ["assign", "simulate", "calibrate"]
+
+
+def test_only_an_alternatives_file_counts_as_evidence_of_assignment(tmp_path, monkeypatch):
+    from otowi import simulate
+
+    routes = tmp_path / "routes-am-0024.rou.xml"
+    alts = tmp_path / "alts-am-0024.rou.alt.xml"
+    monkeypatch.setattr(simulate, "routes_path", lambda window: routes)
+    monkeypatch.setattr(simulate, "alternatives_path", lambda window: alts)
+
+    assert not simulate.assignment_is_converged((0, 24)), "nothing on disk"
+
+    routes.write_text("<routes/>")
+    assert not simulate.assignment_is_converged((0, 24)), (
+        "single-pass routes must not be mistaken for an assignment"
+    )
+
+    alts.write_text("<alts/>")
+    import os
+    os.utime(alts, (routes.stat().st_atime + 10, routes.stat().st_mtime + 10))
+    assert simulate.assignment_is_converged((0, 24))
+
+    # Alternatives older than the routes describe a superseded run.
+    os.utime(alts, (routes.stat().st_atime - 10, routes.stat().st_mtime - 10))
+    assert not simulate.assignment_is_converged((0, 24))

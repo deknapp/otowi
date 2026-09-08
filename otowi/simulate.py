@@ -139,6 +139,28 @@ def alternatives_path(window: tuple[int, int] = AM_PEAK) -> Path:
     return CACHE_DIR / f"alts-am-{window[0]:02d}{window[1]:02d}.rou.alt.xml"
 
 
+def assignment_is_converged(window: tuple[int, int] = AM_PEAK) -> bool:
+    """Whether an *iterative assignment* has already produced these routes.
+
+    Existence of the routes file is not the question, and answering it that way
+    cost a whole run. `otowi route` and `otowi assign` write the same filename,
+    so running the single-pass router once by hand -- to check something,
+    anything -- leaves behind a file that makes `otowi run` skip the assignment
+    forever after. Every driver then holds the path that is fastest on an empty
+    road, they all hold the same one, and the model manufactures congestion:
+    26,495 teleports against 356 on the published model.
+
+    The alternatives file is the evidence, because only :func:`assign_iteratively`
+    writes it. It must also be no older than the routes and trips it describes,
+    or it is evidence about a run that has since been superseded.
+    """
+    routes = routes_path(window)
+    alts = alternatives_path(window)
+    if not routes.exists() or not alts.exists():
+        return False
+    return alts.stat().st_mtime >= routes.stat().st_mtime
+
+
 def _route_distributions(alts_file: Path) -> dict[str, dict[int, float]]:
     """Each vehicle's probability over its alternative paths.
 
