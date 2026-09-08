@@ -260,3 +260,29 @@ def test_the_same_shortfall_scores_worse_on_a_daily_basis():
     assert day["all"]["median_geh"] > 2 * hour["all"]["median_geh"], (
         "and yet a much worse GEH, purely from the basis"
     )
+
+
+def test_a_slice_of_a_long_run_is_scored_per_hour(tmp_path):
+    """Recovering the hourly comparison from a whole-day run.
+
+    A daily GEH cannot be read against the profession's 85%-under-5 bar, so
+    without slicing, a 24-hour model can only be declared different from the
+    peak-window one it replaced -- never better or worse.
+    """
+    intervals = tmp_path / "intervals.xml"
+    intervals.write_text(
+        '<meandata>\n'
+        # 05:00-06:00, outside the morning slice
+        '  <interval begin="18000" end="21600"><edge id="e1" entered="900"/></interval>\n'
+        # 06:00-07:00 and 07:00-08:00, inside it
+        '  <interval begin="21600" end="25200"><edge id="e1" entered="600"/></interval>\n'
+        '  <interval begin="25200" end="28800"><edge id="e1" entered="1200"/></interval>\n'
+        # 20:00, outside again
+        '  <interval begin="72000" end="75600"><edge id="e1" entered="300"/></interval>\n'
+        '</meandata>\n')
+
+    per_hour = counts.simulated_hourly_in_slice(intervals, (6, 8))
+    # 600 + 1200 vehicles over two hours.
+    assert per_hour["e1"] == pytest.approx(900.0)
+    # The intervals either side are not in the slice and must not leak in.
+    assert per_hour["e1"] < 1500

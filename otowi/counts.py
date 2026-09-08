@@ -350,6 +350,39 @@ def simulated_hourly(edgedata: Path, window_hours: float) -> dict[str, float]:
     return volumes
 
 
+def simulated_hourly_in_slice(
+    intervals: Path, slice_hours: tuple[float, float]
+) -> dict[str, float]:
+    """Vehicles per hour on each edge during part of a longer run.
+
+    A whole-day run can only be scored against a daily count, and a daily GEH
+    cannot be read against the hourly bar the profession accepts models on.
+    This recovers the missing comparison: take the morning out of the 24-hour
+    result and score *that* against AADT x K x D, exactly as a morning-only run
+    would be. It is the only way to say whether a whole-day model is better or
+    worse than the peak-window one it replaced rather than merely different.
+
+    Reads the interval file, not the window aggregate, because the aggregate is
+    one bucket spanning the whole run and has no idea when anything happened.
+    """
+    start_s, end_s = slice_hours[0] * 3600, slice_hours[1] * 3600
+    totals: dict[str, float] = {}
+    keep = False
+    for _, element in etree.iterparse(str(intervals), events=("end",)):
+        if element.tag == "interval":
+            begin = float(element.get("begin", 0.0))
+            keep = start_s <= begin < end_s
+            if keep:
+                for edge in element.findall("edge"):
+                    entered = edge.get("entered")
+                    if entered is not None:
+                        eid = edge.get("id")
+                        totals[eid] = totals.get(eid, 0.0) + float(entered)
+            element.clear()
+    hours = (end_s - start_s) / 3600.0
+    return {edge: total / hours for edge, total in totals.items()}
+
+
 def compare(
     matched: dict[str, CountSegment],
     simulated: dict[str, float],

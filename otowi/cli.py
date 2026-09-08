@@ -270,14 +270,40 @@ def cmd_calibrate(args) -> None:
     result = counts.compare(matched, modelled, window_hours=hours)
 
     worst = sorted(result["links"], key=lambda row: -row["observed"])[: args.top]
-    print(json.dumps({
+    payload = {
         "count_segments": len(segments),
         "edges_matched": len(matched),
+        # Which measurement the model was scored against. Printed, not left to
+        # be inferred from the window: a ratio without its basis is not a
+        # result, and the two bases differ by a factor of eight.
+        "basis": result["basis"],
+        "unit": result["unit"],
         "all": result["all"],
         "fit": result["fit"],
         "held_out": result["held_out"],
-        "busiest_measured_links": worst,
-    }, indent=2))
+    }
+
+    # For a whole-day run, also score its morning on the hourly basis. A daily
+    # GEH cannot be read against the profession's 85%-under-5 bar, so without
+    # this a 24-hour model can only be declared *different* from the peak-window
+    # one it replaced, never better or worse.
+    if hours >= 24 and args.peak and args.peak[1] > args.peak[0]:
+        peak = tuple(args.peak)
+        intervals = simulate.intervals_path(window)
+        if intervals.exists():
+            sliced = counts.simulated_hourly_in_slice(intervals, peak)
+            peak_result = counts.compare(
+                matched, sliced, window_hours=peak[1] - peak[0])
+            payload["peak_slice"] = {
+                "hours": f"{peak[0]:02.0f}:00-{peak[1]:02.0f}:00",
+                "basis": peak_result["basis"],
+                "unit": peak_result["unit"],
+                "all": peak_result["all"],
+                "held_out": peak_result["held_out"],
+            }
+
+    payload["busiest_measured_links"] = worst
+    print(json.dumps(payload, indent=2))
 
     ratio = result["held_out"].get("median_ratio_modelled_over_observed")
     if ratio is not None and ratio < 0.8:
@@ -545,6 +571,12 @@ def build_parser() -> argparse.ArgumentParser:
         sub.add_argument("--force", action="store_true")
         sub.add_argument("--top", type=int, default=15,
                          help="How many busiest edges to report.")
+        sub.add_argument("--peak", type=float, nargs=2, default=[6, 9],
+                         metavar=("START", "END"),
+                         help="For a whole-day run, also score this slice on "
+                              "the hourly basis, so the result can be read "
+                              "against the GEH bar and against a peak-window "
+                              "run. Pass 0 0 to skip.")
         sub.add_argument("--iterations", type=int, default=5,
                          help="Assignment rounds for `otowi assign`.")
         sub.add_argument("--internal-only", action="store_true",
