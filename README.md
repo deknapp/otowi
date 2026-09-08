@@ -413,6 +413,34 @@ $ otowi when santa_fe espanola --window 0 24 --between 17:00 23:00
   Spread: 1.0 min between best and worst
 ```
 
+### Which makes the planner recommend a different time
+
+Joining the two halves changes the answer. The journey time moves by a minute
+or two across a whole day; the chance of being killed moves by a factor of
+nineteen. So the recommendation is risk-led, and the minutes are the
+tie-breaker rather than the other way round:
+
+```console
+$ otowi when santa_fe espanola --window 0 24 --between 17:00 23:00 --risk
+
+  leave 17:00   30.9 min   0.8x   <- safest
+  leave 19:00   30.3 min   1.1x
+  leave 22:00   29.9 min   3.0x
+
+  On the roads this drive uses, 6.2 people have died per billion km driven
+  -- about average for this region. 78% of the drive is on roads with no
+  traffic count and could not be assessed.
+
+  Leave at 17:00. About 3.8 times safer per kilometre than leaving at 22:00,
+  and it costs 1 min more driving.
+```
+
+**The fastest departure is consistently among the most dangerous**, which is
+the whole point: an empty road is quick precisely because it is empty, and an
+empty road at night is where people die. A planner that ranks departures on
+minutes recommends exactly the wrong one — and on this network it does so while
+saving under a minute.
+
 The recommendation is a **band**, never a minute. This model carries a fraction
 of real traffic, so every duration is optimistic; the shape survives that
 better than the absolute numbers do, but not well enough to distinguish 06:15

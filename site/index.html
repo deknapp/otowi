@@ -53,6 +53,8 @@
   #hours .h.bad { background: #c0392b; }
   #hours .h.mid { background: #c9a227; }
   .hourax { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); }
+  .barrow .rx { width: 42px; text-align: right; font-size: 11px; color: var(--muted); }
+  .barrow .rx.hot { color: #e08e3c; font-weight: 600; }
   .footrow { display: flex; align-items: center; gap: 6px; margin-top: 10px; font-size: 11.5px; color: var(--muted); cursor: pointer; }
 
   /* Phones. The controls are a fixed side panel on a desktop and a sheet at
@@ -584,7 +586,9 @@
       .then(function (plan) {
         if (plan.error) { throw new Error(plan.error); }
         lastPlan = plan;
-        renderPlan(plan);
+        // The recommendation is risk-led, so the hour-of-day curve has to be
+        // in hand before the first render rather than after it.
+        return loadRisk().then(function () { renderPlan(plan); });
       })
       .catch(function (e) {
         tripOut.innerHTML = '<div class="verdict">' + e.message + "</div>";
@@ -622,11 +626,28 @@
     var good = inside.filter(function (o) {
       return o.duration_min <= best.duration_min + tol;
     });
+    // Risk per departure. The journey time barely moves across a day on these
+    // corridors -- a minute or two -- while the chance of being killed moves
+    // by a factor of nineteen. So the recommendation is risk-led, and the
+    // minutes are the tie-breaker rather than the other way round.
+    var hours = (risk && risk.summary && risk.summary.by_hour) || null;
+    var safest = null, riskiest = null;
+    if (hours) {
+      inside.forEach(function (o) {
+        var h = hours[Math.floor(toMinutes(o.depart) / 60) % 24];
+        o.risk_x = h ? h.relative_risk : null;
+        if (o.risk_x == null) { return; }
+        if (!safest || o.risk_x < safest.risk_x) { safest = o; }
+        if (!riskiest || o.risk_x > riskiest.risk_x) { riskiest = o; }
+      });
+    }
+
     return {
       inside: inside, best: best, worst: worst, good: good,
       goodSet: good.reduce(function (acc, o) { acc[o.depart] = true; return acc; }, {}),
       spread: worst.duration_min - best.duration_min,
-      tol: tol
+      tol: tol,
+      safest: safest, riskiest: riskiest
     };
   }
 
@@ -656,28 +677,48 @@
     plan.options.forEach(function (o) {
       var m = toMinutes(o.depart);
       var within = m >= from && m < to;
-      html += '<div class="barrow' + (s.goodSet[o.depart] ? " best" : "") +
+      var risky = o.risk_x != null && s.safest && o.risk_x >= s.safest.risk_x * 2;
+      html += '<div class="barrow' + (s.safest && o.depart === s.safest.depart ? " best" : "") +
                 (within ? "" : " outside") + '">' +
                 '<span class="t">' + o.depart + "</span>" +
                 '<span class="b" style="width:' +
-                  Math.max(2, Math.round((o.duration_min / max) * 120)) + 'px"></span>' +
+                  Math.max(2, Math.round((o.duration_min / max) * 90)) + 'px"></span>' +
                 '<span class="m">' + o.duration_min.toFixed(0) + " min</span>" +
+                (o.risk_x != null
+                  ? '<span class="rx' + (risky ? " hot" : "") + '">' +
+                    o.risk_x.toFixed(1) + "\u00d7</span>"
+                  : '<span class="rx"></span>') +
               "</div>";
     });
     html += "</div>";
 
-    // The spread is the actionable number. If leaving an hour earlier saves
-    // four minutes, the honest advice is that it does not matter.
-    if (s.spread < 3) {
+    // The verdict. On these corridors departure time is worth a minute or two
+    // of journey time and a large multiple of risk, so saying "leave at the
+    // fastest time" would be answering the question that does not matter.
+    if (s.safest && s.riskiest && s.riskiest.risk_x > s.safest.risk_x * 1.3) {
+      var cost = s.safest.duration_min - s.best.duration_min;
+      html += '<div class="verdict">Leave at <b>' + s.safest.depart +
+        "</b>. Per kilometre it is the safest departure in this window — " +
+        "about <b>" + (s.riskiest.risk_x / s.safest.risk_x).toFixed(1) +
+        "\u00d7</b> safer than leaving at " + s.riskiest.depart +
+        (cost > 0.5
+          ? ", and it costs " + cost.toFixed(0) + " min more driving."
+          : ", and it costs nothing in journey time.") +
+        (plan.risk && plan.risk.per_billion_veh_km != null
+          ? " On the roads this drive uses, <b>" +
+            plan.risk.per_billion_veh_km.toFixed(1) + "</b> people have died " +
+            "per billion km driven" +
+            (plan.risk.assessed_share < 0.95
+              ? "; " + Math.round((1 - plan.risk.assessed_share) * 100) +
+                "% of the drive is on roads with no traffic count and could " +
+                "not be assessed."
+              : ".")
+          : "") +
+        "</div>";
+    } else if (s.spread < 3) {
       html += '<div class="verdict">Departure time barely matters on this ' +
               "trip between " + fmt(from) + " and " + fmt(to) + " — only <b>" +
               s.spread.toFixed(0) + " min</b> between the best and worst option.</div>";
-    } else if (s.good.length > 1) {
-      html += '<div class="verdict">Leave any time between <b>' +
-              s.good[0].depart + "</b> and <b>" + s.good[s.good.length - 1].depart +
-              "</b> — about " + s.best.duration_min.toFixed(0) +
-              " min. Leaving at " + s.worst.depart + " costs <b>" +
-              s.spread.toFixed(0) + " min</b> more.</div>";
     } else {
       html += '<div class="verdict">Leave at <b>' + s.best.depart + "</b> — " +
               s.best.duration_min.toFixed(0) + " min. Leaving at " +

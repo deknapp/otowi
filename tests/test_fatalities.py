@@ -224,3 +224,55 @@ class TestOneDrive:
                  "tiny": risk(road_id="tiny", fatalities=50, vehicle_km=1e6,
                               length_km=0.3)}
         assert fatalities.regional_average(risks) == pytest.approx(4.0)
+
+
+class TestRiskLedRecommendation:
+    """The point of joining the two halves.
+
+    On these corridors the journey time moves by a minute or two across a whole
+    day and the chance of being killed moves by a factor of nineteen. A planner
+    that ranks departures on minutes is answering the question that does not
+    matter -- and worse, it recommends the empty road, which is fast precisely
+    because it is the one people die on.
+    """
+
+    def hours(self):
+        # 08:00 safe, 03:00 deadly, everything else ordinary.
+        return {h: (0.25 if h == 8 else 4.76 if h == 3 else 1.0)
+                for h in range(24)}
+
+    def test_the_fastest_departure_is_not_the_one_to_recommend(self):
+        options = [
+            {"depart": "03:00", "duration_min": 30.0},   # empty road, fastest
+            {"depart": "08:00", "duration_min": 34.0},   # slowest, safest
+        ]
+        hours = self.hours()
+        for option in options:
+            option["risk_x"] = hours[int(option["depart"][:2])]
+
+        fastest = min(options, key=lambda o: o["duration_min"])
+        safest = min(options, key=lambda o: o["risk_x"])
+
+        assert fastest["depart"] == "03:00"
+        assert safest["depart"] == "08:00"
+        # Four minutes of driving against a nineteenfold difference in risk.
+        assert fastest["duration_min"] < safest["duration_min"]
+        assert safest["risk_x"] * 19 == pytest.approx(fastest["risk_x"], rel=0.01)
+
+    def test_a_drive_carries_the_record_of_the_roads_it_uses(self):
+        """The planner needs a per-journey number, not just a regional one."""
+        class E:
+            def __init__(self, m): self._m = m
+            def getLength(self): return self._m
+        class N:
+            def __init__(self): self._e = {"hwy": E(9300), "street": E(32300)}
+            def getEdge(self, i): return self._e[i]
+
+        risks = {"US84P": risk(road_id="US84P", name="US-84", fatalities=4,
+                               vehicle_km=6.5e8, length_km=24.9)}
+        out = fatalities.along_route(N(), ["hwy", "street"], risks,
+                                     {"hwy": "US84P"})
+        assert out["per_billion_veh_km"] == pytest.approx(6.2, abs=0.2)
+        # Most of this drive is city street with no traffic count, and the
+        # answer has to say so rather than average over what it does not know.
+        assert out["assessed_share"] == pytest.approx(0.22, abs=0.02)

@@ -397,13 +397,36 @@ def cmd_when(args) -> None:
 
     good = set(result.get("good_departures", ()))
     longest = max((o["duration_min"] for o in inside), default=1) or 1
-    for option in inside:
-        mark = " <- as good as it gets" if option["depart"] in good else ""
-        bar = "#" * max(1, int(option["duration_min"] / longest * 34))
-        print(f"  leave {option['depart']}   {option['duration_min']:6.1f} min  "
-              f"arrive {option['arrive']}  {bar}{mark}")
 
-    if result.get("options_in_window"):
+    # Risk per departure, if it was asked for. The journey time barely moves
+    # across a day on these corridors while the chance of being killed moves by
+    # a factor of nineteen, so the recommendation is risk-led and the minutes
+    # are the tie-breaker.
+    hours = {}
+    if result.get("risk", {}).get("by_hour"):
+        hours = {r["hour"]: r["relative_risk"] for r in result["risk"]["by_hour"]}
+    for option in inside:
+        if hours:
+            option["risk_x"] = hours.get(int(option["depart"][:2]) % 24)
+    scored = [o for o in inside if o.get("risk_x") is not None]
+    safest = min(scored, key=lambda o: o["risk_x"]) if scored else None
+    riskiest = max(scored, key=lambda o: o["risk_x"]) if scored else None
+
+    for option in inside:
+        # Once risk is on the table the journey-time band is noise: it marks
+        # departures as equally good on the dimension that moves by a minute
+        # while ignoring the one that moves by a factor of nineteen.
+        if safest is not None:
+            mark = " <- safest" if option["depart"] == safest["depart"] else ""
+        else:
+            mark = " <- as good as it gets" if option["depart"] in good else ""
+        bar = "#" * max(1, int(option["duration_min"] / longest * 26))
+        risk_col = (f"  {option['risk_x']:4.1f}x" if option.get("risk_x") is not None
+                    else "")
+        print(f"  leave {option['depart']}   {option['duration_min']:6.1f} min  "
+              f"arrive {option['arrive']}{risk_col}  {bar}{mark}")
+
+    if result.get("options_in_window") and safest is None:
         if len(good) > 1:
             print(f"\n  Leave any time between {result['good_from']} and "
                   f"{result['good_to']} -- within {result['tolerance_min']} min "
@@ -433,13 +456,17 @@ def cmd_when(args) -> None:
                   f"traffic count, so it")
             print("  could not be assessed and is left out of that figure.")
 
-        rows = risk["by_hour"]
-        best = min(rows, key=lambda r: r["relative_risk"])
-        worst = max(rows, key=lambda r: r["relative_risk"])
-        print(f"\n  When matters more than where: a kilometre driven at "
-              f"{worst['hour']:02d}:00 is about")
-        print(f"  {worst['relative_risk'] / best['relative_risk']:.0f} times as "
-              f"likely to kill someone as one driven at {best['hour']:02d}:00.")
+        if safest is not None and riskiest is not None and riskiest["risk_x"] > 0:
+            cost = safest["duration_min"] - min(o["duration_min"] for o in inside)
+            factor = riskiest["risk_x"] / safest["risk_x"]
+            print(f"\n  Leave at {safest['depart']}. It is the safest departure in "
+                  f"this window,")
+            print(f"  about {factor:.1f} times safer per kilometre than leaving at "
+                  f"{riskiest['depart']},")
+            if cost > 0.5:
+                print(f"  and it costs {cost:.0f} min more driving.")
+            else:
+                print("  and it costs nothing in journey time.")
 
     print()
     print(result["caveat"], file=sys.stderr)
@@ -627,6 +654,20 @@ def cmd_export(args) -> None:
     # planner -- would come out flat. cmd_when loads the same file.
     times = journey.TravelTimes.load(simulate.intervals_path(window), net)
     core = trips.reachable_core(net)
+    risk_ctx = None
+    try:
+        from . import fatalities as _f
+        _net, _crashes, _risks, _ = _risk_inputs(args, window)
+        risk_ctx = {
+            "net": _net, "risks": _risks,
+            "route_of": _f.corridors_from_counts(
+                counts.match_to_edges(
+                    _net, counts.parse_segments(counts.fetch_aadt()))),
+        }
+        fatalities = _f
+    except Exception as exc:                                    # noqa: BLE001
+        print(f"per-route risk skipped: {exc}", file=sys.stderr)
+
     plans, unroutable = {}, []
     for origin in PLACES:
         for destination in PLACES:
@@ -644,6 +685,17 @@ def cmd_export(args) -> None:
                 # small enough to ship on a static host.
                 for option in plan["options"]:
                     option.pop("depart_s", None)
+                # The crash record of the roads this particular drive uses,
+                # precomputed so the page can put risk *in* the departure
+                # recommendation rather than in a separate tab. route_edges is
+                # dropped afterwards: it is only needed to compute this, and it
+                # is most of the file's weight.
+                if risk_ctx is not None:
+                    plan["risk"] = fatalities.along_route(
+                        risk_ctx["net"], plan.get("route_edges", []),
+                        risk_ctx["risks"], risk_ctx["route_of"])
+                    plan["risk"]["stretches"] = plan["risk"]["stretches"][:3]
+                plan.pop("route_edges", None)
                 plans[f"{origin}>{destination}"] = plan
             except SystemExit as exc:
                 unroutable.append(f"{origin}>{destination}: {exc}")
