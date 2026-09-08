@@ -16,7 +16,7 @@ from collections import Counter
 
 import pytest
 
-from otowi import trips
+from otowi import config, trips
 from otowi.demand import Flow
 
 
@@ -212,16 +212,44 @@ def test_poisson_of_zero_is_zero():
     assert trips._poisson(-1.0, random.Random(0)) == 0
 
 
-def test_departures_land_inside_the_window_and_are_sorted():
+def test_departures_are_clock_times_and_sorted():
+    """Sampling is over the whole day; the window is applied afterwards by
+    _place(). Getting that order backwards multiplied the morning peak by
+    1.42 -- see day_weights()."""
     class Bin:
         def __init__(self, start, end):
             self.start_hour, self.end_hour = start, end
 
     weighted = [(Bin(6.0, 6.5), 0.5), (Bin(8.5, 9.5), 0.5)]
-    seconds = trips._sample_departures(500, weighted, (6, 9), random.Random(0))
+    seconds = trips._sample_departures(500, weighted, random.Random(0))
 
     assert seconds == sorted(seconds)
-    assert all(0 <= s <= 3 * 3600 for s in seconds), "a departure fell outside the window"
+    assert all(6 * 3600 <= s <= 9.5 * 3600 for s in seconds)
+    assert any(s > 9 * 3600 for s in seconds), "the late bin must not be clipped"
+
+
+def test_place_filters_a_narrow_window_and_wraps_a_whole_day():
+    # 07:30 is inside the morning window, at 90 minutes in.
+    assert trips._place(7.5 * 3600, (6, 9)) == 1.5 * 3600
+    # 17:00 is not, and is dropped rather than clamped to the window edge.
+    assert trips._place(17 * 3600, (6, 9)) is None
+    # A whole-day window takes everything, and a return leaving work at 30:15
+    # is the same vehicle as one leaving at 06:15 -- the model is a typical day
+    # in steady state, so today's night shift stands in for yesterday's.
+    assert trips._place(17 * 3600, (0, 24)) == 17 * 3600
+    assert trips._place(30.25 * 3600, (0, 24)) == 6.25 * 3600
+    # And that wrap applies to a narrow window too, or the night shift's drive
+    # home vanishes from the morning peak it is actually in.
+    assert trips._place(30.25 * 3600, (6, 9)) == 0.25 * 3600
+    assert trips._place(26 * 3600, (6, 9)) is None
+
+
+def test_time_away_is_clipped_not_resampled():
+    rng = random.Random(0)
+    draws = [trips._sample_time_away(rng) / 3600 for _ in range(2000)]
+    assert all(config.TIME_AWAY_MIN_H <= d <= config.TIME_AWAY_MAX_H for d in draws)
+    mean = sum(draws) / len(draws)
+    assert abs(mean - config.TIME_AWAY_MEAN_H) < 0.2
 
 
 def test_generation_accounts_for_every_worker_it_drops():
@@ -362,3 +390,93 @@ def test_choose_destination_falls_back_to_the_single_attached_edge():
     attachment = trips.Attachment(edge_by_block={"w": "b"})
     assert attachment.choose_destination("w", random.Random(0)) == "b"
     assert attachment.choose_destination("missing", random.Random(0)) is None
+
+
+# --------------------------------------------------------------- return trips
+#
+# LODES measures home-to-work flows and nothing else. Run over a whole day, a
+# model built from it alone gives a morning peak and fifteen empty hours,
+# because nobody ever drives home -- which is not a rounding error in a
+# corridor model, it is half the traffic.
+
+
+class MorningBin:
+    start_hour, end_hour = 7.0, 7.5
+
+
+def _one_flow_net():
+    a, b = FakeEdge("a"), FakeEdge("b")
+    two_way(a, b)
+    net = FakeNet([a, b])
+    attachment = trips.Attachment(edge_by_block={"h1": "a", "w1": "b"})
+    flows = [Flow("h1", "w1", 35.7, -106.0, 35.8, -106.1, jobs=400)]
+    return net, flows, attachment
+
+
+def test_a_whole_day_run_has_people_driving_home():
+    net, flows, attachment = _one_flow_net()
+    day, stats = trips.generate(net, flows, attachment, [(MorningBin(), 1.0)],
+                                window=(0, 24), seed=1)
+
+    assert stats["return_trips"] > 0
+    # Everyone who drove to work drove home again.
+    assert stats["return_trips"] == stats["vehicles"] - stats["return_trips"]
+    # And they went the other way.
+    assert any(t["from"] == "b" and t["to"] == "a" for t in day)
+
+
+def test_the_evening_is_not_empty():
+    net, flows, attachment = _one_flow_net()
+    day, _ = trips.generate(net, flows, attachment, [(MorningBin(), 1.0)],
+                            window=(0, 24), seed=1)
+    evening = [t for t in day if 15 * 3600 <= t["depart"] < 20 * 3600]
+    assert evening, "a whole-day run with no evening traffic is the bug"
+    assert all(t["from"] == "b" for t in evening), "the evening is people going home"
+
+
+def test_returns_can_be_turned_off_and_then_it_is_empty():
+    net, flows, attachment = _one_flow_net()
+    day, stats = trips.generate(net, flows, attachment, [(MorningBin(), 1.0)],
+                                window=(0, 24), seed=1, include_returns=False)
+    assert stats["return_trips"] == 0
+    assert not [t for t in day if 15 * 3600 <= t["depart"] < 20 * 3600]
+
+
+def test_a_narrow_window_keeps_only_what_falls_inside_it():
+    """The fix for the 1.42x over-count. A flow's whole-day drivers are
+    expanded and then filtered, so a window holding 70% of departures gets
+    70% of the vehicles -- not all of them squeezed into three hours."""
+    net, flows, attachment = _one_flow_net()
+
+    class Split:
+        # Half depart at 07:00-07:30, half at 12:00-12:30.
+        def __init__(self, start, end):
+            self.start_hour, self.end_hour = start, end
+
+    weighted = [(Split(7.0, 7.5), 0.5), (Split(12.0, 12.5), 0.5)]
+    morning, stats = trips.generate(net, flows, attachment, weighted,
+                                    window=(6, 9), seed=1, include_returns=False)
+    whole, day_stats = trips.generate(net, flows, attachment, weighted,
+                                      window=(0, 24), seed=1, include_returns=False)
+
+    assert stats["trips_outside_window"] > 0
+    assert 0.4 < len(morning) / len(whole) < 0.6, (
+        "roughly half of departures fall in the morning window, so roughly "
+        "half the vehicles should"
+    )
+
+
+def test_a_night_shift_drives_home_through_the_morning_peak():
+    """The trip a window-restricted profile can never produce: someone whose
+    drive *home* lands inside the window being simulated."""
+    net, flows, attachment = _one_flow_net()
+
+    class NightBin:
+        start_hour, end_hour = 21.0, 21.5   # leaves for work at 21:00
+
+    morning, stats = trips.generate(net, flows, attachment, [(NightBin(), 1.0)],
+                                    window=(6, 9), seed=1)
+
+    assert morning, "the night shift's drive home is real traffic at 06:30"
+    assert all(t["from"] == "b" and t["to"] == "a" for t in morning)
+    assert stats["return_trips"] == len(morning)

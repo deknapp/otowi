@@ -129,11 +129,15 @@ def cmd_trips(args) -> None:
     gws = [] if args.internal_only else gateway_module.find(net, core)
 
     profile = departure.blended_profile(_residence_weights(flows))
-    weighted = departure.morning_weights(profile, window)
+    # The whole day, always. Trip generation filters to the window itself --
+    # handing it a window-restricted profile is what put 100% of the day's
+    # drivers inside the morning peak.
+    weighted = departure.day_weights(profile)
 
     vehicles, stats = trips.generate(
         net, flows, attachment, weighted,
         window=window, seed=args.seed, scale=args.scale, gateways=gws,
+        include_returns=not args.no_returns,
     )
     stats["gateways"] = len(gws)
     path = trips.write_trips(vehicles, window=window)
@@ -461,6 +465,9 @@ def build_parser() -> argparse.ArgumentParser:
                          metavar=("START", "END"),
                          help="Simulation window in local hours.")
         sub.add_argument("--seed", type=int, default=0)
+        sub.add_argument("--no-returns", action="store_true",
+                         help="Only generate the drive to work. A whole-day "
+                              "run with this set has an empty evening.")
         sub.add_argument("--scale", type=float, default=1.0,
                          help="Multiply demand. Anything but 1.0 must be reported: "
                               "delay is not linear in demand.")

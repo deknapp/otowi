@@ -34,7 +34,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from xml.etree import ElementTree as etree
 
-from .config import AM_PEAK, CACHE_DIR
+from .config import (AM_PEAK, CACHE_DIR, TIME_AWAY_MAX_H, TIME_AWAY_MEAN_H,
+                     TIME_AWAY_MIN_H, TIME_AWAY_SD_H)
 from . import gateways as gateway_module
 from .demand import Flow, vehicles_on
 
@@ -289,25 +290,63 @@ def attach_blocks(
     return result
 
 
+def _sample_time_away(rng: random.Random) -> float:
+    """Seconds between leaving home and setting off back, for one worker.
+
+    Truncated normal, clipped rather than resampled: resampling until a draw
+    falls in range quietly reshapes the distribution near the bounds, and the
+    bounds here are a statement about plausible working days rather than a
+    tail to be preserved.
+
+    Every number in this comes from :mod:`otowi.config`, where the assumption
+    it encodes is written out. It is the largest unmeasured input in a
+    whole-day run.
+    """
+    hours = rng.gauss(TIME_AWAY_MEAN_H, TIME_AWAY_SD_H)
+    return max(TIME_AWAY_MIN_H, min(TIME_AWAY_MAX_H, hours)) * 3600.0
+
+
 def _sample_departures(
     count: int,
     weighted_bins: list[tuple[object, float]],
-    window: tuple[int, int],
     rng: random.Random,
 ) -> list[float]:
-    """Draw ``count`` departure seconds from the measured profile."""
+    """Draw ``count`` departure times, in seconds since local midnight.
+
+    Absolute, not window-relative, and drawn from the whole-day profile. The
+    window is applied afterwards by :func:`_place`, as a filter. Doing it the
+    other way round -- restricting the profile to the window and then placing a
+    whole-day vehicle count inside it -- silently multiplied the morning peak
+    by 1.42, and produced no output anyone could have noticed it in.
+    """
     bins = [item for item, _ in weighted_bins]
     weights = [weight for _, weight in weighted_bins]
-    window_start_s = window[0] * 3600
+    return sorted(
+        rng.uniform(chosen.start_hour, chosen.end_hour) * 3600
+        for chosen in rng.choices(bins, weights=weights, k=count)
+    )
 
-    seconds = []
-    for chosen in rng.choices(bins, weights=weights, k=count):
-        # Clip to the window: a bin straddling the edge contributes only its
-        # overlapping part, and a departure must land inside what we simulate.
-        low = max(chosen.start_hour, window[0]) * 3600
-        high = min(chosen.end_hour, window[1]) * 3600
-        seconds.append(rng.uniform(low, high) - window_start_s)
-    return sorted(seconds)
+
+DAY_S = 24 * 3600
+
+
+def _place(absolute_s: float, window: tuple[int, int]) -> float | None:
+    """Map a clock time to a second inside the simulated window, or None.
+
+    Times past midnight wrap, whatever the window. A worker who left for a
+    night shift at 21:00 sets off home around 06:30 the *next* morning, and
+    that vehicle is on the road in the morning peak -- the same morning peak,
+    because the model is a *typical* day in steady state, so today's night
+    shift going home stands in for yesterday's. Dropping it because the clock
+    passed 24:00 would delete exactly the traffic a whole-day model is for.
+    """
+    span = (window[1] - window[0]) * 3600
+    relative = absolute_s % DAY_S - window[0] * 3600
+    if relative < 0:
+        relative += DAY_S
+    if 0.0 <= relative < span:
+        return relative
+    return None
 
 
 def generate(
@@ -320,6 +359,7 @@ def generate(
     seed: int = 0,
     scale: float = 1.0,
     gateways: list | None = None,
+    include_returns: bool = True,
 ) -> tuple[list[dict], dict]:
     """Expand flows into individual vehicles with an origin, destination and time.
 
@@ -328,12 +368,28 @@ def generate(
     reported alongside the results, because a scaled run does not reproduce
     congestion -- delay is not linear in demand, which is the entire reason
     this corridor is worth simulating.
+
+    Every flow is expanded over the **whole day** and each trip is then kept or
+    dropped by whether its departure lands in ``window``. Restricting the
+    departure profile to the window instead, which is what this did before,
+    placed 100% of a flow's drivers inside 06:00-09:00 when only 70.5% of
+    departures happen then -- a 1.42x over-count of the morning peak that no
+    output could reveal, because the vehicle total was exactly the number it
+    was supposed to be.
+
+    ``include_returns`` generates the drive home as well as the drive to work.
+    On by default: LODES measures home-to-work flows only, so without it a
+    whole-day run has a morning peak and an empty evening. When it leaves is a
+    stated assumption -- see ``TIME_AWAY_*`` in :mod:`otowi.config`.
     """
     rng = random.Random(seed)
     trips: list[dict] = []
     dropped_unplaced = 0
     dropped_same_edge = 0
     dropped_no_gateway = 0
+    dropped_no_return = 0
+    outside_window = 0
+    returns = 0
     expected_total = 0.0
     by_kind = {"internal": 0, "inbound": 0, "outbound": 0}
     destination_edges: set[str] = set()
@@ -341,6 +397,13 @@ def generate(
     for flow in flows:
         # Where the trip enters and leaves the roads we actually model.
         external_delay_s = 0.0
+        # The mirror image, for the drive home. Set for every flow kind, since
+        # a return trip is not optional in a whole-day model -- LODES measures
+        # home-to-work only, so without this a 24-hour run is a morning peak
+        # followed by fifteen empty hours.
+        return_origin: str | None = None
+        return_destination: str | None = None
+        return_delay_s = 0.0
 
         # ``destination_block`` is set when the trip ends at a workplace inside
         # the study area. It is resolved to an edge once per *vehicle* below
@@ -352,6 +415,9 @@ def generate(
             origin = attachment.edge_by_block.get(flow.home_block)
             destination = attachment.edge_by_block.get(flow.work_block)
             destination_block = flow.work_block
+            # Home is one address, so the return has a single destination and
+            # gets no spreading -- the reverse of the arrival case below.
+            return_destination = origin
 
         elif flow.kind == "inbound":
             # Lives outside, works inside: appears at a gateway.
@@ -370,6 +436,10 @@ def generate(
                     # boundary until roughly 07:00. Putting them on the gateway
                     # at 06:30 would move the whole inbound peak early.
                     external_delay_s = gateway_module.external_travel_s(outside_m)
+                    # Going home they leave work and cross the boundary shortly
+                    # after, so the outside leg comes *after* the modelled part
+                    # and adds no delay to the departure.
+                    return_destination = gateway.edge_id
 
         else:  # outbound -- lives inside, works outside
             origin = attachment.edge_by_block.get(flow.home_block)
@@ -380,7 +450,14 @@ def generate(
                     flow.home_lon, flow.home_lat, "out",
                 )
                 if chosen is not None:
-                    destination = chosen[0].edge_id
+                    gateway, outside_m = chosen
+                    destination = gateway.edge_id
+                    # Mirror of the inbound case: they set off from a workplace
+                    # outside the box and only appear at the boundary after the
+                    # outside leg, so the return departure is delayed.
+                    return_origin = gateway.edge_id
+                    return_delay_s = gateway_module.external_travel_s(outside_m)
+            return_destination = origin
 
         if flow.kind != "internal" and (origin is None or destination is None):
             if attachment.edge_by_block.get(
@@ -397,6 +474,8 @@ def generate(
             dropped_same_edge += flow.jobs
             continue
 
+        # The whole day's drivers for this flow, not the window's. The window
+        # is applied per trip by _place() below.
         expected = vehicles_on(flow) * scale
         expected_total += expected
         count = _poisson(expected, rng)
@@ -404,14 +483,7 @@ def generate(
             continue
 
         by_kind[flow.kind] += count
-        for second in _sample_departures(count, weighted_bins, window, rng):
-            # An inbound vehicle is placed when it reaches the boundary, not
-            # when it left home. Departures pushed past the window are kept at
-            # its end rather than dropped, which slightly over-fills the last
-            # interval and is preferable to deleting long-distance commuters.
-            depart = min(second + external_delay_s,
-                         (window[1] - window[0]) * 3600 - 1)
-
+        for second in _sample_departures(count, weighted_bins, rng):
             arrival = destination
             if destination_block is not None:
                 spread = attachment.choose_destination(destination_block, rng)
@@ -423,8 +495,36 @@ def generate(
                 dropped_same_edge += 1
                 continue
 
-            trips.append({"from": origin, "to": arrival, "depart": depart})
-            destination_edges.add(arrival)
+            # --- the drive to work ---------------------------------------
+            # An inbound vehicle is placed when it reaches the boundary, not
+            # when it left home.
+            depart = _place(second + external_delay_s, window)
+            if depart is None:
+                outside_window += 1
+            else:
+                trips.append({"from": origin, "to": arrival, "depart": depart})
+                destination_edges.add(arrival)
+
+            # --- and the drive home --------------------------------------
+            if not include_returns:
+                continue
+            back_from = return_origin or arrival
+            back_to = return_destination
+            if back_to is None:
+                dropped_no_return += 1
+                continue
+            if back_from == back_to:
+                dropped_same_edge += 1
+                continue
+            home_again = _place(
+                second + _sample_time_away(rng) + return_delay_s, window)
+            if home_again is None:
+                outside_window += 1
+                continue
+            trips.append({"from": back_from, "to": back_to,
+                          "depart": home_again})
+            destination_edges.add(back_to)
+            returns += 1
 
     trips.sort(key=lambda trip: trip["depart"])
     stats = {
@@ -434,13 +534,22 @@ def generate(
         "workers_dropped_unplaced_block": dropped_unplaced,
         "workers_dropped_same_edge": dropped_same_edge,
         "workers_dropped_no_gateway": dropped_no_gateway,
+        "trips_outside_window": outside_window,
+        "returns_without_a_home_edge": dropped_no_return,
+        "return_trips": returns,
+        "include_returns": include_returns,
+        "time_away_mean_h": TIME_AWAY_MEAN_H,
+        "time_away_sd_h": TIME_AWAY_SD_H,
         # A funnel is invisible in the vehicle count and obvious here.
         "distinct_destination_edges": len(destination_edges),
         "scale": scale,
         "seed": seed,
         "window": f"{window[0]:02d}:00-{window[1]:02d}:00",
     }
-    log.info("generated %d vehicles (expected %.0f)", len(trips), expected_total)
+    log.info("generated %d vehicles in %02d:00-%02d:00 (%d outbound, %d returning) "
+             "from %.0f whole-day commuters; %d departures fell outside the window",
+             len(trips), window[0], window[1], len(trips) - returns, returns,
+             expected_total, outside_window)
     return trips, stats
 
 

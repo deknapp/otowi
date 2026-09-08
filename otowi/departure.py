@@ -220,6 +220,27 @@ def morning_weights(bins: list[Bin], window: tuple[int, int]) -> list[tuple[Bin,
     return [(item, weight / total) for item, weight in overlapping]
 
 
+def day_weights(bins: list[Bin]) -> list[tuple[Bin, float]]:
+    """The whole 24-hour profile, normalized. Every worker appears exactly once.
+
+    Trip generation samples from *this*, never from a window-restricted
+    profile, and then keeps the trips whose departure lands in the window being
+    simulated. That ordering matters and getting it backwards was a bug:
+    :func:`morning_weights` renormalizes the bin shares to the window, so
+    combining it with a whole-day vehicle count placed 100% of a flow's drivers
+    inside 06:00-09:00 when only 70.5% of departures happen then -- a 1.42x
+    over-count of the morning peak, invisible in every output because the
+    vehicle total looked exactly as intended.
+
+    Filtering also gets the trips a renormalized window can never produce: the
+    night-shift worker whose drive *home* lands in the morning peak.
+    """
+    total = sum(item.workers for item in bins)
+    if total <= 0:
+        raise ValueError("departure profile is empty")
+    return [(item, item.workers / total) for item in bins if item.workers > 0]
+
+
 def summarize(bins: list[Bin], window: tuple[int, int]) -> dict:
     """Headline numbers for the CLI and provenance."""
     inside = morning_weights(bins, window)

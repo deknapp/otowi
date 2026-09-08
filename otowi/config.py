@@ -74,7 +74,46 @@ CORRIDORS = {
     "cerrillos": "Cerrillos Road",
 }
 
+# ---------------------------------------------------------------- returning
+#
+# LODES measures home-to-work flows and nothing else, so a model built from it
+# alone contains only the trip *to* work. Run over a whole day that produces a
+# morning peak and an empty evening, because nobody ever drives home -- which
+# is not a small error in a corridor model, it is half the traffic.
+#
+# The return trip has to be generated, and the only honest way to say when it
+# leaves is to say what was assumed. ACS publishes departure time to work
+# (B08302) and travel time to work (B08303). It publishes nothing at all about
+# the return, and no other free source crosses return time with an
+# origin-destination pair. So:
+#
+#   return departure = outbound departure + time away from home
+#
+# where "time away" is sampled per vehicle. Folding the commute into the same
+# quantity is deliberate -- it needs one assumption instead of two, and the
+# outbound commute duration is a model *output* that is not known when trips
+# are generated.
+#
+# The mean is the BLS American Time Use Survey figure for hours worked on days
+# worked by full-time workers (~8.6 h) plus a round-trip commute and breaks.
+# The spread is wide on purpose: it is standing in for part-time work, shift
+# lengths, and overtime all at once, none of which this model can distinguish.
+#
+# **This is the single largest unmeasured input in a whole-day run, and the
+# timing of the evening peak is almost entirely determined by it.** It is a
+# constant here rather than buried in a function so that it can be varied and
+# the result reported as a sensitivity, which is the only defensible way to
+# use a number nobody measured.
+TIME_AWAY_MEAN_H = 9.6
+TIME_AWAY_SD_H = 1.8
+TIME_AWAY_MIN_H = 4.0
+TIME_AWAY_MAX_H = 14.0
+
 # Peak windows, local time. A full 24-hour microscopic run over this area is
 # heavy and mostly empty; the questions worth asking live in these two windows.
 AM_PEAK = (6, 9)
 PM_PEAK = (15, 18)
+
+#: The whole day. Only meaningful with return trips generated -- without them
+#: a 24-hour run is a morning peak followed by fifteen empty hours.
+FULL_DAY = (0, 24)
