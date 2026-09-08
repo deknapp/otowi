@@ -332,14 +332,24 @@ def cmd_web(args) -> None:
 
 
 def cmd_run(args) -> None:
-    """Everything, skipping stages whose output already exists."""
+    """Everything, skipping stages whose output already exists.
+
+    Routing here is `cmd_assign`, not `cmd_route`. Single-pass duarouter hands
+    every driver the path that is fastest on an empty road, so they all choose
+    the same one and the model manufactures congestion on one corridor while
+    leaving its alternatives empty. Iterative assignment was written to fix
+    exactly that and then was reachable only by running `otowi assign` by hand
+    -- so the default path through this program still had the defect the fix
+    was for, and anyone running `otowi run` on a clean checkout got the old
+    behaviour without being told.
+    """
     window = tuple(args.window)
     if not network.network_path().exists():
         cmd_network(args)
     if not trips.trips_path(window).exists():
         cmd_trips(args)
     if not simulate.routes_path(window).exists():
-        cmd_route(args)
+        cmd_assign(args)
     cmd_simulate(args)
     cmd_calibrate(args)
 

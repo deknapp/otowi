@@ -12,15 +12,18 @@ rather than estimating.
 
 > **Status: it runs end to end, it is validated against real counts, and it
 > fails them.** `otowi run` goes from an empty checkout to a finished morning
-> peak compared against 1,894 NMDOT-measured links. On held-out segments the
-> median GEH is 6.15 and **the model carries 8% of measured peak-hour volume**.
+> peak compared against 2,152 NMDOT-measured links. On held-out segments the
+> median GEH is 5.92 and **the model carries 16% of measured peak-hour volume**.
 > That number is reported rather than tuned away, because it is not a tuning
 > error — see [What the calibration says](#what-the-calibration-says).
 
 ![The modelled morning peak](docs/map-modelled.png)
 
 *`otowi web` — the modelled 06:00–09:00 peak. The bright corridor is US-84/285
-north out of Santa Fe, branching west over Otowi Bridge to Los Alamos.*
+north out of Santa Fe, branching west over Otowi Bridge to Los Alamos. Both
+map images on this page were captured before the gateway and assignment
+changes and show the 8% model; `otowi web` regenerates them from the current
+run.*
 
 ## What it is for
 
@@ -159,52 +162,66 @@ Things this will say about itself, and keep saying:
 `otowi calibrate` compares modelled edge volumes against NMDOT's published
 AADT, converted to a directional peak hour with the K and D factors NMDOT
 publishes alongside it. 7,149 count segments intersect the study area; 4,904
-match an edge; 1,894 of those carry modelled traffic to compare.
+match an edge; 2,152 of those carry modelled traffic to compare.
 
 On the held-out half of the segments — split by a hash of the station ID, so it
 is the same split on every run and cannot be reshuffled until it flatters:
 
-| | |
-|---|---|
-| Median GEH | 6.15 |
-| Links with GEH < 5 | 31% |
-| **Median modelled ÷ observed** | **0.079** |
+| | held out | the other half |
+|---|---|---|
+| Links | 1,058 | 1,094 |
+| Median GEH | 5.92 | 5.93 |
+| Links with GEH < 5 | 37.8% | 36.8% |
+| **Median modelled ÷ observed** | **0.163** | 0.157 |
 
 The conventional bar is 85% of links under GEH 5. This is nowhere near it.
+
+The two columns agree to within half a percent, which is the least interesting
+result here and the one most worth stating: nothing was fitted, so there was
+nothing to overfit. The held-out half exists to make that checkable rather than
+asserted.
 
 ![Where the model is missing traffic](docs/map-ratio.png)
 
 *The ratio layer. Red is where the model carries far less than NMDOT measured;
-grey would be a match. Almost nothing is grey, and the red is densest on the
-highways — which is the shape of the error, not just its size.*
+grey would be a match. Almost nothing is grey.*
 
-**The 8% is the finding, and no constant will fix it.** The model contains
-commuting between two points *both inside the study area* and nothing else.
-Dropping trips with one end outside the box removes essentially all through
-traffic — on I-25 the ratio is 0.02, because almost everything on it is going
-to Albuquerque or beyond. Freight, shopping, school runs and tourism are absent
-by construction.
+**The 16% is the finding, and no constant will fix it.** The model contains
+commuting and nothing else: no freight, no shopping, no school runs, no
+tourism. Those are absent by construction, not by accident, and they are most
+of what is on the road at 07:30.
 
-So the shortfall is not uniform, which is the useful part: it is worst exactly
-where through traffic dominates and least bad on the in-town Santa Fe streets
-where a commute model should do best. That is a map of what to build next,
-which is what a calibration is supposed to produce.
+The shortfall is close to flat across the size of the road, which was not true
+before trips with one end outside the study area were added back. On links
+measuring 1,000 veh/h or more the median ratio is 0.151; on links under
+300 veh/h it is 0.159. A model that was missing *highway* traffic specifically
+would not look like that.
+
+The exception is the through corridor, and it is the exception that makes
+sense. I-25 sits at 0.054 against the 0.16 overall, because almost everything
+on it is going to Albuquerque or beyond — past the study area rather than into
+it. NM-14, which is a Santa Fe commuter road, is at 0.361. That ordering is a
+map of what to build next, which is what a calibration is supposed to
+produce.
 
 ### What is wrong with the current numbers, specifically
 
 The pipeline runs. That is not the same as the answers being right, and these
 are the three reasons no travel time from it is quoted here:
 
-1. **The model carries 8% of measured volume**, for the structural reason
-   above. Travel times from a network loaded to a twelfth of reality are not
-   the travel times of that network.
-2. **Routing is single-pass on free-flow times.** `duarouter` gives every
-   driver the path that would be fastest on an empty road, so all of them
-   choose the same one and the busiest corridors are overloaded in a way real
-   drivers avoid by spreading out. The fix is iterative assignment
-   (`duaIterate`), which is not wired up yet. Until it is, congestion on the
-   single best path is overstated and congestion on the alternatives is
-   understated.
+1. **The model carries 16% of measured volume**, for the structural reason
+   above. Travel times from a network loaded to a sixth of reality are not the
+   travel times of that network.
+2. **The network is over-saturated even at 16% of real demand.** Routing is
+   now iterative — `otowi run` reaches equilibrium rather than handing every
+   driver the same free-flow path — and the run still needed **2,635 jam
+   teleports**, SUMO's rescue for a deadlocked vehicle, and still had 7.0% of
+   vehicles unfinished when the clock stopped. Mean time loss is 31 minutes per
+   vehicle and the 90th percentile trip takes 2.6 hours, against a median of
+   25 minutes. A quarter-hour commute and a two-and-a-half-hour tail cannot
+   both be right. The plausible causes are junction control and lane
+   connectivity at the interchanges, not demand, since there is six times less
+   demand here than reality carries without deadlocking.
 3. **Some vehicles do not finish.** Any that are still travelling when the
    clock stops are absent from every average, which biases travel times
    *downward* exactly where the network is worst. The run reports
