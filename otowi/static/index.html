@@ -316,7 +316,14 @@
     });
   });
 
-  fetch("summary.json").then(function (r) { return r.json(); }).then(function (s) {
+  // `otowi web` serves the JSON from its own endpoints; the published page
+  // (see `otowi export`) has the same files sitting in data/ beside it, and
+  // a precomputed answer for every place pair instead of a live router.
+  // One page, so the served version and the published one cannot drift.
+  var STATIC = !!window.OTOWI_STATIC;
+  var DATA = STATIC ? "data/" : "";
+
+  fetch(DATA + "summary.json").then(function (r) { return r.json(); }).then(function (s) {
     document.getElementById("window").textContent = s.window || "";
     var held = s.held_out || {};
     var ratio = held.median_ratio_modelled_over_observed;
@@ -343,7 +350,7 @@
       goBtn   = document.getElementById("go"),
       tripOut = document.getElementById("trip-out");
 
-  fetch("places.json").then(function (r) { return r.json(); }).then(function (places) {
+  fetch(DATA + "places.json").then(function (r) { return r.json(); }).then(function (places) {
     places.forEach(function (p) {
       [fromSel, toSel].forEach(function (sel) {
         var o = document.createElement("option");
@@ -355,6 +362,26 @@
     toSel.value = "los_alamos";
   });
 
+  // Static mode has no router, so every ordered pair of places was routed
+  // ahead of time and written into plans.json. Same payload either way, so
+  // renderPlan does not know which mode it is in.
+  var plansPromise = null;
+
+  function planFor(from, to) {
+    if (!STATIC) {
+      return fetch(DATA + "plan.json?from=" + encodeURIComponent(from) +
+                   "&to=" + encodeURIComponent(to));
+    }
+    if (!plansPromise) {
+      plansPromise = fetch(DATA + "plans.json").then(function (r) { return r.json(); });
+    }
+    return plansPromise.then(function (all) {
+      var plan = all[from + ">" + to];
+      if (!plan) { throw new Error("No precomputed route for that pair."); }
+      return plan;
+    });
+  }
+
   goBtn.addEventListener("click", function () {
     if (fromSel.value === toSel.value) {
       tripOut.innerHTML = '<div class="verdict">Pick two different places.</div>';
@@ -364,9 +391,8 @@
     goBtn.textContent = "Routing…";
     tripOut.innerHTML = "";
 
-    fetch("plan.json?from=" + encodeURIComponent(fromSel.value) +
-          "&to=" + encodeURIComponent(toSel.value))
-      .then(function (r) { return r.json(); })
+    planFor(fromSel.value, toSel.value)
+      .then(function (r) { return r.json ? r.json() : r; })
       .then(function (plan) {
         if (plan.error) { throw new Error(plan.error); }
         renderPlan(plan);
@@ -410,7 +436,7 @@
     tripOut.innerHTML = html;
   }
 
-  fetch("data.geojson").then(function (r) { return r.json(); }).then(function (d) {
+  fetch(DATA + (STATIC ? "map.geojson" : "data.geojson")).then(function (r) { return r.json(); }).then(function (d) {
     geo = d;
     draw();
     try {

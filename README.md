@@ -12,8 +12,8 @@ rather than estimating.
 
 > **Status: it runs end to end, it is validated against real counts, and it
 > fails them.** `otowi run` goes from an empty checkout to a finished morning
-> peak compared against 2,152 NMDOT-measured links. On held-out segments the
-> median GEH is 5.92 and **the model carries 16% of measured peak-hour volume**.
+> peak compared against 2,306 NMDOT-measured links. On held-out segments the
+> median GEH is 5.78 and **the model carries 16% of measured peak-hour volume**.
 > That number is reported rather than tuned away, because it is not a tuning
 > error — see [What the calibration says](#what-the-calibration-says).
 
@@ -162,17 +162,17 @@ Things this will say about itself, and keep saying:
 `otowi calibrate` compares modelled edge volumes against NMDOT's published
 AADT, converted to a directional peak hour with the K and D factors NMDOT
 publishes alongside it. 7,149 count segments intersect the study area; 4,904
-match an edge; 2,152 of those carry modelled traffic to compare.
+match an edge; 2,306 of those carry modelled traffic to compare.
 
 On the held-out half of the segments — split by a hash of the station ID, so it
 is the same split on every run and cannot be reshuffled until it flatters:
 
 | | held out | the other half |
 |---|---|---|
-| Links | 1,058 | 1,094 |
-| Median GEH | 5.92 | 5.93 |
-| Links with GEH < 5 | 37.8% | 36.8% |
-| **Median modelled ÷ observed** | **0.163** | 0.157 |
+| Links | 1,128 | 1,178 |
+| Median GEH | 5.78 | 5.78 |
+| Links with GEH < 5 | 38.6% | 38.6% |
+| **Median modelled ÷ observed** | **0.163** | 0.173 |
 
 The conventional bar is 85% of links under GEH 5. This is nowhere near it.
 
@@ -191,42 +191,89 @@ commuting and nothing else: no freight, no shopping, no school runs, no
 tourism. Those are absent by construction, not by accident, and they are most
 of what is on the road at 07:30.
 
-The shortfall is close to flat across the size of the road, which was not true
-before trips with one end outside the study area were added back. On links
-measuring 1,000 veh/h or more the median ratio is 0.151; on links under
-300 veh/h it is 0.159. A model that was missing *highway* traffic specifically
-would not look like that.
+The shortfall is not concentrated on the big roads. On links measuring
+1,000 veh/h or more the median ratio is 0.203; on links under 300 veh/h it is
+0.159. A model missing *highway* traffic specifically would look the other way
+round.
 
-The exception is the through corridor, and it is the exception that makes
-sense. I-25 sits at 0.054 against the 0.16 overall, because almost everything
-on it is going to Albuquerque or beyond — past the study area rather than into
-it. NM-14, which is a Santa Fe commuter road, is at 0.361. That ordering is a
-map of what to build next, which is what a calibration is supposed to
-produce.
+The ordering by corridor is the useful part. I-25 sits at 0.126, because almost
+everything on it is going to Albuquerque or beyond — past the study area rather
+than into it. NM-14, a Santa Fe commuter road, is at 0.672. The model is
+closest to reality exactly where the traffic is commuting and furthest where it
+is through traffic, which is what a commute-only model should look like, and it
+is a map of what to build next.
+
+### What the model says about the commute
+
+This is the question the project exists for, and until 2026-09-08 the model
+could not answer it: the Santa Fe to Los Alamos trip came out at a median of
+116 minutes for a 63 km drive that really takes about 45. The cause was not the
+highway. LODES reports jobs by census block, the laboratory sits in a couple of
+blocks, and each block was attached to exactly one edge -- so 6,080 of the
+9,387 vehicles arriving in Los Alamos were delivered to 6th Street, a
+residential street. It deadlocked and the queue propagated back down East Road
+and Diamond Drive onto NM-502. Arrivals are now spread across the roads that
+actually serve the site, weighted by capacity.
+
+`otowi when santa_fe los_alamos`, on the converged assignment:
+
+| leave | duration | arrive |
+|---|---|---|
+| 06:00 | 39.3 min | 06:39 |
+| 07:00 | 41.2 min | 07:41 |
+| 07:30 | 41.8 min | 08:11 |
+| 08:00 | 45.7 min | 08:45 |
+| 08:45 | 40.9 min | 09:25 |
+
+**The spread is 6.4 minutes across the whole window.** That is the answer worth
+having, and it is not the one a commute model is expected to give: on this
+corridor, at this demand, when you leave barely matters. A tool that only ever
+emitted a single recommended departure could not say that, which is why the
+planner reports every option and the gap between best and worst rather than a
+recommendation.
+
+Treat the durations as optimistic -- see the coverage figure above -- and the
+shape of the curve as the more trustworthy part.
+
+### Convergence
+
+Assignment iterates until routes and travel times agree. Route shift is the
+share of drivers who changed path since the previous round:
+
+| round | unfinished | mean duration | mean delay | route shift |
+|---|---|---|---|---|
+| 1 | 22.4% | 59 min | 36 min | — |
+| 2 | 4.8% | 48 min | 24 min | 44.2% |
+| 3 | 1.0% | 40 min | 16 min | 23.8% |
+| 4 | 0.4% | 35 min | 11 min | 15.1% |
+| 5 | 0.4% | 34 min | 10 min | 10.8% |
+
+Round 1 is single-pass free-flow routing -- every driver handed the same
+fastest-on-an-empty-road path -- so it is the worst case by construction rather
+than a result. The last two rounds barely move the outcome, which is what
+settled looks like. A run whose route shift is still large at round 5 has not
+converged and its travel times are not worth quoting.
 
 ### What is wrong with the current numbers, specifically
 
-The pipeline runs. That is not the same as the answers being right, and these
-are the three reasons no travel time from it is quoted here:
+The pipeline runs and converges. These are the reasons to read its travel times
+with care:
 
 1. **The model carries 16% of measured volume**, for the structural reason
-   above. Travel times from a network loaded to a sixth of reality are not the
-   travel times of that network.
-2. **The network is over-saturated even at 16% of real demand.** Routing is
-   now iterative — `otowi run` reaches equilibrium rather than handing every
-   driver the same free-flow path — and the run still needed **2,635 jam
-   teleports**, SUMO's rescue for a deadlocked vehicle, and still had 7.0% of
-   vehicles unfinished when the clock stopped. Mean time loss is 31 minutes per
-   vehicle and the 90th percentile trip takes 2.6 hours, against a median of
-   25 minutes. A quarter-hour commute and a two-and-a-half-hour tail cannot
-   both be right. The plausible causes are junction control and lane
-   connectivity at the interchanges, not demand, since there is six times less
-   demand here than reality carries without deadlocking.
-3. **Some vehicles do not finish.** Any that are still travelling when the
-   clock stops are absent from every average, which biases travel times
-   *downward* exactly where the network is worst. The run reports
-   `vehicles_unfinished` for this reason rather than leaving it to be inferred
-   from a missing row.
+   above. A network loaded to a sixth of reality is a network with less
+   competition for space than the real one, so every duration here is
+   optimistic. This is the honest limit on the whole model and no amount of
+   assignment fixes it.
+2. **A small amount of deadlock remains.** The converged run needed 155 jam
+   teleports, SUMO's rescue for a stuck vehicle, down from 2,635. Of the 356
+   teleports in total, 183 were vehicles waiting too long to yield, which
+   points at right-of-way at unsignalised junctions rather than at capacity.
+   Small enough not to distort the averages, not small enough to call the
+   network right.
+3. **0.4% of vehicles do not finish** within the window and are absent from
+   every average, which biases travel times *downward* where the network is
+   worst. Down from 7.0%, and the run reports `vehicles_unfinished` rather than
+   leaving it to be inferred from a missing row.
 
 Two bugs found by building this are worth recording, because both reported
 success while being wrong:

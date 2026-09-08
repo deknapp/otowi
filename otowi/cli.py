@@ -18,6 +18,7 @@ import json
 import logging
 import sys
 from collections import Counter
+from pathlib import Path
 
 from . import demand, departure, network, simulate, trips
 from .config import AM_PEAK, CORRIDORS, PLACES
@@ -331,6 +332,66 @@ def cmd_web(args) -> None:
     )
 
 
+def cmd_export(args) -> None:
+    """Write the map, the numbers and the routes as files a static host serves.
+
+    GitHub Pages rather than a running server, deliberately. Nothing here is
+    computed per visitor and nothing could be: a run of this model takes about
+    an hour, so any hosted version shows precomputed output whatever is behind
+    it. A static export is the honest shape of that, and it cannot break at
+    3 a.m.
+
+    The page is `otowi/static/index.html`, the same file `otowi web` serves,
+    with a flag set. Keeping one page means the published copy cannot quietly
+    drift from the one this repository runs.
+    """
+    from . import journey, web
+
+    window = tuple(args.window)
+    out = Path(args.out)
+    data = out / "data"
+    data.mkdir(parents=True, exist_ok=True)
+
+    geojson, summary = web.build(window=window, force=args.force)
+    (data / "map.geojson").write_bytes(geojson.read_bytes())
+    (data / "summary.json").write_text(json.dumps(summary, indent=2))
+
+    (data / "places.json").write_text(json.dumps(
+        [{"key": key, "name": place.name, "note": place.note}
+         for key, place in PLACES.items()], indent=2))
+
+    # Every ordered pair, routed now so the page does not need a router. Six
+    # places is thirty pairs; a pair that cannot be routed is left out and
+    # reported rather than written as an empty answer.
+    net = _load_net()
+    times = journey.TravelTimes.load(simulate.edgedata_path(window), net)
+    core = trips.reachable_core(net)
+    plans, unroutable = {}, []
+    for origin in PLACES:
+        for destination in PLACES:
+            if origin == destination:
+                continue
+            try:
+                plans[f"{origin}>{destination}"] = journey.plan(
+                    net, times, core, origin, destination, window=window)
+            except SystemExit as exc:
+                unroutable.append(f"{origin}>{destination}: {exc}")
+    (data / "plans.json").write_text(json.dumps(plans, separators=(",", ":")))
+
+    page = Path(__file__).resolve().parent / "static" / "index.html"
+    html = page.read_text().replace(
+        "<body>", "<body>\n<script>window.OTOWI_STATIC = true;</script>", 1)
+    (out / "index.html").write_text(html)
+
+    print(json.dumps({
+        "out": str(out),
+        "index_kb": round(len(html) / 1024, 1),
+        "map_mb": round((data / "map.geojson").stat().st_size / 1e6, 2),
+        "plans": len(plans),
+        "unroutable": unroutable,
+    }, indent=2))
+
+
 def cmd_run(args) -> None:
     """Everything, skipping stages whose output already exists.
 
@@ -386,6 +447,7 @@ def build_parser() -> argparse.ArgumentParser:
          "Iterate routing against measured congestion (user equilibrium)."),
         ("calibrate", cmd_calibrate, "Compare modelled volumes against NMDOT counts."),
         ("web", cmd_web, "Serve an interactive map of the model and its error."),
+        ("export", cmd_export, "Write the map as static files for GitHub Pages."),
         ("run", cmd_run, "Do every stage that has not been done."),
     ]:
         sub = add(name, handler, help_text)
@@ -408,6 +470,8 @@ def build_parser() -> argparse.ArgumentParser:
                               "the model did before gateways existed.")
         sub.add_argument("--port", type=int, default=8814,
                          help="Port for the local map server.")
+        sub.add_argument("--out", default="site",
+                         help="Directory for `otowi export`.")
         sub.add_argument("--no-browser", action="store_true",
                          help="Do not open a browser window.")
         sub.add_argument("--end-padding", type=int, default=10800,

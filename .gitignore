@@ -2,7 +2,9 @@
 .venv/
 __pycache__/
 *.pyc
-data/
+# Anchored: unanchored `data/` also matches site/data/, which is the
+# published map and must be committed.
+/data/
 .cache/
 .pytest_cache/
 .DS_Store
