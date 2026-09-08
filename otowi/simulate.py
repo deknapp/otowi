@@ -7,8 +7,10 @@ network. It does this on free-flow travel times, which means every driver is
 routed as though the road were empty. That is a real limitation and it is the
 standard first pass: it produces the routes people would choose if there were
 no congestion, and then the simulation shows what happens when all of them try
-it at once. Iterating routing against the resulting congestion is what
-``duaIterate`` does, and it is a later step here, not this one.
+it at once. Iterating routing against the resulting congestion, so that drivers
+spread across alternatives the way real ones do, is
+:func:`assign_iteratively` -- and getting that iteration to converge rather
+than oscillate is the subtle part. Its docstring is where that story lives.
 
 ``sumo`` runs the microscopic simulation: every vehicle, every second,
 car-following and lane-changing on the real geometry. The outputs worth having
@@ -24,6 +26,7 @@ from __future__ import annotations
 
 import logging
 import subprocess
+import zlib
 from pathlib import Path
 from xml.etree import ElementTree as etree
 
@@ -109,6 +112,93 @@ def build_routes(
     return out
 
 
+#: Gawron's route-choice parameters, at SUMO's defaults.
+#:
+#: ``beta`` is the share of a driver's route probability that may move in one
+#: round, and it is the damping: at 0.3 a route losing badly still keeps most
+#: of its traffic this round and sheds it over the next few. Raising it makes
+#: the assignment converge faster right up until it does not converge at all.
+GAWRON_BETA = "0.3"
+GAWRON_A = "0.05"
+
+#: How many paths a driver keeps in play. Beyond about five the extra
+#: alternatives are minor variations that never carry traffic, and they cost
+#: memory on every round for 54,000 vehicles.
+MAX_ALTERNATIVES = "5"
+
+
+def alternatives_path(window: tuple[int, int] = AM_PEAK) -> Path:
+    """Route *alternatives*, carried from one assignment round to the next.
+
+    Distinct from the routes file, and the distinction is the entire mechanism
+    described in :func:`assign_iteratively`: the routes file says which path
+    each driver takes, the alternatives file says which paths each driver is
+    choosing *between* and with what probability. Iterating on the second is
+    what stops the assignment flipping.
+    """
+    return CACHE_DIR / f"alts-am-{window[0]:02d}{window[1]:02d}.rou.alt.xml"
+
+
+def _route_distributions(alts_file: Path) -> dict[str, dict[int, float]]:
+    """Each vehicle's probability over its alternative paths.
+
+    Keyed by a CRC32 of the edge list rather than the list itself: at 54,000
+    vehicles with up to five alternatives apiece, holding the paths twice to
+    compare two rounds is hundreds of megabytes and nothing here needs to read
+    them, only to tell one from another.
+    """
+    dists: dict[str, dict[int, float]] = {}
+    current: str | None = None
+    for event, element in etree.iterparse(str(alts_file), events=("start", "end")):
+        if event == "start":
+            if element.tag == "vehicle":
+                current = element.get("id")
+                dists[current] = {}
+            continue
+        if element.tag == "route" and current is not None:
+            key = zlib.crc32((element.get("edges") or "").encode())
+            dists[current][key] = float(element.get("probability") or 0.0)
+        elif element.tag == "vehicle":
+            current = None
+            element.clear()
+    return dists
+
+
+def _route_shift(previous: dict[str, dict[int, float]],
+                 current: dict[str, dict[int, float]]) -> float | None:
+    """How far route choice moved between rounds, in [0, 1].
+
+    Total-variation distance between each vehicle's probability distribution
+    over its paths, averaged across vehicles. Zero means nobody's route choice
+    moved at all, which is the equilibrium being iterated toward.
+
+    **Measure the distribution, not the route that got written.** The obvious
+    version of this metric compares the chosen path in each round's route file
+    and counts how many drivers changed, and it is wrong in a way that looks
+    convincing. duarouter *samples* the route it writes out of the
+    distribution, so a driver holding four alternatives at 0.25 apiece has a
+    75% chance of appearing to "change route" every round no matter how
+    completely the assignment has settled. Measured on a tenth of the demand,
+    that version reported 37.8%, then 45.3%, then 49.1% -- rising steadily
+    toward the coin-flip it actually was -- across exactly the rounds where
+    mean time loss fell 583 s to 290 to 248 to 246 and jam teleports fell from
+    138 to 1. It would have reported divergence at the moment of convergence.
+
+    The distributions are what Gawron updates, so they are what settles.
+    """
+    if not previous:
+        return None
+    shared = [v for v in current if v in previous]
+    if not shared:
+        return None
+    total = 0.0
+    for v in shared:
+        before, after = previous[v], current[v]
+        keys = set(before) | set(after)
+        total += 0.5 * sum(abs(after.get(k, 0.0) - before.get(k, 0.0)) for k in keys)
+    return total / len(shared)
+
+
 def assign_iteratively(
     trips_file: Path,
     *,
@@ -125,23 +215,49 @@ def assign_iteratively(
     vehicles failed to finish, and adding traffic barely raised the volume the
     model carried because throughput had collapsed.
 
-    The standard remedy is an iterative assignment approaching a user
-    equilibrium -- the state where no driver can improve their own journey by
-    switching route. Each round:
+    The remedy is an iterative assignment approaching a user equilibrium -- the
+    state where no driver can improve their own journey by switching route.
 
-    1. route the trips using the previous round's *measured* edge travel times,
+    **The first attempt at this oscillated, and the reason is worth keeping.**
+    Each round re-ran duarouter over the raw trips with the last round's
+    measured travel times and replaced every driver's route with the new
+    shortest path. That is all-or-nothing reassignment, and it cannot converge:
+    the whole population moves onto whatever was fast last round, which jams
+    it, so next round the whole population moves back. Measured over three
+    rounds the unfinished fraction went 23.1%, then 11.1%, then 34.9% -- not
+    noise around a converging value, a flip. Reporting a "relative change" over
+    that and calling a small number convergence would have been reporting the
+    moment the swing crossed zero.
+
+    What fixes it is moving *some* traffic rather than all of it. Each driver
+    keeps a set of alternative paths with probabilities, and after each
+    simulation those probabilities shift toward the routes that turned out
+    faster -- by a bounded fraction, set by :data:`GAWRON_BETA`. A route that
+    is losing sheds traffic over several rounds instead of emptying at once, so
+    the flow that arrives on the alternative is small enough not to jam it in
+    turn. This is Gawron's method, it is what ``duaIterate.py`` uses, and
+    duarouter implements it directly given an alternatives file to iterate on.
+
+    So the loop is:
+
+    1. route on the previous round's *measured* edge travel times, shifting
+       route probabilities rather than replacing routes,
     2. simulate,
     3. keep the travel times that came out, and go again.
 
-    Convergence is measured by how much total travel time moves between
-    rounds. It is reported rather than assumed, because an assignment that has
-    not converged is not an equilibrium and its travel times mean little.
+    Convergence is reported as **route shift**: how far drivers' probability
+    distributions over their paths moved since the last round, averaged across
+    drivers. Falling shift is an assignment settling; shift that stays high is
+    one that has not, and its travel times should not be believed. See
+    :func:`_route_shift` -- both for why this replaced the travel-time
+    comparison that was here before, and for the more subtle metric that also
+    had to be thrown away.
 
-    This is deliberately a simple fixed-point iteration rather than SUMO's
-    ``duaIterate.py``. That script does the same thing with more options, but
-    it wants to own the whole directory layout and its interface is a moving
-    target across versions; the loop itself is twenty lines and doing it here
-    keeps the file naming and the convergence report under our control.
+    This stays a hand-rolled loop rather than a call to ``duaIterate.py``. That
+    script does the same thing with more options, but it wants to own the whole
+    directory layout and its interface moves between versions; the loop is
+    forty lines and keeping it here keeps the file naming and the convergence
+    report under our control.
     """
     duarouter = find_tool("duarouter")
     if duarouter is None:
@@ -150,34 +266,54 @@ def assign_iteratively(
     history: list[dict] = []
     weights: Path | None = None
     routes = routes_path(window)
+    alts = alternatives_path(window)
+    # duarouter streams its input, so it cannot read and write the same
+    # alternatives file in one pass. Write beside it and swap.
+    alts_next = alts.with_suffix(".next.xml")
+    previous_dists: dict[str, dict[int, float]] = {}
 
     for step in range(iterations):
+        first = step == 0
         cmd = [
             duarouter,
             "--net-file", str(network_path()),
-            "--route-files", str(trips_file),
+            # Round one starts from the trips. Every round after starts from
+            # the alternatives, which is what carries each driver's route
+            # probabilities forward -- restarting from the trips each time is
+            # exactly the all-or-nothing behaviour this replaced.
+            "--route-files", str(trips_file if first else alts),
             "--output-file", str(routes),
+            "--alternatives-output", str(alts_next),
             "--ignore-errors", "--no-warnings",
             "--routing-threads", "4",
         ]
         if weights is not None:
-            # Route on what the last simulation actually measured.
-            cmd += ["--weight-files", str(weights),
-                    "--weight-attribute", "traveltime"]
+            cmd += [
+                "--weight-files", str(weights),
+                "--weight-attribute", "traveltime",
+                # The measured intervals end when the last vehicle departs,
+                # but vehicles departing near the end are still driving for an
+                # hour afterwards. Without this their second half is routed
+                # over free-flow roads.
+                "--weights.expand",
+                "--route-choice-method", "gawron",
+                "--gawron.beta", GAWRON_BETA,
+                "--gawron.a", GAWRON_A,
+                "--max-alternatives", MAX_ALTERNATIVES,
+            ]
         log.info("assignment round %d/%d: routing", step + 1, iterations)
         subprocess.run(cmd, check=True, capture_output=True, text=True)
+        alts_next.replace(alts)
+
+        distributions = _route_distributions(alts)
+        shift = _route_shift(previous_dists, distributions)
+        previous_dists = distributions
 
         log.info("assignment round %d/%d: simulating", step + 1, iterations)
         outputs = run(routes, window=window, end_padding_s=end_padding_s)
-        summary = summarize_tripinfo(outputs["tripinfo"], routes)
+        summary = summarize_tripinfo(outputs["tripinfo"], routes,
+                                     outputs.get("statistics"))
         weights = outputs["intervals"]
-
-        total = summary.get("mean_duration_s", 0.0) * summary.get("vehicles_arrived", 0)
-        if history:
-            previous = history[-1]["total_travel_time_s"]
-            change = abs(total - previous) / previous if previous else 1.0
-        else:
-            change = 1.0
 
         record = {
             "round": step + 1,
@@ -185,15 +321,25 @@ def assign_iteratively(
             "unfinished_fraction": summary.get("unfinished_fraction"),
             "mean_duration_s": summary.get("mean_duration_s"),
             "mean_time_loss_s": summary.get("mean_time_loss_s"),
-            "total_travel_time_s": total,
-            "relative_change": round(change, 4),
+            "teleports_jam": summary.get("teleports_jam"),
+            # None on the first round: there is nothing to have moved from.
+            "route_shift": None if shift is None else round(shift, 4),
+            "mean_time_loss_change": (
+                None if not history or not history[-1]["mean_time_loss_s"]
+                else round(abs((summary.get("mean_time_loss_s") or 0)
+                               - history[-1]["mean_time_loss_s"])
+                           / history[-1]["mean_time_loss_s"], 4)
+            ),
         }
         history.append(record)
         log.info(
-            "round %d: %d arrived, %.1f%% unfinished, mean %.0f s, change %.1f%%",
+            "round %d: %d arrived, %.1f%% unfinished, mean %.0f s, "
+            "time loss %.0f s, route shift %s",
             step + 1, record["arrived"],
             100 * (record["unfinished_fraction"] or 0),
-            record["mean_duration_s"] or 0, 100 * change,
+            record["mean_duration_s"] or 0,
+            record["mean_time_loss_s"] or 0,
+            "n/a" if shift is None else f"{100 * shift:.1f}%",
         )
 
     return routes, history
@@ -275,7 +421,8 @@ def read_teleports(path: Path) -> dict:
     return result
 
 
-def _write_edgedata_config(path: Path, out_file: Path, window: tuple[int, int]) -> Path:
+def _write_edgedata_config(path: Path, out_file: Path, window: tuple[int, int],
+                           end_padding_s: int = 0) -> Path:
     """An additional-file asking SUMO for per-edge aggregates.
 
     Two collectors, because two different questions are being asked.
@@ -289,6 +436,15 @@ def _write_edgedata_config(path: Path, out_file: Path, window: tuple[int, int]) 
     and 08:00 together produces a road that is moderately busy all morning and
     never actually congested, so every departure time looks equally good and
     the model has nothing to say.
+
+    The interval collector runs past the last departure by ``end_padding_s``,
+    and the whole-window one does not. That asymmetry is deliberate. The
+    whole-window figure exists to sit beside a count station's three-hour
+    total, so it must cover the same three hours and no more. The intervals
+    feed the next round of :func:`assign_iteratively`, and a driver leaving at
+    08:59 is still on the road at 09:40; cutting the measurement at 09:00 makes
+    the tail of the peak invisible to routing, which then sends the next
+    round's traffic into it.
     """
     duration = (window[1] - window[0]) * 3600
     root = etree.Element("additional")
@@ -305,7 +461,7 @@ def _write_edgedata_config(path: Path, out_file: Path, window: tuple[int, int]) 
         id="intervals",
         file=str(intervals_path(window)),
         begin="0",
-        end=str(duration),
+        end=str(duration + end_padding_s),
         period=str(INTERVAL_S),
         excludeEmpty="true",
     )
@@ -342,7 +498,8 @@ def run(
     edgedata = edgedata_path(window)
     statistics = stats_path(window)
     additional = _write_edgedata_config(
-        CACHE_DIR / "edgedata.add.xml", edgedata, window
+        CACHE_DIR / "edgedata.add.xml", edgedata, window,
+        end_padding_s=end_padding_s,
     )
 
     duration = (window[1] - window[0]) * 3600 + end_padding_s

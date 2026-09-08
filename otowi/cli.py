@@ -167,11 +167,59 @@ def cmd_assign(args) -> None:
     )
     print(json.dumps({"routes": str(routes), "history": history}, indent=2))
 
-    if len(history) > 1 and history[-1]["relative_change"] > 0.05:
+    _report_convergence(history)
+
+
+#: Route choice is called settled below this much movement per round, and the
+#: measured travel times settled below this much change.
+#:
+#: Neither is zero, and route shift in particular never reaches zero: Gawron
+#: keeps shuffling probability between alternatives that cost nearly the same,
+#: which is not a failure to converge but a description of what equilibrium
+#: looks like -- a driver genuinely indifferent between two equally good routes.
+#: On a tenth of the demand the shift fell 37.9%, 18.3%, 11.3%, 8.6%, 7.8% and
+#: was still drifting down while mean time loss had been within 3% of 245 s for
+#: three rounds. So the physical measure is what says the answer has stopped
+#: moving, and the route shift is what says the assignment is still settling
+#: rather than flipping.
+SETTLED_SHIFT = 0.15
+SETTLED_TIME_LOSS = 0.05
+
+
+def _report_convergence(history: list[dict]) -> None:
+    """Say whether these travel times are worth believing."""
+    if len(history) < 2:
+        return
+    shift = history[-1]["route_shift"]
+    moved = history[-1]["mean_time_loss_change"]
+    if shift is None or moved is None:
+        return
+
+    problems = []
+    if shift > SETTLED_SHIFT:
+        problems.append(f"route choice still moved {100 * shift:.1f}%")
+    if moved > SETTLED_TIME_LOSS:
+        problems.append(f"mean time loss still moved {100 * moved:.1f}%")
+
+    shifts = [h["route_shift"] for h in history if h["route_shift"] is not None]
+    if len(shifts) > 2 and shifts[-1] > shifts[0]:
+        problems.append(
+            "and route shift is rising rather than falling, which is the "
+            "signature of an assignment flipping between routes rather than "
+            "settling on them"
+        )
+
+    if problems:
         print(
-            f"\nNot converged: total travel time still moved "
-            f"{100 * history[-1]['relative_change']:.1f}% on the last round. "
-            "Run more iterations before trusting these travel times.",
+            "\nNot converged: " + "; ".join(problems) + " on the last round. "
+            "An assignment that has not settled is not an equilibrium and its "
+            "travel times are not worth much. Run more iterations.",
+            file=sys.stderr,
+        )
+    else:
+        print(
+            f"\nConverged: route choice moved {100 * shift:.1f}% on the last "
+            f"round and mean time loss {100 * moved:.1f}%.",
             file=sys.stderr,
         )
 
