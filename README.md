@@ -134,6 +134,61 @@ Useful flags:
   morning.
 - `--end-padding N` — seconds to keep simulating after the last departure.
 
+## Where people have actually been killed
+
+Everything else here models what *would* happen. `otowi risk`, and the **Risk**
+tab on the map, report what did: every fatal crash NHTSA's
+[FARS](https://www.nhtsa.gov/research-data/fatality-analysis-reporting-system-fars)
+recorded inside the study area — a census, not a sample, of every crash on a US
+public road that killed someone within thirty days, with a coordinate for each.
+
+**A crash count is not a risk.** US-84 has more fatal crashes than almost any
+road in the study area, and it is also the road the most people drive. Ranking
+roads by crash count ranks them by how busy they are, which everybody already
+knows. The number worth having is deaths per unit of *travel*, and the hard part
+is the denominator — which is why this belongs in a traffic model rather than a
+spreadsheet.
+
+    road      deaths     km  veh/day  per bn veh-km  measured
+    NM-68          3   15.5     5551      15.9 (5.8)      68%
+    I-25           6   30.9    14707       6.0 (3.2)     100%
+    NM-14          2   15.4     5686      10.4 (2.8)      84%
+    US-84          4   24.9    11828       6.2 (2.7)      90%
+    NM-599         2    9.5     9624      10.0 (2.6)     100%
+    NM-502         1    6.5    27830       2.5 (0.2)      31%
+
+NM-68 through the gorge is the worst road here and NM-502 over Otowi Bridge is
+the safest, which is worth noting given that NM-502 is the corridor this whole
+project is named for. The US average is about 7.
+
+Three things about that table are the point:
+
+**The bracketed figure is a Poisson lower bound, and it is the one to rank on.**
+Three deaths and thirty deaths are not equally good evidence of a rate. Sorting
+on the point estimate puts whichever quiet road had one bad night at the top,
+which is how safety rankings usually go wrong.
+
+**`measured` is the share of the exposure that came from a traffic count**
+rather than from this model. A safety number resting on a count is a different
+object from one resting on a simulation's opinion, and the model carries 14% of
+real volume — so where a count exists it is used, and where one does not the
+modelled volume is scaled by the calibration ratio and the column says so.
+
+**Only 12% of the deaths are on roads that can be ranked at all.** 161 people
+died in 147 crashes here between 2018 and 2023; 20 of those deaths were on
+corridors NMDOT counts, which is what a rate needs. The rest are drawn on the
+map as points and deliberately left unranked, because there is nothing honest
+to rank them by. 45% of all of them happened after dark.
+
+**What the unit of analysis had to be.** Per SUMO edge — a couple of hundred
+metres — every road in the study area returns exactly one crash at 300 to 800
+deaths per billion vehicle-kilometres. That is not a finding, it is circularity:
+the exposure denominator has been chosen by looking at where the numerator is.
+Per OSM street name is not much better, since most edges here are unnamed and
+the highways carrying the deaths are among them. NMDOT's route identifiers are
+the unit, they arrive free with the count segments already matched for
+calibration, and they were chosen without reference to where anybody died.
+
 ## Built on
 
 [Eclipse SUMO](https://eclipse.dev/sumo/) — microscopic, open source (EPL-2.0),

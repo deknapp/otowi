@@ -126,6 +126,7 @@
     <button data-layer="modelled" class="on">Modelled</button>
     <button data-layer="observed">Measured</button>
     <button data-layer="ratio">Ratio</button>
+    <button data-layer="risk">Risk</button>
   </div>
 
   <div class="explain" id="explain"></div>
@@ -219,6 +220,19 @@
       color: function (p) { return ramp2(p.observed / 1500); },
       has:   function (p) { return p.observed != null; }
     },
+    risk: {
+      label: "Deaths per billion vehicle-km",
+      explain: "Fatal crashes NHTSA recorded here, divided by the travel that produced them. Points are the crashes; colour is the corridor's rate. The US average is about 7.",
+      lo: "0", hi: "20+",
+      gradient: ["#1b3a2a", "#2f6b3a", "#c9a227", "#d9743a", "#c0392b"],
+      value: function (p) { return p.risk; },
+      color: function (p) { return scale(LAYERS.risk.gradient, Math.min(1, p.risk / 20)); },
+      // Only corridors NMDOT counts get a rate, which is most of the deaths'
+      // roads and a small share of the network. Drawing the rest in this view
+      // would imply they had been assessed and found safe.
+      has:   function (p) { return p.risk != null; },
+      points: true
+    },
     ratio: {
       label: "Modelled ÷ measured",
       explain: "Where the model is missing traffic. Red is far too little; grey would be right. Almost nothing is grey — see below.",
@@ -259,10 +273,61 @@
   }
 
   var current = "modelled", geo = null, layer = null;
+  var risk = null, crashLayer = null;
+
+  // Risk is loaded separately: 147 points against 8,000 lines, on a different
+  // cadence, and a reader looking at traffic volumes should not pay for it.
+  function loadRisk() {
+    if (risk !== null) { return Promise.resolve(risk); }
+    return fetch(DATA + "risk.json")
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) {
+        risk = d || false;
+        if (!risk) { return risk; }
+        // Attach each edge's corridor rate to its properties, so the layer
+        // spec can read it like any other value.
+        geo.features.forEach(function (f) {
+          var id = String(f.properties.id).replace(/^-/, "");
+          var corridor = risk.corridor_of[id];
+          var r = corridor && risk.corridors[corridor];
+          if (r && r.rankable) {
+            f.properties.risk = r.lower_bound;
+            f.properties.risk_rate = r.per_billion_veh_km;
+            f.properties.risk_road = r.name;
+            f.properties.risk_deaths = r.fatalities;
+            f.properties.risk_km = r.length_km;
+          }
+        });
+        return risk;
+      })
+      .catch(function () { risk = false; return risk; });
+  }
+
+  function drawCrashes(show) {
+    if (crashLayer) { map.removeLayer(crashLayer); crashLayer = null; }
+    if (!show || !risk || !risk.crashes) { return; }
+    crashLayer = L.layerGroup(risk.crashes.map(function (c) {
+      return L.circleMarker([c.lat, c.lon], {
+        radius: 3 + Math.min(4, c.n),
+        color: c.dark ? "#f0c674" : "#e8e8e8",
+        weight: 1.2, fillColor: "#c0392b", fillOpacity: 0.85
+      }).bindTooltip(
+        c.n + (c.n === 1 ? " death" : " deaths") + " &middot; " + c.year +
+        (c.road ? " &middot; " + c.road : "") +
+        (c.hour != null ? " &middot; " + String(c.hour).padStart(2, "0") + ":00" : "") +
+        (c.dark ? " &middot; after dark" : ""));
+    })).addTo(map);
+  }
 
   function draw() {
     var spec = LAYERS[current];
+    if (spec.points && risk === null) {
+      // First time on this tab: fetch, then draw once for real.
+      loadRisk().then(draw);
+      return;
+    }
     if (layer) { map.removeLayer(layer); }
+    drawCrashes(!!spec.points);
 
     layer = L.geoJSON(geo, {
       filter: function (f) { return spec.has(f.properties); },
@@ -278,7 +343,17 @@
       }
     }).addTo(map);
 
-    document.getElementById("explain").textContent = spec.explain;
+    var explain = spec.explain;
+    if (spec.points && risk && risk.summary) {
+      var sm = risk.summary;
+      explain += " " + sm.fatalities + " deaths in " + sm.crashes +
+        " crashes; only " + Math.round(sm.share_of_deaths_ranked * 100) +
+        "% are on roads with a measured traffic count, which is what a rate " +
+        "needs. The rest are shown as points and not ranked.";
+    } else if (spec.points && risk === false) {
+      explain = "Crash data unavailable in this export.";
+    }
+    document.getElementById("explain").textContent = explain;
     document.getElementById("legend-bar").style.background =
       "linear-gradient(90deg," + spec.gradient.join(",") + ")";
     document.getElementById("legend-lo").textContent = spec.lo;
@@ -306,6 +381,14 @@
       html += row("AADT " + (p.aadt_year || ""), num(p.aadt), true);
     } else {
       html += row("Measured", "not a count segment", true);
+    }
+    if (p.risk != null) {
+      html += row("Corridor", p.risk_road, true);
+      html += row("Deaths / bn veh-km",
+                  p.risk_rate.toFixed(1) + " <span class='muted'>(" +
+                  p.risk.toFixed(1) + " lower bound)</span>");
+      html += row("Deaths on it", p.risk_deaths + " over " +
+                  p.risk_km.toFixed(0) + " km, 6 years", true);
     }
     document.getElementById("d-table").innerHTML = html;
     document.getElementById("detail").style.display = "block";

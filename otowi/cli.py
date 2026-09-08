@@ -402,6 +402,71 @@ def cmd_when(args) -> None:
     print(result["caveat"], file=sys.stderr)
 
 
+def _risk_inputs(args, window):
+    """Everything the risk view needs: crashes, exposure, and the ratio."""
+    from . import counts, fatalities
+
+    net = _load_net()
+    crashes = fatalities.fetch(force=getattr(args, "force", False))
+    segments = counts.parse_segments(counts.fetch_aadt())
+    counted = counts.match_to_edges(net, segments)
+    hours = window[1] - window[0]
+    modelled = counts.simulated_hourly(simulate.edgedata_path(window), hours)
+    # The model carries a fraction of real traffic, so its volumes understate
+    # exposure and would overstate every rate computed from them. Scale by the
+    # measured ratio rather than pretending otherwise.
+    comparison = counts.compare(matched := counted, modelled, window_hours=hours)
+    carries = comparison["held_out"].get(
+        "median_ratio_modelled_over_observed") or 1.0
+    years = fatalities.DEFAULT_YEARS[1] - fatalities.DEFAULT_YEARS[0] + 1
+    risks = fatalities.build(
+        net, fatalities.match_to_edges(net, crashes),
+        modelled=modelled, counted=matched, years=years, model_carries=carries)
+    return net, crashes, risks, carries
+
+
+def cmd_risk(args) -> None:
+    """Where people have actually been killed, per unit of travel."""
+    from . import fatalities
+
+    window = tuple(args.window)
+    if not simulate.edgedata_path(window).exists():
+        raise SystemExit(
+            f"No simulation output for {window}.\nRun:  otowi run --window "
+            f"{window[0]} {window[1]}")
+
+    _, crashes, risks, carries = _risk_inputs(args, window)
+    summary = fatalities.summarise(crashes, risks)
+
+    if args.json:
+        print(json.dumps(summary, indent=2))
+        return
+
+    print(f"\nFatal crashes in the study area, "
+          f"{fatalities.DEFAULT_YEARS[0]}-{fatalities.DEFAULT_YEARS[1]}\n")
+    print(f"  {summary['crashes']} crashes, {summary['fatalities']} deaths."
+          f"  {summary['share_after_dark']:.0%} of them after dark.\n")
+
+    print(f"  {'road':<9}{'deaths':>7}{'km':>7}{'veh/day':>9}"
+          f"{'per bn veh-km':>15}{'measured':>10}")
+    for row in summary["worst"]:
+        print(f"  {row['name']:<9}{row['fatalities']:>7}{row['length_km']:>7.1f}"
+              f"{row['veh_per_day']:>9}"
+              f"{row['per_billion_veh_km']:>10.1f} ({row['lower_bound']:.1f})"
+              f"{row['counted_share']:>9.0%}")
+
+    print("\n  The bracketed figure is a Poisson lower bound, and it is the one to")
+    print("  rank on: three deaths and thirty deaths are not equally good evidence")
+    print("  of a rate, and sorting on the point estimate puts whichever quiet road")
+    print("  had one bad night at the top. The US average is about 7.\n")
+    print(f"  Only {summary['share_of_deaths_ranked']:.0%} of the deaths "
+          f"({summary['fatalities_on_ranked_corridors']} of "
+          f"{summary['fatalities']}) are on corridors NMDOT counts, which is")
+    print("  what a rate needs. The rest happened on roads with no measured")
+    print("  traffic; they are on the map as points and are not ranked, because")
+    print("  there is nothing honest to rank them by.\n")
+
+
 def cmd_web(args) -> None:
     """Build the map data and serve it on localhost."""
     from . import web
@@ -437,6 +502,33 @@ def cmd_export(args) -> None:
     geojson, summary = web.build(window=window, force=args.force)
     (data / "map.geojson").write_bytes(geojson.read_bytes())
     (data / "summary.json").write_text(json.dumps(summary, indent=2))
+
+    # Fatal crashes, and the corridor rates computed from them. Written as a
+    # separate file rather than folded into the map: it is 147 points against
+    # 8,000 lines, it changes on a different cadence, and a reader who wants
+    # the risk view should not pay for it on every other view.
+    try:
+        from . import counts, fatalities
+        net_r, crashes, risks, carries = _risk_inputs(args, window)
+        route_of = fatalities.corridors_from_counts(
+            counts.match_to_edges(net_r, counts.parse_segments(counts.fetch_aadt())))
+        (data / "risk.json").write_text(json.dumps({
+            "summary": fatalities.summarise(crashes, risks),
+            "model_carries": round(carries, 3),
+            # edge -> corridor, so the map can colour a line by its road's rate
+            "corridor_of": route_of,
+            "corridors": {k: r.as_dict() for k, r in risks.items() if r.fatalities},
+            "crashes": [
+                {"lat": round(c.lat, 5), "lon": round(c.lon, 5),
+                 "n": c.fatalities, "year": c.year, "hour": c.hour,
+                 "road": c.road, "dark": c.is_dark, "harm": c.harm}
+                for c in crashes
+            ],
+        }, separators=(",", ":")))
+    except Exception as exc:                                   # noqa: BLE001
+        # The risk view is additive. A FARS outage must not take the map with
+        # it, but it must also not silently ship a page whose tab is empty.
+        print(f"risk layer skipped: {exc}", file=sys.stderr)
 
     (data / "places.json").write_text(json.dumps(
         [{"key": key, "name": place.name, "note": place.note}
@@ -551,6 +643,7 @@ def build_parser() -> argparse.ArgumentParser:
         ("assign", cmd_assign,
          "Iterate routing against measured congestion (user equilibrium)."),
         ("calibrate", cmd_calibrate, "Compare modelled volumes against NMDOT counts."),
+        ("risk", cmd_risk, "Rank corridors by fatal crashes per unit of travel."),
         ("web", cmd_web, "Serve an interactive map of the model and its error."),
         ("export", cmd_export, "Write the map as static files for GitHub Pages."),
         ("run", cmd_run, "Do every stage that has not been done."),
@@ -569,6 +662,8 @@ def build_parser() -> argparse.ArgumentParser:
                          help="Multiply demand. Anything but 1.0 must be reported: "
                               "delay is not linear in demand.")
         sub.add_argument("--force", action="store_true")
+        sub.add_argument("--json", action="store_true",
+                         help="Emit the raw payload.")
         sub.add_argument("--top", type=int, default=15,
                          help="How many busiest edges to report.")
         sub.add_argument("--peak", type=float, nargs=2, default=[6, 9],
@@ -577,8 +672,8 @@ def build_parser() -> argparse.ArgumentParser:
                               "the hourly basis, so the result can be read "
                               "against the GEH bar and against a peak-window "
                               "run. Pass 0 0 to skip.")
-        sub.add_argument("--iterations", type=int, default=5,
-                         help="Assignment rounds for `otowi assign`.")
+        sub.add_argument("--iterations", type=int, default=9,
+                         help="Assignment rounds for `otowi assign`. Five does not converge a whole-day run -- route choice settles while travel times are still moving -- so the default is nine.")
         sub.add_argument("--internal-only", action="store_true",
                          help="Drop trips with one end outside the study area, as "
                               "the model did before gateways existed.")
