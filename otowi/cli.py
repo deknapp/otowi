@@ -265,10 +265,11 @@ def cmd_calibrate(args) -> None:
     net = _load_net()
     segments = counts.parse_segments(counts.fetch_aadt(force=args.force))
     matched = counts.match_to_edges(net, segments)
-    modelled = counts.simulated_hourly(edgedata, window_hours=window[1] - window[0])
-    result = counts.compare(matched, modelled)
+    hours = window[1] - window[0]
+    modelled = counts.simulated_hourly(edgedata, window_hours=hours)
+    result = counts.compare(matched, modelled, window_hours=hours)
 
-    worst = sorted(result["links"], key=lambda row: -row["observed_veh_per_h"])[: args.top]
+    worst = sorted(result["links"], key=lambda row: -row["observed"])[: args.top]
     print(json.dumps({
         "count_segments": len(segments),
         "edges_matched": len(matched),
@@ -281,7 +282,7 @@ def cmd_calibrate(args) -> None:
     ratio = result["held_out"].get("median_ratio_modelled_over_observed")
     if ratio is not None and ratio < 0.8:
         print(
-            f"\nThe model carries {ratio:.0%} of measured peak-hour volume. It contains "
+            f"\nThe model carries {ratio:.0%} of measured volume ({result['basis']}). It contains "
             "commuting between two points inside the study area and nothing else -- no "
             "freight, no shopping, no tourism, and no trip with one end outside the box, "
             "which is most of I-25 and US-84. This number is the size of that decision, "

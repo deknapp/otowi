@@ -101,6 +101,37 @@ class CountSegment:
         return self.aadt * (self.k_factor / 100.0) * (self.d_factor / 100.0)
 
     @property
+    def daily_directional(self) -> float:
+        """AADT as a one-direction daily total.
+
+        AADT is a two-way figure, so this halves it. Over a whole day the split
+        really is close to even, by conservation: the commuters who drive one
+        way in the morning drive back the other way in the evening. That is not
+        true of any single hour, which is exactly what the published D factor
+        exists to describe -- and exactly why D has no place in a 24-hour
+        comparison.
+
+        The gain over :attr:`peak_hour_directional` is that this drops both K
+        and D. They are fitted factors published alongside the count, and a
+        whole-day model can be checked against the measured total itself
+        rather than against a peak-hour figure derived from it.
+        """
+        return self.aadt / 2.0
+
+    def target(self, window_hours: float) -> tuple[float, str]:
+        """What this segment's measurement means for a window of that length.
+
+        A whole-day run is compared against the daily total; a peak window
+        against the design hour. Getting this wrong is not a small error --
+        comparing a 24-hour model to AADT x K x D is comparing a day's traffic
+        to one hour of it -- and it returns the basis alongside the number so
+        no output can be ambiguous about which comparison was made.
+        """
+        if window_hours >= 24:
+            return self.daily_directional, "AADT / 2 (daily, one direction)"
+        return self.peak_hour_directional, "AADT x K x D (design hour)"
+
+    @property
     def key(self) -> str:
         return self.station_id or f"{self.route_id}@{self.lon:.5f},{self.lat:.5f}"
 
@@ -290,15 +321,22 @@ def match_to_edges(
 
 
 def simulated_hourly(edgedata: Path, window_hours: float) -> dict[str, float]:
-    """Vehicles per hour on each edge, from SUMO's edgeData output.
+    """Modelled volume per edge, on the same basis as :meth:`CountSegment.target`.
 
-    The edgeData interval covers the whole simulation window, so ``entered``
-    is a window total and has to be divided by the window length before it can
-    sit next to a peak-*hour* count. Comparing a three-hour total against an
-    hourly measurement would overstate the model by a factor of three, which
-    would look like the model being far too busy rather than like an arithmetic
+    The edgeData interval covers the whole simulation window, so ``entered`` is
+    a window total.
+
+    For a peak window that total is divided by the window length, because it
+    has to sit next to a peak-*hour* count -- comparing a three-hour total
+    against an hourly measurement would overstate the model threefold, which
+    looks like the model being far too busy rather than like an arithmetic
     error.
+
+    For a whole-day run the total is exactly what is wanted, because the
+    measurement it goes next to is a daily total. Dividing by 24 there would be
+    the same class of mistake in the other direction.
     """
+    per_hour = window_hours < 24
     volumes: dict[str, float] = {}
     for _, element in etree.iterparse(str(edgedata), events=("end",)):
         if element.tag != "edge":
@@ -306,7 +344,8 @@ def simulated_hourly(edgedata: Path, window_hours: float) -> dict[str, float]:
             continue
         entered = element.get("entered")
         if entered is not None:
-            volumes[element.get("id")] = int(entered) / window_hours
+            total = int(entered)
+            volumes[element.get("id")] = total / window_hours if per_hour else total
         element.clear()
     return volumes
 
@@ -316,6 +355,7 @@ def compare(
     simulated: dict[str, float],
     *,
     held_out_fraction: float = 0.5,
+    window_hours: float = 3.0,
 ) -> dict:
     """Model against measurement, reported separately for fit and held-out.
 
@@ -334,11 +374,12 @@ def compare(
     shortfall can be seen rather than only scored.
     """
     rows = []
+    basis = "n/a"
     for edge_id, segment in matched.items():
         modelled = simulated.get(edge_id)
         if modelled is None:
             continue
-        observed = segment.peak_hour_directional
+        observed, basis = segment.target(window_hours)
         if observed <= 0:
             continue
         geh = math.sqrt(2 * (modelled - observed) ** 2 / (modelled + observed))
@@ -346,8 +387,8 @@ def compare(
             "edge": edge_id,
             "route": segment.route_id,
             "station": segment.station_id,
-            "observed_veh_per_h": round(observed, 1),
-            "modelled_veh_per_h": round(modelled, 1),
+            "observed": round(observed, 1),
+            "modelled": round(modelled, 1),
             "ratio": round(modelled / observed, 3),
             "geh": round(geh, 2),
             "held_out": segment.held_out(fraction=held_out_fraction),
@@ -367,7 +408,12 @@ def compare(
             "median_ratio_modelled_over_observed": round(ratios[len(ratios) // 2], 3),
         }
 
+    unit = "veh/day" if window_hours >= 24 else "veh/h"
     return {
+        # Never leave which comparison was made to be inferred from the window.
+        "basis": basis,
+        "unit": unit,
+        "window_hours": window_hours,
         "all": stats(rows),
         "fit": stats([row for row in rows if not row["held_out"]]),
         "held_out": stats([row for row in rows if row["held_out"]]),

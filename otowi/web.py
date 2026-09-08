@@ -65,6 +65,7 @@ def build_geojson(
     matched: dict,
     *,
     min_veh_per_h: float = MIN_DRAWN_VEH_PER_H,
+    window_hours: float = 3.0,
 ) -> dict:
     """One LineString per edge worth drawing, carrying both numbers.
 
@@ -82,7 +83,10 @@ def build_geojson(
 
         volume = modelled.get(edge_id, 0.0)
         segment = matched.get(edge_id)
-        if segment is None and volume < min_veh_per_h:
+        # The threshold is a rate. A whole-day run reports daily totals, so
+        # scale it up rather than drawing every driveway that saw one car.
+        floor = min_veh_per_h * (window_hours if window_hours >= 24 else 1.0)
+        if segment is None and volume < floor:
             continue
 
         properties = {
@@ -92,7 +96,7 @@ def build_geojson(
             "limit_kmh": round(edge.getSpeed() * 3.6),
         }
         if segment is not None:
-            observed = segment.peak_hour_directional
+            observed, _ = segment.target(window_hours)
             properties.update({
                 "observed": round(observed, 1),
                 "route": segment.route_id,
@@ -129,15 +133,20 @@ def build(window: tuple[int, int] = AM_PEAK, *, force: bool = False) -> tuple[Pa
     import sumolib
 
     net = sumolib.net.readNet(str(network_path()))
-    modelled = counts.simulated_hourly(edgedata, window_hours=window[1] - window[0])
+    hours = window[1] - window[0]
+    modelled = counts.simulated_hourly(edgedata, window_hours=hours)
     segments = counts.parse_segments(counts.fetch_aadt())
     matched = counts.match_to_edges(net, segments)
-    comparison = counts.compare(matched, modelled)
+    comparison = counts.compare(matched, modelled, window_hours=hours)
 
-    data = build_geojson(net, modelled, matched)
+    data = build_geojson(net, modelled, matched, window_hours=hours)
 
     summary = {
         "window": f"{window[0]:02d}:00-{window[1]:02d}:00",
+        # The map's three layers are all on this basis; saying so on the page
+        # is the difference between a number and a claim.
+        "basis": comparison["basis"],
+        "unit": comparison["unit"],
         "drawn_edges": len(data["features"]),
         "measured_links": comparison["all"]["links"],
         "held_out": comparison["held_out"],

@@ -178,3 +178,46 @@ def test_a_feature_with_no_geometry_is_skipped():
                                 "DFactor": 60, "AADTYear": 2025},
                  "geometry": {"paths": []}}]
     assert counts.parse_segments(features) == []
+
+
+# ------------------------------------------------- what the counts mean when
+#
+# AADT x K x D is a directional *design-hour* volume. Comparing a 24-hour model
+# against it compares a day's traffic to one hour of it. A whole-day run has to
+# be checked against the daily total instead -- which is the more direct
+# measurement anyway, since it drops both published factors.
+
+
+def test_peak_hour_target_for_a_peak_window():
+    value, basis = segment().target(window_hours=3)
+    assert value == pytest.approx(1200.0)
+    assert "design hour" in basis
+
+
+def test_daily_target_for_a_whole_day():
+    value, basis = segment().target(window_hours=24)
+    assert value == pytest.approx(10000.0)
+    assert "daily" in basis
+    # K and D take no part in it -- that is the gain.
+    assert (segment(k_factor=9.0, d_factor=75.0).target(24)[0]
+            == segment(k_factor=15.0, d_factor=55.0).target(24)[0])
+
+
+def test_a_whole_day_run_is_not_scored_against_one_hour():
+    """The bug this guards: 24 hours of modelled traffic compared against a
+    design-hour count would read as the model being several times too busy."""
+    peak, _ = segment().target(3)
+    daily, _ = segment().target(24)
+    assert daily > peak * 5
+
+
+def test_compare_reports_which_basis_it_used():
+    matched = {"e1": segment()}
+    day = counts.compare(matched, {"e1": 9000.0}, window_hours=24)
+    hour = counts.compare(matched, {"e1": 1080.0}, window_hours=3)
+
+    assert day["unit"] == "veh/day" and "daily" in day["basis"]
+    assert hour["unit"] == "veh/h" and "design hour" in hour["basis"]
+    # Same segment, different question, each scored against the right target.
+    assert day["links"][0]["ratio"] == pytest.approx(0.9, abs=0.01)
+    assert hour["links"][0]["ratio"] == pytest.approx(0.9, abs=0.01)
