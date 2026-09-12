@@ -771,6 +771,124 @@ def cmd_crashes(args) -> None:
     print("  crash data is protected under 23 U.S.C. 409.\n")
 
 
+def cmd_vru(args) -> None:
+    """The people who were not driving, with coordinates this time.
+
+    FARS has 40 of them and no way to say which street or at what hour. NMDOT's
+    Vulnerable Road User Safety Assessment has 758 inside this bounding box,
+    2013 to 2023, each with a latitude, an hour, a severity and a lighting
+    condition -- and it includes the people who were hit and lived, which is
+    most of them.
+    """
+    from . import fatalities, vru as vru_module
+
+    crashes = vru_module.fetch(force=getattr(args, "force", False))
+    corridors = vru_module.fetch_corridors(force=getattr(args, "force", False))
+    if not crashes:
+        raise SystemExit("No VRU crashes returned. Check the network, or run "
+                         "with -v to see what NMDOT's service said.")
+
+    summary = vru_module.summarise(crashes, corridors)
+
+    window = tuple(args.window)
+    if simulate.edgedata_path(window).exists():
+        from . import tru
+
+        travel = fatalities.hourly_travel(
+            _load_net(), simulate.intervals_path(window))
+        summary["relative_risk"] = vru_module.relative_risk(crashes, travel)
+        # The same bracket `otowi crashes` puts round the driver curve. The
+        # model's travel curve has a hole at midday that is the commuter-only
+        # demand and not the road, and it lands straight on the hours these
+        # crashes happen.
+        hourly, _ = tru.fetch()
+        county_all = tru.profile(hourly, "all",
+                                 places=tru.names_for(tru.COUNTY_KEYS))
+        if sum(county_all):
+            summary["relative_risk_on_crash_exposure"] = vru_module.relative_risk(
+                crashes, tru.as_exposure(county_all))
+
+    if args.json:
+        print(json.dumps(summary, indent=2))
+        return
+
+    span = summary["years"]
+    print(f"\nPedestrians and cyclists struck in the study area, "
+          f"{span[0]}-{span[1]}\n")
+    print(f"  {summary['crashes']} crashes: {summary['pedestrians']} on foot, "
+          f"{summary['cyclists']} on a bike.")
+    print(f"  {summary['killed']} killed, {summary['killed_or_serious']} killed or "
+          f"seriously hurt.")
+    print(f"  {summary['share_after_dark']:.0%} happened after dark -- but "
+          f"{summary['share_after_dark_when_killed']:.0%} of the ones that")
+    print("  killed someone did. Darkness does not cause many more of these; it")
+    print("  decides how they end.\n")
+
+    print(f"  {'street':<26}{'crashes':>9}{'KSI':>6}{'killed':>8}{'dark':>7}")
+    for row in summary["worst_streets"][:8]:
+        print(f"  {row['street'][:25]:<26}{row['crashes']:>9}"
+              f"{row['killed_or_serious']:>6}{row['killed']:>8}"
+              f"{row['after_dark'] / row['crashes']:>7.0%}")
+
+    counts = summary["by_hour"]
+    peak = max(range(24), key=lambda h: counts[h])
+    print(f"\n  By hour. The peak is {peak:02d}:00, and "
+          f"{summary['ksi_share_1700_2300']:.0%} of the killed-and-serious")
+    print("  happen between 17:00 and 23:00.\n")
+    widest = max(counts) or 1
+    for hour in range(24):
+        bar = "#" * int(counts[hour] / widest * 44)
+        print(f"  {hour:02d}:00 {counts[hour]:>4}  {bar}")
+
+    hin = summary.get("high_injury_network")
+    if hin:
+        print(f"\n  NMDOT's own ranking: {hin['segments']} High Injury Network "
+              f"segments here.\n")
+        print(f"  {'road':<26}{'index':>8}{'VRU':>6}{'ped KA':>8}{'miles':>7}")
+        for row in hin["by_road"][:8]:
+            print(f"  {row['name'][:25]:<26}{row['severity_index']:>8.0f}"
+                  f"{row['vru_crashes']:>6}{row['ped_ka']:>8}{row['miles']:>7.1f}")
+        top = hin["by_road"][0]
+        second = hin["by_road"][1] if len(hin["by_road"]) > 1 else None
+        if second and second["severity_index"]:
+            print(f"\n  {top['name']} scores "
+                  f"{top['severity_index'] / second['severity_index']:.1f}x the next "
+                  f"road on the list, and it is")
+            print("  the same road FARS puts at the top on deaths alone. Two files,")
+            print("  two methods, one answer.")
+
+    rows = summary.get("relative_risk")
+    if rows is None:
+        print(f"\n  No whole-day simulation for {window}, so there is no exposure")
+        print(f"  curve. Run:  otowi run --window {window[0]} {window[1]}\n")
+        return
+
+    worst = max(rows, key=lambda r: r["relative_risk"])
+    print(f"\n  Per kilometre driven, the worst hour for hitting somebody on foot")
+    print(f"  is {worst['hour']:02d}:00, at {worst['relative_risk']:.1f}x an ordinary "
+          f"hour --")
+
+    proxy = summary.get("relative_risk_on_crash_exposure")
+    if proxy:
+        worst_proxy = max(proxy, key=lambda r: r["relative_risk"])
+        print(f"  or {worst_proxy['hour']:02d}:00 at "
+              f"{worst_proxy['relative_risk']:.1f}x, measuring exposure by the "
+              f"state's crash")
+        print("  counts instead of by the model. The two disagree because the")
+        print("  model's day has a hole in the middle of it where the errands")
+        print("  should be, and these crashes happen in the afternoon. Take the")
+        print("  evening block rather than the single hour: both curves agree")
+        print("  the risk is high from mid-afternoon until it gets dark.\n")
+    else:
+        print()
+
+    print("  That denominator is vehicle travel, because vehicle travel is the")
+    print("  only thing this project measures. It answers how likely a kilometre")
+    print("  of driving is to hit somebody -- not how dangerous walking is, which")
+    print("  would need a count of people walking, and nobody counts that.\n")
+    print("  NMDOT crash data is protected under 23 U.S.C. 409.\n")
+
+
 def cmd_web(args) -> None:
     """Build the map data and serve it on localhost."""
     from . import web
@@ -982,6 +1100,8 @@ def build_parser() -> argparse.ArgumentParser:
         ("risk", cmd_risk, "Rank corridors by fatal crashes per unit of travel."),
         ("crashes", cmd_crashes,
          "When crashes happen, from the state's all-severity file."),
+        ("vru", cmd_vru,
+         "Pedestrians and cyclists: where they are hit, and when."),
         ("web", cmd_web, "Serve an interactive map of the model and its error."),
         ("export", cmd_export, "Write the map as static files for GitHub Pages."),
         ("run", cmd_run, "Do every stage that has not been done."),
