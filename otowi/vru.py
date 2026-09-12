@@ -49,7 +49,7 @@ from __future__ import annotations
 
 import json
 import logging
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, field
 from pathlib import Path
 
 import httpx
@@ -158,6 +158,10 @@ class Corridor:
     aadt: int | None
     speed_limit: int | None
     lanes: int | None
+    #: The segment's own shape, as [[lon, lat], ...] paths. Carried because
+    #: the whole point of the state's ranking is to be drawn next to this
+    #: project's own, and a ranking without a line on a map is a table.
+    paths: list[list[list[float]]] = field(default_factory=list)
 
 
 # ------------------------------------------------------------------ fetching
@@ -273,8 +277,10 @@ def fetch_corridors(*, force: bool = False) -> list[Corridor]:
 
     log.info("querying NMDOT High Injury Network")
     found: list[Corridor] = []
-    for feature in _query(HIN_LAYER, HIN_FIELDS, geometry=False):
+    for feature in _query(HIN_LAYER, HIN_FIELDS):
         a = feature.get("attributes", {})
+        paths = [[[round(x, 5), round(y, 5)] for x, y in path]
+                 for path in (feature.get("geometry") or {}).get("paths", [])]
 
         def number(key, cast=int):
             value = a.get(key)
@@ -294,6 +300,7 @@ def fetch_corridors(*, force: bool = False) -> list[Corridor]:
             aadt=number("AADT"),
             speed_limit=number("Speed_limit"),
             lanes=number("Number_of_lanes"),
+            paths=paths,
         ))
 
     log.info("  %d High Injury Network segments", len(found))
