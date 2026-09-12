@@ -959,6 +959,18 @@ def cmd_export(args) -> None:
         # it, but it must also not silently ship a page whose tab is empty.
         print(f"risk layer skipped: {exc}", file=sys.stderr)
 
+    # The walking page. Independent of the simulation -- it is measurements,
+    # not model output -- so it is built whether or not a run exists, and its
+    # failure is reported rather than allowed to take the export with it.
+    try:
+        walk_data, _ = web.build_walk(force=args.force)
+        (data / "walk.json").write_bytes(walk_data.read_bytes())
+        walk_page = (web.STATIC_DIR / "walk.html").read_text().replace(
+            "<body>", "<body>\n<script>window.OTOWI_STATIC = true;</script>", 1)
+        (out / "walk.html").write_text(walk_page)
+    except Exception as exc:                                   # noqa: BLE001
+        print(f"walking page skipped: {exc}", file=sys.stderr)
+
     (data / "places.json").write_text(json.dumps(
         [{"key": key, "name": place.name, "note": place.note}
          for key, place in PLACES.items()], indent=2))

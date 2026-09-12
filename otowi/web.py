@@ -198,6 +198,7 @@ class _Handler(http.server.SimpleHTTPRequestHandler):
     """Serves the page from the package and the data from the cache."""
 
     data_path: Path
+    walk_path: Path
     summary: dict
     window: tuple[int, int]
 
@@ -221,6 +222,10 @@ class _Handler(http.server.SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(body)
             return None
+        if self.path.startswith("/walk.json"):
+            return self._send_file(self.walk_path, "application/json")
+        if self.path.rstrip("/") in ("/walk", "/walk.html"):
+            return self._send_file(STATIC_DIR / "walk.html", "text/html; charset=utf-8")
         if self.path in ("/", "/index.html"):
             return self._send_file(STATIC_DIR / "index.html", "text/html; charset=utf-8")
         self.send_error(404)
@@ -289,9 +294,18 @@ def serve(
 ) -> None:
     """Build the data if needed, then serve the map on localhost."""
     data_path, summary = build(window, force=force)
+    # The walking page needs no simulation, so a failure to build it must not
+    # take the driving map down with it -- but it must be visible, because a
+    # tab that silently 404s is worse than one that is not there.
+    try:
+        walk_data, _ = build_walk(force=force)
+    except Exception as exc:                                    # noqa: BLE001
+        log.warning("walking page unavailable: %s", exc)
+        walk_data = CACHE_DIR / "walk.json"
 
     handler = type("Handler", (_Handler,),
-                   {"data_path": data_path, "summary": summary, "window": window})
+                   {"data_path": data_path, "walk_path": walk_data,
+                    "summary": summary, "window": window})
 
     # Without this a restart inside the TIME_WAIT window fails with "Address
     # already in use", which for a tool you stop and start constantly is the
@@ -301,9 +315,208 @@ def serve(
     with socketserver.TCPServer(("127.0.0.1", port), handler) as httpd:
         url = f"http://127.0.0.1:{port}/"
         print(f"otowi map on {url}   (ctrl-C to stop)")
+        print(f"  walking and cycling in Santa Fe: {url}walk")
         if open_browser:
             threading.Timer(0.5, lambda: webbrowser.open(url)).start()
         try:
             httpd.serve_forever()
         except KeyboardInterrupt:
             print("\nstopped")
+
+
+# ------------------------------------------------------------ on foot, on a bike
+#
+# A second bundle, for a second question. The main map answers "how does
+# driving here go wrong"; this one answers "what happens to the people who are
+# not in a car", and it needs different data at a different scale -- crash
+# points rather than link volumes, and the width of a street rather than the
+# length of a corridor. Kept separate so the driving map does not pay for it.
+
+
+#: Santa Fe, tightly. The walking page is a city instrument: 614 of the 758
+#: pedestrian and cyclist crashes in the study area are inside this box, and
+#: including the other 144 would zoom the map out to a region in which none of
+#: the streets being discussed are legible.
+SANTA_FE_BBOX = (-106.12, 35.57, -105.85, 35.76)
+
+#: Lighting, collapsed to what a person walking would actually distinguish.
+#: "Dark-Lighted" and "Dark-Not Lighted" are kept apart deliberately: they are
+#: the same darkness and a different public works budget.
+LIGHT_CODES = {
+    "daylight": 0, "dark-lighted": 1, "dark-not lighted": 2,
+    "dusk": 3, "dawn": 3,
+}
+
+
+def _light_code(lighting: str) -> int:
+    return LIGHT_CODES.get(lighting.strip().lower(), 4)
+
+
+def _in_box(lon: float, lat: float, box) -> bool:
+    west, south, east, north = box
+    return west <= lon <= east and south <= lat <= north
+
+
+#: Vertices closer together than this are dropped when the geometry is written
+#: for the page. The inventory records a sidewalk run as a survey track -- one
+#: point every few metres, 28 of them for an average run -- and at the zoom a
+#: city map is read at, twenty-five of those 28 land on the same pixel. Thinning
+#: takes the bundle from 2.7 MB to under 1 and changes nothing anyone can see.
+THIN_M = 12.0
+
+
+def _thin(path: list, step_m: float = THIN_M) -> list:
+    """Drop vertices that are not far enough from the last one kept.
+
+    The endpoints always survive, so a thinned run still starts and stops where
+    the real one does -- which is what matters for a line whose *extent* is the
+    information.
+    """
+    if len(path) <= 2:
+        return [[round(lon, 5), round(lat, 5)] for lon, lat in path]
+
+    from .walking import _metres
+
+    kept = [path[0]]
+    for lon, lat in path[1:-1]:
+        last_lon, last_lat = kept[-1]
+        if _metres(last_lon, last_lat, lon, lat) >= step_m:
+            kept.append((lon, lat))
+    kept.append(path[-1])
+    return [[round(lon, 5), round(lat, 5)] for lon, lat in kept]
+
+
+def _asset_lines(assets, box, kinds=None) -> list:
+    """Asset geometry inside the box, thinned, as flat coordinate paths.
+
+    Written as bare arrays rather than GeoJSON features: there are eight
+    thousand crossings and a wrapper object each would be most of the file.
+    """
+    out = []
+    for asset in assets:
+        if kinds is not None and asset.subtype not in kinds:
+            continue
+        for path in asset.paths:
+            if any(_in_box(lon, lat, box) for lon, lat in path):
+                out.append(_thin(path))
+    return out
+
+
+def walk_path() -> Path:
+    return CACHE_DIR / "walk.json"
+
+
+def build_walk(*, box=SANTA_FE_BBOX, force: bool = False) -> tuple[Path, dict]:
+    """The pedestrian and cyclist bundle: crashes, corridors, and what is built.
+
+    Everything the walking page draws, in one file, with the arrays kept
+    positional. Nothing here depends on the simulation -- these are
+    measurements, and the page is useful before a single vehicle has been
+    routed.
+    """
+    from . import tru, vru, walking
+
+    path = walk_path()
+    if path.exists() and not force:
+        return path, json.loads(path.read_text())
+
+    crashes = vru.fetch(force=force)
+    corridors = vru.fetch_corridors(force=force)
+    assets = walking.fetch_all(force=force)
+    exposures = walking.assess(crashes, assets)
+
+    here = [e for e in exposures if _in_box(e.crash.lon, e.crash.lat, box)]
+
+    def hours_for(rows) -> list[int]:
+        counts = [0] * 24
+        for exposure in rows:
+            if exposure.crash.hour is not None:
+                counts[exposure.crash.hour] += 1
+        return counts
+
+    walkers = [e for e in here if e.crash.pedestrian]
+    riders = [e for e in here if e.crash.pedalcycle]
+
+    # Crashes by hour and by what the light was doing. This is the claim "it is
+    # when the light goes" made checkable rather than asserted: the evening
+    # hours should fill with dark and dusk while the count is still high.
+    by_light = [[0, 0, 0, 0, 0] for _ in range(24)]
+    for exposure in here:
+        if exposure.crash.hour is not None:
+            by_light[exposure.crash.hour][_light_code(exposure.crash.lighting)] += 1
+
+    data = {
+        "box": list(box),
+        "years": [min(e.crash.year for e in here), max(e.crash.year for e in here)],
+        # lon, lat, hour, severity, mode, light, year, street, metres to the
+        # nearest marked crossing (-1 where nothing is inventoried near by).
+        "crashes": [[
+            round(e.crash.lon, 5), round(e.crash.lat, 5),
+            e.crash.hour if e.crash.hour is not None else -1,
+            e.crash.severity,
+            0 if e.crash.pedestrian and not e.crash.pedalcycle else 1,
+            _light_code(e.crash.lighting),
+            e.crash.year,
+            e.crash.street,
+            round(e.crosswalk_m) if e.crosswalk_m < 1e6 else -1,
+        ] for e in here],
+        "corridors": [{
+            "name": c.name,
+            "index": round(c.severity_index, 1),
+            "vru": c.vru_crashes,
+            "ped_ka": c.ped_ka,
+            "ksi": c.ksi,
+            "aadt": c.aadt,
+            "speed": c.speed_limit,
+            "lanes": c.lanes,
+            "miles": round(c.length_mi, 2),
+            "paths": [p for p in c.paths
+                      if any(_in_box(lon, lat, box) for lon, lat in p)],
+        } for c in corridors
+            if any(_in_box(lon, lat, box)
+                   for path in c.paths for lon, lat in path)],
+        "assets": {
+            "crosswalk": _asset_lines(assets["crosswalk"], box),
+            "bike_lane": _asset_lines(assets["bike_lane"], box),
+            "sidewalk": _asset_lines(assets["sidewalk"], box),
+        },
+        "hours": {
+            "pedestrian": hours_for(walkers),
+            "cyclist": hours_for(riders),
+            "pedestrian_ksi": hours_for(
+                [e for e in walkers if e.crash.killed_or_serious]),
+            "cyclist_ksi": hours_for(
+                [e for e in riders if e.crash.killed_or_serious]),
+            "by_light": by_light,
+        },
+        "crossings": walking.crossings_and_crashes(
+            exposures, corridors, assets["crosswalk"]),
+        "by_corridor": walking.by_corridor(here, corridors)[:12],
+        "infrastructure": walking.summarise(here),
+        "summary": {
+            "crashes": len(here),
+            "pedestrians": sum(1 for e in here if e.crash.pedestrian),
+            "cyclists": sum(1 for e in here if e.crash.pedalcycle),
+            "killed": sum(1 for e in here if e.crash.severity == "K"),
+            "killed_or_serious": sum(1 for e in here if e.crash.killed_or_serious),
+            "after_dark": sum(1 for e in here if e.crash.is_dark),
+            "killed_after_dark": sum(1 for e in here
+                                     if e.crash.severity == "K" and e.crash.is_dark),
+            "of_study_area": len(exposures),
+        },
+    }
+
+    # The town's own vehicle-crash curve, so the page can say that the hour
+    # pedestrians are hit is not the hour drivers crash. Optional: the walking
+    # page must still build if the TRU reports cannot be read.
+    try:
+        hourly, _ = tru.fetch()
+        towns = tru.names_for(("santa_fe_city",))
+        data["town_crashes_by_hour"] = tru.profile(hourly, "all", places=towns)
+    except Exception as exc:                                    # noqa: BLE001
+        log.warning("TRU curve unavailable for the walking page: %s", exc)
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(data, separators=(",", ":")))
+    log.info("wrote %s (%.1f MB)", path.name, path.stat().st_size / 1e6)
+    return path, data
