@@ -48,6 +48,14 @@
   }
   .outside { opacity: .32; }
 
+  #addrrow { display: grid; gap: 6px; margin-bottom: 6px; }
+  #addrrow input {
+    width: 100%; padding: 6px 8px; font: inherit; font-size: 11.5px;
+    background: #182029; color: var(--text); border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+  #addrrow input:focus { outline: none; border-color: var(--accent); }
+
   #hours { display: flex; align-items: flex-end; gap: 1px; height: 54px; margin: 8px 0 4px; }
   #hours .h { flex: 1; background: #2f6b3a; border-radius: 1px 1px 0 0; min-height: 2px; position: relative; }
   #hours .h.bad { background: #c0392b; }
@@ -234,7 +242,13 @@
 
   <div class="trip">
     <div class="triptitle">When should I leave?</div>
-    <div class="odrow">
+    <label class="footrow" id="addrtoggle" style="display:none;margin:2px 0 6px">
+      <input type="checkbox" id="useaddr"> <span>Type an address instead</span></label>
+    <div id="addrrow" style="display:none">
+      <input id="fromaddr" type="text" placeholder="From — street address or place">
+      <input id="toaddr" type="text" placeholder="To — street address or place">
+    </div>
+    <div class="odrow" id="placerow">
       <select id="from"></select>
       <span class="arrow">&rarr;</span>
       <select id="to"></select>
@@ -633,6 +647,18 @@
   var STATIC = !!window.OTOWI_STATIC;
   // Served from a path on localhost, a file next to this one when exported.
   document.getElementById("walklink").href = STATIC ? "walk.html" : "/walk";
+
+  // Arbitrary addresses need a router, and the published copy is a static
+  // host carrying thirty precomputed journeys. Rather than show a box that
+  // cannot answer, the option appears only when a server is behind the page.
+  if (!STATIC) {
+    document.getElementById("addrtoggle").style.display = "flex";
+    document.getElementById("useaddr").addEventListener("change", function () {
+      var on = this.checked;
+      document.getElementById("addrrow").style.display = on ? "grid" : "none";
+      document.getElementById("placerow").style.display = on ? "none" : "";
+    });
+  }
   var DATA = STATIC ? "data/" : "";
 
   fetch(DATA + "summary.json").then(function (r) { return r.json(); }).then(function (s) {
@@ -706,6 +732,15 @@
 
   function planFor(from, to) {
     if (!STATIC) {
+      if (!STATIC && document.getElementById("useaddr").checked) {
+        var a = document.getElementById("fromaddr").value.trim();
+        var b = document.getElementById("toaddr").value.trim();
+        if (!a || !b) {
+          return Promise.resolve({ error: "Type a start and an end address." });
+        }
+        return fetch("/plan.json?addresses=1&from=" + encodeURIComponent(a) +
+                     "&to=" + encodeURIComponent(b));
+      }
       return fetch(DATA + "plan.json?from=" + encodeURIComponent(from) +
                    "&to=" + encodeURIComponent(to));
     }

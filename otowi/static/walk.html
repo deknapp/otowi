@@ -804,12 +804,16 @@
         "&q=" + encodeURIComponent(query);
       return fetch(url).then(function (r) { return r.json(); }).then(function (rows) {
         return rows.length ? { lat: +rows[0].lat, lon: +rows[0].lon,
-                               name: rows[0].display_name } : null;
+                               name: rows[0].display_name, typed: query } : null;
       });
     }
     return fetch("/geocode.json?q=" + encodeURIComponent(query))
       .then(function (r) { return r.json(); })
-      .then(function (rows) { return rows.length ? rows[0] : null; });
+      .then(function (rows) {
+        if (!rows.length) return null;
+        rows[0].typed = query;
+        return rows[0];
+      });
   }
 
   function runRoute() {
@@ -864,7 +868,7 @@
           pins.addLayer(L.circleMarker([spec[0].lat, spec[0].lon], {
             pane: "crashes", radius: 7, color: "#0e1116", weight: 2,
             fillColor: spec[1], fillOpacity: 1
-          }).bindTooltip(spec[2] + ": " + (spec[0].name || "").split(",")[0]));
+          }).bindTooltip(spec[2] + ": " + (spec[0].typed || spec[0].name || "")));
         });
         if (all.length) map.fitBounds(L.latLngBounds(all), padded());
         el("routeout").innerHTML = describe(result, a, b, ends);

@@ -33,11 +33,12 @@ from __future__ import annotations
 import heapq
 import logging
 import math
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from xml.etree import ElementTree as etree
 
-from .config import AM_PEAK, PLACES
+from .config import AM_PEAK, BBOX, PLACES, Place
 
 log = logging.getLogger(__name__)
 
@@ -294,6 +295,43 @@ def summarise(options: list[dict], window: tuple[float, float] | None) -> dict:
     }
 
 
+#: A point given as coordinates rather than as one of the six named places.
+#: Accepted so that a caller which has geocoded an address -- the served map
+#: does -- can ask about it without the address having to exist in `PLACES`.
+_COORDINATE = re.compile(
+    r"^\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*(?:@(.*))?$")
+
+
+def resolve(where: str):
+    """One end of a journey: a named place, or "lat,lon" with an optional label.
+
+    Keeping both forms in one function means the planner does not care which
+    it was given, and the CLI keeps its six-place vocabulary while the map can
+    ask about anywhere. The label after ``@`` is what the answer calls the
+    place -- "1600 St Michaels Dr" reads better in a result than "35.658,
+    -105.977", and the caller is the only one who knows it.
+    """
+    if where in PLACES:
+        return PLACES[where]
+
+    found = _COORDINATE.match(where or "")
+    if found:
+        latitude, longitude = float(found.group(1)), float(found.group(2))
+        west, south, east, north = BBOX
+        if not (west <= longitude <= east and south <= latitude <= north):
+            raise SystemExit(
+                f"{latitude:.4f},{longitude:.4f} is outside the study area."
+            )
+        label = (found.group(3) or "").strip()
+        return Place(label or f"{latitude:.4f}, {longitude:.4f}",
+                     latitude, longitude)
+
+    raise SystemExit(
+        f"Unknown place {where!r}. Known: {', '.join(sorted(PLACES))}, "
+        f"or a \"lat,lon\" pair inside the study area."
+    )
+
+
 def plan(
     net,
     times: TravelTimes,
@@ -319,20 +357,14 @@ def plan(
     four minutes, the honest advice is that it does not matter when you leave,
     and a tool that only ever emits a single recommended time cannot say that.
     """
-    for key in (origin, destination):
-        if key not in PLACES:
-            raise SystemExit(
-                f"Unknown place {key!r}. Known: {', '.join(sorted(PLACES))}"
-            )
-
-    start = PLACES[origin]
-    end = PLACES[destination]
+    start = resolve(origin)
+    end = resolve(destination)
     origin_edge = _nearest_edge(net, start.longitude, start.latitude, core)
     destination_edge = _nearest_edge(net, end.longitude, end.latitude, core)
 
     if origin_edge is None or destination_edge is None:
         raise SystemExit(
-            f"Could not attach {origin} or {destination} to a routable road."
+            f"Could not attach {start.name} or {end.name} to a routable road."
         )
 
     journeys = sweep(
@@ -341,7 +373,7 @@ def plan(
     )
     arrived = [j for j in journeys if j.arrived]
     if not arrived:
-        raise SystemExit(f"No route found from {origin} to {destination}.")
+        raise SystemExit(f"No route found from {start.name} to {end.name}.")
 
     # Simulation seconds are offsets from the start of the simulated span, so
     # for a whole-day run they are already clock times.

@@ -275,6 +275,28 @@ class _Handler(http.server.SimpleHTTPRequestHandler):
         origin = (query.get("from") or [""])[0]
         destination = (query.get("to") or [""])[0]
 
+        # An address reaches the planner as coordinates: the geocoder runs
+        # here, where its cache and its rate limit live, and journey.resolve
+        # takes "lat,lon@label" as readily as it takes a place key.
+        if (query.get("addresses") or [""])[0] == "1":
+            from . import geocode
+
+            resolved = []
+            for text in (origin, destination):
+                found = geocode.lookup(text)
+                if not found:
+                    return self._send_json(
+                        {"error": f"Could not find {text!r} in the study area. "
+                                  f"Try adding the town, or a cross street."},
+                        status=400)
+                place = found[0]
+                # Label the end with what the person typed, not with what
+                # OpenStreetMap calls the building. "1600 St Michaels Dr"
+                # reads better in an answer than "Vital Spaces", which is the
+                # gallery that happens to be the first thing at that address.
+                resolved.append(f"{place.lat},{place.lon}@{text.strip()}")
+            origin, destination = resolved
+
         try:
             from . import journey
 

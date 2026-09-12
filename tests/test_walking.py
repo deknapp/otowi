@@ -144,3 +144,56 @@ class TestThinning:
     def test_a_two_point_line_is_left_alone(self):
         from otowi.web import _thin
         assert len(_thin([[-106.0, 35.7], [-106.0, 35.8]])) == 2
+
+
+class TestResolvingAnEnd:
+    """A journey end is a named place or a coordinate, and the planner does not care.
+
+    The six places are the right vocabulary for a regional commute model and
+    the wrong one for "from my house". Both forms go through one function so
+    the CLI keeps its vocabulary while the map can ask about anywhere -- and
+    so that the bounds check happens once rather than at each caller.
+    """
+
+    def test_a_named_place_still_works(self):
+        from otowi import journey
+        assert journey.resolve("los_alamos").name == "Los Alamos"
+
+    def test_a_coordinate_inside_the_box_becomes_a_place(self):
+        from otowi import journey
+        place = journey.resolve("35.6582,-105.9767")
+        assert place.latitude == pytest.approx(35.6582)
+        assert place.longitude == pytest.approx(-105.9767)
+
+    def test_the_label_after_an_at_sign_is_what_the_answer_calls_it(self):
+        from otowi import journey
+        assert journey.resolve("35.6582,-105.9767@1600 St Michaels Dr").name \
+            == "1600 St Michaels Dr"
+
+    def test_a_coordinate_outside_the_study_area_is_refused(self):
+        from otowi import journey
+        # Times Square. The model has nothing to say about it, and routing
+        # from the nearest edge in New Mexico would answer a question nobody
+        # asked rather than decline one.
+        with pytest.raises(SystemExit, match="outside the study area"):
+            journey.resolve("40.7580,-73.9855")
+
+    def test_an_unknown_name_lists_what_is_known(self):
+        from otowi import journey
+        with pytest.raises(SystemExit, match="los_alamos"):
+            journey.resolve("mordor")
+
+    def test_latitude_comes_first_because_that_is_what_a_map_hands_you(self):
+        from otowi import journey
+        place = journey.resolve("35.69,-105.94")
+        assert 35 < place.latitude < 36 and -107 < place.longitude < -105
+
+
+class TestGeocodeCacheKey:
+    def test_case_and_spacing_are_not_part_of_an_address(self):
+        from otowi import geocode
+        assert geocode._normalise("  1600   St Michaels DR ") == "1600 st michaels dr"
+
+    def test_an_empty_query_never_reaches_the_service(self):
+        from otowi import geocode
+        assert geocode.lookup("   ") == []
