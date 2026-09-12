@@ -8,6 +8,12 @@ httpx>=0.27
 lxml>=5.0
 pytest>=8.0
 
+# NMDOT's crash counts reach the public as a PDF of bar charts, one per
+# community per year, and the numbers wanted are the data labels printed over
+# the bars. Reading them needs word positions, not page text: the labels are
+# ordered by where they sit, not by where they appear in the file.
+pdfplumber>=0.11
+
 # Reading the built network back in to attach trips to edges. Ships separately
 # from the eclipse-sumo binaries, and needs pyproj for the lat/lon conversion
 # the network's geo-projection describes.
