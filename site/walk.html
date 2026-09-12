@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>otowi — walking and cycling in Santa Fe</title>
+<title>Santa Fe &amp; Northern NM Traffic Safety — walking and cycling</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <style>
   :root {
@@ -53,6 +53,17 @@
   .modes button.on { background: var(--accent); border-color: var(--accent); color: #0b1017; font-weight: 600; }
   .modes button.on.foot { background: var(--foot); border-color: var(--foot); }
   .modes button.on.bike { background: var(--bike); border-color: var(--bike); }
+
+  /* The project keeps its name, and a stranger does not have to decode it to
+     find out whose work this is or where the rest of it lives. */
+  .madeby { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border);
+            font-size: 11px; color: var(--muted); line-height: 1.6; }
+  .madeby .mark { color: var(--text); font-weight: 600; letter-spacing: .3px; }
+  .madeby a { color: var(--accent); text-decoration: none; }
+  .madeby a:hover { text-decoration: underline; }
+  .madeby .ghrow { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 5px; }
+  .madeby .ghrow a { display: inline-flex; align-items: center; gap: 5px; }
+  .madeby svg { width: 13px; height: 13px; flex: none; }
 
   .explain {
     font-size: 11.5px; color: var(--muted); margin-bottom: 12px;
@@ -133,6 +144,22 @@
   .legrow .s-b { width: 7px; height: 7px; }
   .legrow.sizes { gap: 4px; }
   .legrow.sizes .dot { margin-left: 4px; }
+  .legtitle.sub2 { margin-top: 10px; }
+  #filterreset {
+    padding: 2px 8px; font: inherit; font-size: 10.5px; cursor: pointer;
+    background: #182029; color: var(--muted); border: 1px solid var(--border);
+    border-radius: 5px;
+  }
+  #filterreset:hover { color: var(--text); border-color: var(--accent); }
+  .filt { display: flex; align-items: center; gap: 7px; font-size: 11.5px;
+          color: var(--muted); cursor: pointer; padding: 3px 0; }
+  .filt:hover { color: var(--text); }
+  .filt input { accent-color: var(--accent); margin: 0; flex: none; }
+  .filt b { margin-left: auto; font-variant-numeric: tabular-nums; font-weight: 500;
+            font-size: 10.5px; color: #6e7d91; }
+  .filt .dot { border-radius: 50%; display: inline-block; flex: none;
+               border: 1px solid #0e1116; }
+  .filt .key { width: 10px; height: 10px; border-radius: 3px; flex: none; }
   .legrow .ring-lit { border: 1.6px solid #7f9ddb; }
   .legrow .ring-unlit { border: 1.6px solid #3c4a6b; }
   .legbar { height: 9px; border-radius: 5px; margin-bottom: 3px;
@@ -183,6 +210,8 @@
   }
   .views a:hover { background: #1b232e; color: var(--text); }
   .views a.here { background: var(--accent); color: #0b1017; cursor: default; }
+  .views a.wide { grid-column: 1 / -1; min-height: 32px; font-weight: 500;
+                  border-top: 1px solid var(--border); }
   .views a.here.foot { background: var(--foot, #f0a35e); }
   .views a svg { width: 15px; height: 15px; flex: none; }
   .views a.pulse { box-shadow: inset 0 0 0 1px var(--foot, #f0a35e); color: var(--foot, #f0a35e); }
@@ -203,13 +232,14 @@
 <div id="map"></div>
 
 <div id="controls" class="panel">
-  <h1>otowi &middot; on foot, on a bike</h1>
+  <h1>Santa Fe on foot &amp; on a bike</h1>
   <div class="sub" id="lead">Santa Fe</div>
 
   <div class="views">
     <a id="v-drive" href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14M6 17l-1.2-5.2A2 2 0 0 1 6.7 9.3h10.6a2 2 0 0 1 1.9 2.5L18 17"/><path d="M7 9.3 8.2 6.1A1.5 1.5 0 0 1 9.6 5h4.8a1.5 1.5 0 0 1 1.4 1.1L17 9.3"/><circle cx="7.5" cy="17" r="1.6"/><circle cx="16.5" cy="17" r="1.6"/></svg>Driving</a>
     <a class="here foot" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13" cy="4" r="2"/><path d="M12.5 8 9.8 10.2 8 15"/><path d="m12.5 8 3 1.6.8 3.6"/><path d="M16.3 13.2 18 21"/><path d="M11 12.2 8.5 21"/></svg>Walking &amp; cycling</a>
       <a id="v-hours" href="hours.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>By hour</a>
+      <a id="v-sources" class="wide" href="sources.html">Data sources</a>
   </div>
 
   <div class="modes">
@@ -257,6 +287,14 @@
   <div class="sectiontitle">The state's High Injury Network, here</div>
   <table id="corridors"></table>
   <div class="note" id="foot"></div>
+  <div class="madeby">
+    <span class="mark">otowi</span> &mdash; named for the bridge on NM-502, the
+    bottleneck on the Los Alamos commute. Built by Nathaniel Knapp.
+    <div class="ghrow">
+      <a href="https://github.com/deknapp/otowi" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" aria-hidden="true" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>Source code</a>
+      <a href="https://github.com/deknapp" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" aria-hidden="true" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>All my projects</a>
+    </div>
+  </div>
 </div>
 
 <div id="layers" class="panel">
@@ -278,24 +316,46 @@
 
   <div id="legendbody">
     <div class="legrule"></div>
-    <div class="legtitle">Each dot is one person</div>
-    <div class="legrow">
-      <span class="dot" style="background:#f0a35e"></span> on foot
-      <span class="dot" style="background:#5dd6c0;margin-left:10px"></span> on a bike
+    <div class="legendhead">
+      <div class="legtitle" style="margin:0">Each dot is one person</div>
+      <button id="filterreset" title="Show everything again">reset</button>
     </div>
 
-    <div class="legtitle">Size &mdash; what happened to them</div>
-    <div class="legrow sizes">
-      <span class="dot s-k" style="background:#f0a35e"></span>killed
-      <span class="dot s-a" style="background:#f0a35e"></span>serious
-      <span class="dot s-b" style="background:#f0a35e"></span>minor
-    </div>
+    <div class="legtitle sub2">What happened to them &mdash; click to show or hide</div>
+    <label class="filt"><input type="checkbox" data-f="sev" value="K" checked>
+      <span class="dot s-k" style="background:#f0a35e"></span> killed
+      <b data-count="sev:K"></b></label>
+    <label class="filt"><input type="checkbox" data-f="sev" value="A" checked>
+      <span class="dot s-a" style="background:#f0a35e"></span> serious injury
+      <b data-count="sev:A"></b></label>
+    <label class="filt"><input type="checkbox" data-f="sev" value="B" checked>
+      <span class="dot s-b" style="background:#f0a35e"></span> minor injury
+      <b data-count="sev:B"></b></label>
+    <label class="filt"><input type="checkbox" data-f="sev" value="C" checked>
+      <span class="dot s-b" style="background:#f0a35e"></span> possible injury
+      <b data-count="sev:C"></b></label>
+    <label class="filt"><input type="checkbox" data-f="sev" value="O" checked>
+      <span class="dot s-b" style="background:#f0a35e"></span> nobody hurt
+      <b data-count="sev:O"></b></label>
 
-    <div class="legtitle">A ring means it was dark</div>
-    <div class="legrow">
-      <span class="dot s-a ring-lit" style="background:#f0a35e"></span> street lit
-      <span class="dot s-a ring-unlit" style="background:#f0a35e;margin-left:10px"></span> unlit
-    </div>
+    <div class="legtitle sub2">Light</div>
+    <label class="filt"><input type="checkbox" data-f="light" value="0" checked>
+      <span class="key" style="background:#e9d8a6"></span> daylight
+      <b data-count="light:0"></b></label>
+    <label class="filt"><input type="checkbox" data-f="light" value="1" checked>
+      <span class="key" style="background:#7f9ddb"></span> dark, street lit
+      <b data-count="light:1"></b></label>
+    <label class="filt"><input type="checkbox" data-f="light" value="2" checked>
+      <span class="key" style="background:#3c4a6b"></span> dark, unlit
+      <b data-count="light:2"></b></label>
+    <label class="filt"><input type="checkbox" data-f="light" value="3" checked>
+      <span class="key" style="background:#c9a227"></span> dusk or dawn
+      <b data-count="light:3"></b></label>
+    <label class="filt"><input type="checkbox" data-f="light" value="4" checked>
+      <span class="key" style="background:#5b6676"></span> not recorded
+      <b data-count="light:4"></b></label>
+
+    <div class="legnote" id="filtcount"></div>
 
     <div class="legrule"></div>
     <div class="legtitle">Injury network &mdash; colour</div>
@@ -403,10 +463,52 @@
     return mode === "all" || (mode === "foot" ? c[4] === 0 : c[4] === 1);
   }
 
+  // Severity and light are filters on what is drawn; mode and hour are the
+  // page's own state. All three compose, and every filter starts on -- the
+  // map's job is to show what happened, and a default that hides some of it
+  // is a claim in itself.
+  var filters = { sev: ["K", "A", "B", "C", "O"], light: ["0", "1", "2", "3", "4"] };
+
+  function passesFilter(c) {
+    return filters.sev.indexOf(c[3]) >= 0 &&
+           filters.light.indexOf(String(c[5])) >= 0;
+  }
+
   function visible() {
     return D.crashes.filter(function (c) {
-      return modeMatches(c) && (hour < 0 || c[2] === hour);
+      return modeMatches(c) && passesFilter(c) && (hour < 0 || c[2] === hour);
     });
+  }
+
+  function readFilters() {
+    filters = { sev: [], light: [] };
+    document.querySelectorAll("#legendbody input[data-f]").forEach(function (box) {
+      if (box.checked) filters[box.dataset.f].push(box.value);
+    });
+  }
+
+  // Counted against the mode being shown but not against the other filters:
+  // a number that moved every time you unticked something else would be
+  // unreadable, and the question the row answers is "how many of these".
+  function labelCounts() {
+    var pool = D.crashes.filter(modeMatches);
+    function tally(key, test) {
+      var node = document.querySelector('[data-count="' + key + '"]');
+      if (node) node.textContent = pool.filter(test).length;
+    }
+    ["K", "A", "B", "C", "O"].forEach(function (v) {
+      tally("sev:" + v, function (c) { return c[3] === v; });
+    });
+    ["0", "1", "2", "3", "4"].forEach(function (v) {
+      tally("light:" + v, function (c) { return String(c[5]) === v; });
+    });
+    var drawn = visible().length;
+    var note = document.getElementById("filtcount");
+    if (!note) return;
+    note.innerHTML = (drawn === pool.length && hour < 0)
+      ? "Showing all " + pool.length + "."
+      : "Showing <b>" + drawn + "</b> of " + pool.length +
+        (hour >= 0 ? " (this hour only)" : "") + ".";
   }
 
   function colourFor(c) { return c[4] === 0 ? "#f0a35e" : "#5dd6c0"; }
@@ -549,6 +651,7 @@
       (h < 10 ? "0" : "") + h + ":00–" + (h < 9 ? "0" : "") + (h + 1) + ":00";
     drawClock();
     drawCrashes();
+    labelCounts();
     writeHash();
   }
 
@@ -996,7 +1099,8 @@
       });
       b.className = "on " + (b.dataset.mode === "foot" ? "foot" : b.dataset.mode === "bike" ? "bike" : "");
       mode = b.dataset.mode;
-      drawFigures(); drawClock(); drawCrashes(); drawComparison(); writeHash();
+      drawFigures(); drawClock(); drawCrashes(); drawComparison();
+      labelCounts(); writeHash();
     };
   });
 
@@ -1061,6 +1165,18 @@
   };
   if (window.innerWidth <= 680) el("legendtoggle").onclick();
 
+  document.querySelectorAll("#legendbody input[data-f]").forEach(function (box) {
+    box.addEventListener("change", function () {
+      readFilters(); drawCrashes(); labelCounts();
+    });
+  });
+  el("filterreset").addEventListener("click", function () {
+    document.querySelectorAll("#legendbody input[data-f]").forEach(function (box) {
+      box.checked = true;
+    });
+    readFilters(); drawCrashes(); labelCounts();
+  });
+
   map.on("click", function () { el("detail").style.display = "none"; });
 
   document.getElementById("v-drive").href = STATIC ? "index.html" : "/";
@@ -1089,7 +1205,7 @@
     }
 
     drawAssets(); drawHin(); drawCrashes(); drawClock(); drawFigures();
-    drawComparison(); drawCorridors();
+    drawComparison(); drawCorridors(); labelCounts();
 
     // A route in the link is a shared route: "here is the ride I do every
     // morning" should open on that ride, not on an empty form.

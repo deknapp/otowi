@@ -1,0 +1,91 @@
+place,scope,year,fatal,injury,property_damage,total,alcohol_fatal,alcohol_injury,alcohol_property_damage,alcohol_total
+Española,city,2007,2,211,414,627,2,28,22,52
+Española,city,2008,3,176,419,598,3,14,26,43
+Española,city,2009,1,206,360,567,1,18,18,37
+Española,city,2010,6,128,248,382,4,10,12,26
+Española,city,2011,1,163,265,429,0,12,14,26
+Española,city,2012,0,91,211,302,0,12,22,34
+Española,city,2013,2,92,154,248,0,14,8,22
+Española,city,2014,3,82,177,262,1,7,7,15
+Española,city,2015,3,153,228,384,1,8,14,23
+Española,city,2016,0,167,300,467,0,14,11,25
+Española,city,2017,0,164,261,425,0,17,8,25
+Española,city,2018,0,117,268,385,0,9,7,16
+Española,city,2019,2,122,314,438,1,8,7,16
+Española,city,2020,4,77,212,293,2,3,7,12
+Española,city,2021,4,94,232,330,0,10,12,22
+Los Alamos,city,2007,1,63,150,214,1,8,3,12
+Los Alamos,city,2008,0,42,130,172,0,1,6,7
+Los Alamos,city,2009,1,57,141,199,0,3,6,9
+Los Alamos,city,2010,1,42,88,131,0,1,3,4
+Los Alamos,city,2011,1,31,90,122,0,3,3,6
+Los Alamos,city,2012,0,20,64,84,0,0,2,2
+Los Alamos,city,2013,0,12,47,59,0,1,2,3
+Los Alamos,city,2014,2,15,29,46,0,2,0,2
+Los Alamos,city,2015,0,23,62,85,0,0,0,0
+Los Alamos,city,2016,0,29,64,93,0,1,3,4
+Los Alamos,city,2017,0,40,68,108,0,2,1,3
+Los Alamos,city,2018,0,28,94,122,0,2,5,7
+Los Alamos,city,2019,0,33,63,96,0,2,1,3
+Los Alamos,city,2020,1,17,54,72,0,0,4,4
+Los Alamos,city,2021,2,21,44,67,1,1,1,3
+Los Alamos County,county,2007,1,63,153,217,1,8,3,12
+Los Alamos County,county,2008,0,46,139,185,0,2,7,9
+Los Alamos County,county,2009,1,62,154,217,0,4,7,11
+Los Alamos County,county,2010,1,46,92,139,0,1,3,4
+Los Alamos County,county,2011,1,34,93,128,0,3,3,6
+Los Alamos County,county,2012,0,20,64,84,0,0,2,2
+Los Alamos County,county,2013,0,14,50,64,0,1,2,3
+Los Alamos County,county,2014,2,18,38,58,0,2,0,2
+Los Alamos County,county,2015,0,43,82,125,0,2,1,3
+Los Alamos County,county,2016,0,39,86,125,0,3,3,6
+Los Alamos County,county,2017,0,53,82,135,0,3,2,5
+Los Alamos County,county,2018,0,34,115,149,0,2,5,7
+Los Alamos County,county,2019,1,44,91,136,0,4,3,7
+Los Alamos County,county,2020,2,28,82,112,0,0,5,5
+Los Alamos County,county,2021,3,33,59,95,1,1,1,3
+Rio Arriba County,county,2007,13,224,496,733,11,43,22,76
+Rio Arriba County,county,2008,14,168,456,638,7,23,21,51
+Rio Arriba County,county,2009,12,171,416,599,7,39,42,88
+Rio Arriba County,county,2010,6,156,360,522,3,23,20,46
+Rio Arriba County,county,2011,11,141,329,481,6,25,19,50
+Rio Arriba County,county,2012,17,177,442,636,6,23,35,64
+Rio Arriba County,county,2013,11,163,415,589,5,29,23,57
+Rio Arriba County,county,2014,8,169,425,602,3,19,20,42
+Rio Arriba County,county,2015,11,228,447,686,5,31,22,58
+Rio Arriba County,county,2016,9,261,589,859,8,35,20,63
+Rio Arriba County,county,2017,7,242,509,758,3,25,21,49
+Rio Arriba County,county,2018,13,208,530,751,7,23,19,49
+Rio Arriba County,county,2019,12,227,565,804,5,15,20,40
+Rio Arriba County,county,2020,13,188,466,667,6,21,18,45
+Rio Arriba County,county,2021,5,171,505,681,0,19,23,42
+Santa Fe,city,2007,7,877,2008,2892,4,62,83,149
+Santa Fe,city,2008,7,844,1858,2709,3,59,81,143
+Santa Fe,city,2009,5,709,1699,2413,1,49,59,109
+Santa Fe,city,2010,4,694,1538,2236,3,43,61,107
+Santa Fe,city,2011,10,667,1523,2200,7,57,76,140
+Santa Fe,city,2012,9,766,1649,2424,3,61,67,131
+Santa Fe,city,2013,5,701,1456,2162,4,49,65,118
+Santa Fe,city,2014,10,673,1512,2195,5,53,70,128
+Santa Fe,city,2015,7,783,1586,2376,3,48,54,105
+Santa Fe,city,2016,6,774,1528,2308,3,44,56,103
+Santa Fe,city,2017,10,800,1784,2594,7,46,63,116
+Santa Fe,city,2018,9,758,1628,2395,4,51,68,123
+Santa Fe,city,2019,10,770,1555,2335,4,44,68,116
+Santa Fe,city,2020,13,538,1002,1553,3,36,42,81
+Santa Fe,city,2021,9,648,1116,1773,1,29,44,74
+Santa Fe County,county,2007,18,1256,2652,3926,10,104,114,228
+Santa Fe County,county,2008,14,1210,2539,3763,6,99,128,233
+Santa Fe County,county,2009,20,1117,2374,3511,7,99,102,208
+Santa Fe County,county,2010,22,1075,2222,3319,17,79,96,192
+Santa Fe County,county,2011,18,1038,2227,3283,8,94,112,214
+Santa Fe County,county,2012,18,932,2029,2979,7,78,87,172
+Santa Fe County,county,2013,8,894,1865,2767,6,66,83,155
+Santa Fe County,county,2014,17,875,1933,2825,7,71,94,172
+Santa Fe County,county,2015,13,1068,2118,3199,3,77,81,161
+Santa Fe County,county,2016,20,1078,2074,3172,8,86,85,179
+Santa Fe County,county,2017,16,1100,2386,3502,9,74,89,172
+Santa Fe County,county,2018,18,1014,2228,3260,7,76,84,167
+Santa Fe County,county,2019,15,1115,2276,3406,6,85,103,194
+Santa Fe County,county,2020,29,819,1580,2428,12,60,72,144
+Santa Fe County,county,2021,19,925,1590,2534,6,58,68,132

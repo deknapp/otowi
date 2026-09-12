@@ -1,0 +1,2593 @@
+place,scope,year,kind,hour,crashes,hour_unknown
+Santa Fe County,county,2016,all,0,31,7
+Santa Fe County,county,2016,all,1,29,7
+Santa Fe County,county,2016,all,2,25,7
+Santa Fe County,county,2016,all,3,19,7
+Santa Fe County,county,2016,all,4,14,7
+Santa Fe County,county,2016,all,5,21,7
+Santa Fe County,county,2016,all,6,49,7
+Santa Fe County,county,2016,all,7,168,7
+Santa Fe County,county,2016,all,8,204,7
+Santa Fe County,county,2016,all,9,166,7
+Santa Fe County,county,2016,all,10,168,7
+Santa Fe County,county,2016,all,11,148,7
+Santa Fe County,county,2016,all,12,229,7
+Santa Fe County,county,2016,all,13,238,7
+Santa Fe County,county,2016,all,14,229,7
+Santa Fe County,county,2016,all,15,254,7
+Santa Fe County,county,2016,all,16,295,7
+Santa Fe County,county,2016,all,17,302,7
+Santa Fe County,county,2016,all,18,164,7
+Santa Fe County,county,2016,all,19,117,7
+Santa Fe County,county,2016,all,20,92,7
+Santa Fe County,county,2016,all,21,87,7
+Santa Fe County,county,2016,all,22,68,7
+Santa Fe County,county,2016,all,23,48,7
+Santa Fe County,county,2016,alcohol,0,13,3
+Santa Fe County,county,2016,alcohol,1,9,3
+Santa Fe County,county,2016,alcohol,2,10,3
+Santa Fe County,county,2016,alcohol,3,6,3
+Santa Fe County,county,2016,alcohol,4,2,3
+Santa Fe County,county,2016,alcohol,5,2,3
+Santa Fe County,county,2016,alcohol,6,3,3
+Santa Fe County,county,2016,alcohol,7,2,3
+Santa Fe County,county,2016,alcohol,8,0,3
+Santa Fe County,county,2016,alcohol,9,1,3
+Santa Fe County,county,2016,alcohol,10,2,3
+Santa Fe County,county,2016,alcohol,11,1,3
+Santa Fe County,county,2016,alcohol,12,2,3
+Santa Fe County,county,2016,alcohol,13,7,3
+Santa Fe County,county,2016,alcohol,14,9,3
+Santa Fe County,county,2016,alcohol,15,9,3
+Santa Fe County,county,2016,alcohol,16,14,3
+Santa Fe County,county,2016,alcohol,17,9,3
+Santa Fe County,county,2016,alcohol,18,12,3
+Santa Fe County,county,2016,alcohol,19,8,3
+Santa Fe County,county,2016,alcohol,20,4,3
+Santa Fe County,county,2016,alcohol,21,14,3
+Santa Fe County,county,2016,alcohol,22,23,3
+Santa Fe County,county,2016,alcohol,23,14,3
+Santa Fe County,county,2016,injury_or_fatal,0,11,0
+Santa Fe County,county,2016,injury_or_fatal,1,7,0
+Santa Fe County,county,2016,injury_or_fatal,2,9,0
+Santa Fe County,county,2016,injury_or_fatal,3,3,0
+Santa Fe County,county,2016,injury_or_fatal,4,6,0
+Santa Fe County,county,2016,injury_or_fatal,5,10,0
+Santa Fe County,county,2016,injury_or_fatal,6,12,0
+Santa Fe County,county,2016,injury_or_fatal,7,62,0
+Santa Fe County,county,2016,injury_or_fatal,8,73,0
+Santa Fe County,county,2016,injury_or_fatal,9,56,0
+Santa Fe County,county,2016,injury_or_fatal,10,48,0
+Santa Fe County,county,2016,injury_or_fatal,11,50,0
+Santa Fe County,county,2016,injury_or_fatal,12,85,0
+Santa Fe County,county,2016,injury_or_fatal,13,87,0
+Santa Fe County,county,2016,injury_or_fatal,14,84,0
+Santa Fe County,county,2016,injury_or_fatal,15,83,0
+Santa Fe County,county,2016,injury_or_fatal,16,112,0
+Santa Fe County,county,2016,injury_or_fatal,17,108,0
+Santa Fe County,county,2016,injury_or_fatal,18,54,0
+Santa Fe County,county,2016,injury_or_fatal,19,35,0
+Santa Fe County,county,2016,injury_or_fatal,20,31,0
+Santa Fe County,county,2016,injury_or_fatal,21,31,0
+Santa Fe County,county,2016,injury_or_fatal,22,25,0
+Santa Fe County,county,2016,injury_or_fatal,23,16,0
+Santa Fe County,county,2016,vru,0,0,0
+Santa Fe County,county,2016,vru,1,0,0
+Santa Fe County,county,2016,vru,2,0,0
+Santa Fe County,county,2016,vru,3,0,0
+Santa Fe County,county,2016,vru,4,0,0
+Santa Fe County,county,2016,vru,5,0,0
+Santa Fe County,county,2016,vru,6,2,0
+Santa Fe County,county,2016,vru,7,5,0
+Santa Fe County,county,2016,vru,8,4,0
+Santa Fe County,county,2016,vru,9,1,0
+Santa Fe County,county,2016,vru,10,5,0
+Santa Fe County,county,2016,vru,11,3,0
+Santa Fe County,county,2016,vru,12,4,0
+Santa Fe County,county,2016,vru,13,4,0
+Santa Fe County,county,2016,vru,14,4,0
+Santa Fe County,county,2016,vru,15,3,0
+Santa Fe County,county,2016,vru,16,7,0
+Santa Fe County,county,2016,vru,17,6,0
+Santa Fe County,county,2016,vru,18,2,0
+Santa Fe County,county,2016,vru,19,6,0
+Santa Fe County,county,2016,vru,20,3,0
+Santa Fe County,county,2016,vru,21,4,0
+Santa Fe County,county,2016,vru,22,3,0
+Santa Fe County,county,2016,vru,23,2,0
+Santa Fe County,county,2016,dwi_arrests,0,75,82
+Santa Fe County,county,2016,dwi_arrests,1,71,82
+Santa Fe County,county,2016,dwi_arrests,2,58,82
+Santa Fe County,county,2016,dwi_arrests,3,47,82
+Santa Fe County,county,2016,dwi_arrests,4,14,82
+Santa Fe County,county,2016,dwi_arrests,5,12,82
+Santa Fe County,county,2016,dwi_arrests,6,8,82
+Santa Fe County,county,2016,dwi_arrests,7,7,82
+Santa Fe County,county,2016,dwi_arrests,8,3,82
+Santa Fe County,county,2016,dwi_arrests,9,4,82
+Santa Fe County,county,2016,dwi_arrests,10,4,82
+Santa Fe County,county,2016,dwi_arrests,11,6,82
+Santa Fe County,county,2016,dwi_arrests,12,11,82
+Santa Fe County,county,2016,dwi_arrests,13,12,82
+Santa Fe County,county,2016,dwi_arrests,14,17,82
+Santa Fe County,county,2016,dwi_arrests,15,12,82
+Santa Fe County,county,2016,dwi_arrests,16,21,82
+Santa Fe County,county,2016,dwi_arrests,17,26,82
+Santa Fe County,county,2016,dwi_arrests,18,27,82
+Santa Fe County,county,2016,dwi_arrests,19,34,82
+Santa Fe County,county,2016,dwi_arrests,20,35,82
+Santa Fe County,county,2016,dwi_arrests,21,59,82
+Santa Fe County,county,2016,dwi_arrests,22,46,82
+Santa Fe County,county,2016,dwi_arrests,23,73,82
+Santa Fe County,county,2019,all,0,43,4
+Santa Fe County,county,2019,all,1,28,4
+Santa Fe County,county,2019,all,2,29,4
+Santa Fe County,county,2019,all,3,25,4
+Santa Fe County,county,2019,all,4,32,4
+Santa Fe County,county,2019,all,5,27,4
+Santa Fe County,county,2019,all,6,64,4
+Santa Fe County,county,2019,all,7,215,4
+Santa Fe County,county,2019,all,8,209,4
+Santa Fe County,county,2019,all,9,166,4
+Santa Fe County,county,2019,all,10,196,4
+Santa Fe County,county,2019,all,11,180,4
+Santa Fe County,county,2019,all,12,217,4
+Santa Fe County,county,2019,all,13,218,4
+Santa Fe County,county,2019,all,14,223,4
+Santa Fe County,county,2019,all,15,243,4
+Santa Fe County,county,2019,all,16,327,4
+Santa Fe County,county,2019,all,17,336,4
+Santa Fe County,county,2019,all,18,167,4
+Santa Fe County,county,2019,all,19,112,4
+Santa Fe County,county,2019,all,20,114,4
+Santa Fe County,county,2019,all,21,110,4
+Santa Fe County,county,2019,all,22,70,4
+Santa Fe County,county,2019,all,23,51,4
+Santa Fe County,county,2019,alcohol,0,10,0
+Santa Fe County,county,2019,alcohol,1,12,0
+Santa Fe County,county,2019,alcohol,2,11,0
+Santa Fe County,county,2019,alcohol,3,7,0
+Santa Fe County,county,2019,alcohol,4,6,0
+Santa Fe County,county,2019,alcohol,5,2,0
+Santa Fe County,county,2019,alcohol,6,5,0
+Santa Fe County,county,2019,alcohol,7,4,0
+Santa Fe County,county,2019,alcohol,8,0,0
+Santa Fe County,county,2019,alcohol,9,1,0
+Santa Fe County,county,2019,alcohol,10,1,0
+Santa Fe County,county,2019,alcohol,11,2,0
+Santa Fe County,county,2019,alcohol,12,2,0
+Santa Fe County,county,2019,alcohol,13,4,0
+Santa Fe County,county,2019,alcohol,14,7,0
+Santa Fe County,county,2019,alcohol,15,7,0
+Santa Fe County,county,2019,alcohol,16,9,0
+Santa Fe County,county,2019,alcohol,17,12,0
+Santa Fe County,county,2019,alcohol,18,12,0
+Santa Fe County,county,2019,alcohol,19,15,0
+Santa Fe County,county,2019,alcohol,20,14,0
+Santa Fe County,county,2019,alcohol,21,21,0
+Santa Fe County,county,2019,alcohol,22,17,0
+Santa Fe County,county,2019,alcohol,23,13,0
+Santa Fe County,county,2019,injury_or_fatal,0,16,0
+Santa Fe County,county,2019,injury_or_fatal,1,13,0
+Santa Fe County,county,2019,injury_or_fatal,2,9,0
+Santa Fe County,county,2019,injury_or_fatal,3,11,0
+Santa Fe County,county,2019,injury_or_fatal,4,12,0
+Santa Fe County,county,2019,injury_or_fatal,5,7,0
+Santa Fe County,county,2019,injury_or_fatal,6,22,0
+Santa Fe County,county,2019,injury_or_fatal,7,75,0
+Santa Fe County,county,2019,injury_or_fatal,8,59,0
+Santa Fe County,county,2019,injury_or_fatal,9,52,0
+Santa Fe County,county,2019,injury_or_fatal,10,61,0
+Santa Fe County,county,2019,injury_or_fatal,11,59,0
+Santa Fe County,county,2019,injury_or_fatal,12,67,0
+Santa Fe County,county,2019,injury_or_fatal,13,67,0
+Santa Fe County,county,2019,injury_or_fatal,14,80,0
+Santa Fe County,county,2019,injury_or_fatal,15,92,0
+Santa Fe County,county,2019,injury_or_fatal,16,100,0
+Santa Fe County,county,2019,injury_or_fatal,17,113,0
+Santa Fe County,county,2019,injury_or_fatal,18,50,0
+Santa Fe County,county,2019,injury_or_fatal,19,41,0
+Santa Fe County,county,2019,injury_or_fatal,20,51,0
+Santa Fe County,county,2019,injury_or_fatal,21,37,0
+Santa Fe County,county,2019,injury_or_fatal,22,20,0
+Santa Fe County,county,2019,injury_or_fatal,23,16,0
+Santa Fe County,county,2019,vru,0,1,0
+Santa Fe County,county,2019,vru,1,1,0
+Santa Fe County,county,2019,vru,2,0,0
+Santa Fe County,county,2019,vru,3,0,0
+Santa Fe County,county,2019,vru,4,1,0
+Santa Fe County,county,2019,vru,5,0,0
+Santa Fe County,county,2019,vru,6,1,0
+Santa Fe County,county,2019,vru,7,3,0
+Santa Fe County,county,2019,vru,8,1,0
+Santa Fe County,county,2019,vru,9,2,0
+Santa Fe County,county,2019,vru,10,2,0
+Santa Fe County,county,2019,vru,11,3,0
+Santa Fe County,county,2019,vru,12,6,0
+Santa Fe County,county,2019,vru,13,4,0
+Santa Fe County,county,2019,vru,14,7,0
+Santa Fe County,county,2019,vru,15,4,0
+Santa Fe County,county,2019,vru,16,7,0
+Santa Fe County,county,2019,vru,17,6,0
+Santa Fe County,county,2019,vru,18,7,0
+Santa Fe County,county,2019,vru,19,3,0
+Santa Fe County,county,2019,vru,20,3,0
+Santa Fe County,county,2019,vru,21,5,0
+Santa Fe County,county,2019,vru,22,1,0
+Santa Fe County,county,2019,vru,23,1,0
+Santa Fe County,county,2019,dwi_arrests,0,67,145
+Santa Fe County,county,2019,dwi_arrests,1,73,145
+Santa Fe County,county,2019,dwi_arrests,2,78,145
+Santa Fe County,county,2019,dwi_arrests,3,38,145
+Santa Fe County,county,2019,dwi_arrests,4,23,145
+Santa Fe County,county,2019,dwi_arrests,5,15,145
+Santa Fe County,county,2019,dwi_arrests,6,3,145
+Santa Fe County,county,2019,dwi_arrests,7,10,145
+Santa Fe County,county,2019,dwi_arrests,8,6,145
+Santa Fe County,county,2019,dwi_arrests,9,3,145
+Santa Fe County,county,2019,dwi_arrests,10,9,145
+Santa Fe County,county,2019,dwi_arrests,11,5,145
+Santa Fe County,county,2019,dwi_arrests,12,5,145
+Santa Fe County,county,2019,dwi_arrests,13,10,145
+Santa Fe County,county,2019,dwi_arrests,14,14,145
+Santa Fe County,county,2019,dwi_arrests,15,9,145
+Santa Fe County,county,2019,dwi_arrests,16,18,145
+Santa Fe County,county,2019,dwi_arrests,17,35,145
+Santa Fe County,county,2019,dwi_arrests,18,31,145
+Santa Fe County,county,2019,dwi_arrests,19,31,145
+Santa Fe County,county,2019,dwi_arrests,20,48,145
+Santa Fe County,county,2019,dwi_arrests,21,45,145
+Santa Fe County,county,2019,dwi_arrests,22,58,145
+Santa Fe County,county,2019,dwi_arrests,23,73,145
+Santa Fe County,county,2020,all,0,26,2
+Santa Fe County,county,2020,all,1,23,2
+Santa Fe County,county,2020,all,2,18,2
+Santa Fe County,county,2020,all,3,16,2
+Santa Fe County,county,2020,all,4,21,2
+Santa Fe County,county,2020,all,5,35,2
+Santa Fe County,county,2020,all,6,51,2
+Santa Fe County,county,2020,all,7,115,2
+Santa Fe County,county,2020,all,8,142,2
+Santa Fe County,county,2020,all,9,113,2
+Santa Fe County,county,2020,all,10,142,2
+Santa Fe County,county,2020,all,11,158,2
+Santa Fe County,county,2020,all,12,146,2
+Santa Fe County,county,2020,all,13,182,2
+Santa Fe County,county,2020,all,14,163,2
+Santa Fe County,county,2020,all,15,181,2
+Santa Fe County,county,2020,all,16,205,2
+Santa Fe County,county,2020,all,17,207,2
+Santa Fe County,county,2020,all,18,124,2
+Santa Fe County,county,2020,all,19,98,2
+Santa Fe County,county,2020,all,20,94,2
+Santa Fe County,county,2020,all,21,66,2
+Santa Fe County,county,2020,all,22,55,2
+Santa Fe County,county,2020,all,23,45,2
+Santa Fe County,county,2020,alcohol,0,10,0
+Santa Fe County,county,2020,alcohol,1,7,0
+Santa Fe County,county,2020,alcohol,2,4,0
+Santa Fe County,county,2020,alcohol,3,6,0
+Santa Fe County,county,2020,alcohol,4,2,0
+Santa Fe County,county,2020,alcohol,5,0,0
+Santa Fe County,county,2020,alcohol,6,2,0
+Santa Fe County,county,2020,alcohol,7,3,0
+Santa Fe County,county,2020,alcohol,8,3,0
+Santa Fe County,county,2020,alcohol,9,1,0
+Santa Fe County,county,2020,alcohol,10,3,0
+Santa Fe County,county,2020,alcohol,11,4,0
+Santa Fe County,county,2020,alcohol,12,6,0
+Santa Fe County,county,2020,alcohol,13,2,0
+Santa Fe County,county,2020,alcohol,14,4,0
+Santa Fe County,county,2020,alcohol,15,3,0
+Santa Fe County,county,2020,alcohol,16,4,0
+Santa Fe County,county,2020,alcohol,17,12,0
+Santa Fe County,county,2020,alcohol,18,9,0
+Santa Fe County,county,2020,alcohol,19,7,0
+Santa Fe County,county,2020,alcohol,20,17,0
+Santa Fe County,county,2020,alcohol,21,11,0
+Santa Fe County,county,2020,alcohol,22,11,0
+Santa Fe County,county,2020,alcohol,23,13,0
+Santa Fe County,county,2020,injury_or_fatal,0,8,0
+Santa Fe County,county,2020,injury_or_fatal,1,8,0
+Santa Fe County,county,2020,injury_or_fatal,2,7,0
+Santa Fe County,county,2020,injury_or_fatal,3,5,0
+Santa Fe County,county,2020,injury_or_fatal,4,6,0
+Santa Fe County,county,2020,injury_or_fatal,5,10,0
+Santa Fe County,county,2020,injury_or_fatal,6,16,0
+Santa Fe County,county,2020,injury_or_fatal,7,42,0
+Santa Fe County,county,2020,injury_or_fatal,8,37,0
+Santa Fe County,county,2020,injury_or_fatal,9,28,0
+Santa Fe County,county,2020,injury_or_fatal,10,55,0
+Santa Fe County,county,2020,injury_or_fatal,11,50,0
+Santa Fe County,county,2020,injury_or_fatal,12,53,0
+Santa Fe County,county,2020,injury_or_fatal,13,58,0
+Santa Fe County,county,2020,injury_or_fatal,14,64,0
+Santa Fe County,county,2020,injury_or_fatal,15,64,0
+Santa Fe County,county,2020,injury_or_fatal,16,59,0
+Santa Fe County,county,2020,injury_or_fatal,17,80,0
+Santa Fe County,county,2020,injury_or_fatal,18,50,0
+Santa Fe County,county,2020,injury_or_fatal,19,40,0
+Santa Fe County,county,2020,injury_or_fatal,20,37,0
+Santa Fe County,county,2020,injury_or_fatal,21,30,0
+Santa Fe County,county,2020,injury_or_fatal,22,27,0
+Santa Fe County,county,2020,injury_or_fatal,23,14,0
+Santa Fe County,county,2020,vru,0,1,0
+Santa Fe County,county,2020,vru,1,0,0
+Santa Fe County,county,2020,vru,2,0,0
+Santa Fe County,county,2020,vru,3,0,0
+Santa Fe County,county,2020,vru,4,0,0
+Santa Fe County,county,2020,vru,5,0,0
+Santa Fe County,county,2020,vru,6,1,0
+Santa Fe County,county,2020,vru,7,2,0
+Santa Fe County,county,2020,vru,8,2,0
+Santa Fe County,county,2020,vru,9,4,0
+Santa Fe County,county,2020,vru,10,1,0
+Santa Fe County,county,2020,vru,11,2,0
+Santa Fe County,county,2020,vru,12,1,0
+Santa Fe County,county,2020,vru,13,5,0
+Santa Fe County,county,2020,vru,14,5,0
+Santa Fe County,county,2020,vru,15,2,0
+Santa Fe County,county,2020,vru,16,3,0
+Santa Fe County,county,2020,vru,17,6,0
+Santa Fe County,county,2020,vru,18,7,0
+Santa Fe County,county,2020,vru,19,3,0
+Santa Fe County,county,2020,vru,20,2,0
+Santa Fe County,county,2020,vru,21,8,0
+Santa Fe County,county,2020,vru,22,1,0
+Santa Fe County,county,2020,vru,23,1,0
+Santa Fe County,county,2020,dwi_arrests,0,74,115
+Santa Fe County,county,2020,dwi_arrests,1,35,115
+Santa Fe County,county,2020,dwi_arrests,2,34,115
+Santa Fe County,county,2020,dwi_arrests,3,13,115
+Santa Fe County,county,2020,dwi_arrests,4,12,115
+Santa Fe County,county,2020,dwi_arrests,5,7,115
+Santa Fe County,county,2020,dwi_arrests,6,9,115
+Santa Fe County,county,2020,dwi_arrests,7,7,115
+Santa Fe County,county,2020,dwi_arrests,8,0,115
+Santa Fe County,county,2020,dwi_arrests,9,7,115
+Santa Fe County,county,2020,dwi_arrests,10,5,115
+Santa Fe County,county,2020,dwi_arrests,11,7,115
+Santa Fe County,county,2020,dwi_arrests,12,5,115
+Santa Fe County,county,2020,dwi_arrests,13,8,115
+Santa Fe County,county,2020,dwi_arrests,14,8,115
+Santa Fe County,county,2020,dwi_arrests,15,15,115
+Santa Fe County,county,2020,dwi_arrests,16,16,115
+Santa Fe County,county,2020,dwi_arrests,17,16,115
+Santa Fe County,county,2020,dwi_arrests,18,18,115
+Santa Fe County,county,2020,dwi_arrests,19,25,115
+Santa Fe County,county,2020,dwi_arrests,20,42,115
+Santa Fe County,county,2020,dwi_arrests,21,38,115
+Santa Fe County,county,2020,dwi_arrests,22,51,115
+Santa Fe County,county,2020,dwi_arrests,23,56,115
+Santa Fe County,county,2021,all,0,33,2
+Santa Fe County,county,2021,all,1,29,2
+Santa Fe County,county,2021,all,2,14,2
+Santa Fe County,county,2021,all,3,13,2
+Santa Fe County,county,2021,all,4,14,2
+Santa Fe County,county,2021,all,5,26,2
+Santa Fe County,county,2021,all,6,58,2
+Santa Fe County,county,2021,all,7,119,2
+Santa Fe County,county,2021,all,8,167,2
+Santa Fe County,county,2021,all,9,120,2
+Santa Fe County,county,2021,all,10,126,2
+Santa Fe County,county,2021,all,11,138,2
+Santa Fe County,county,2021,all,12,174,2
+Santa Fe County,county,2021,all,13,179,2
+Santa Fe County,county,2021,all,14,182,2
+Santa Fe County,county,2021,all,15,208,2
+Santa Fe County,county,2021,all,16,230,2
+Santa Fe County,county,2021,all,17,217,2
+Santa Fe County,county,2021,all,18,131,2
+Santa Fe County,county,2021,all,19,89,2
+Santa Fe County,county,2021,all,20,79,2
+Santa Fe County,county,2021,all,21,85,2
+Santa Fe County,county,2021,all,22,46,2
+Santa Fe County,county,2021,all,23,55,2
+Santa Fe County,county,2021,alcohol,0,6,0
+Santa Fe County,county,2021,alcohol,1,11,0
+Santa Fe County,county,2021,alcohol,2,4,0
+Santa Fe County,county,2021,alcohol,3,4,0
+Santa Fe County,county,2021,alcohol,4,1,0
+Santa Fe County,county,2021,alcohol,5,4,0
+Santa Fe County,county,2021,alcohol,6,2,0
+Santa Fe County,county,2021,alcohol,7,2,0
+Santa Fe County,county,2021,alcohol,8,2,0
+Santa Fe County,county,2021,alcohol,9,3,0
+Santa Fe County,county,2021,alcohol,10,3,0
+Santa Fe County,county,2021,alcohol,11,1,0
+Santa Fe County,county,2021,alcohol,12,4,0
+Santa Fe County,county,2021,alcohol,13,3,0
+Santa Fe County,county,2021,alcohol,14,2,0
+Santa Fe County,county,2021,alcohol,15,7,0
+Santa Fe County,county,2021,alcohol,16,6,0
+Santa Fe County,county,2021,alcohol,17,10,0
+Santa Fe County,county,2021,alcohol,18,7,0
+Santa Fe County,county,2021,alcohol,19,10,0
+Santa Fe County,county,2021,alcohol,20,6,0
+Santa Fe County,county,2021,alcohol,21,11,0
+Santa Fe County,county,2021,alcohol,22,12,0
+Santa Fe County,county,2021,alcohol,23,11,0
+Santa Fe County,county,2021,injury_or_fatal,0,12,0
+Santa Fe County,county,2021,injury_or_fatal,1,11,0
+Santa Fe County,county,2021,injury_or_fatal,2,5,0
+Santa Fe County,county,2021,injury_or_fatal,3,6,0
+Santa Fe County,county,2021,injury_or_fatal,4,8,0
+Santa Fe County,county,2021,injury_or_fatal,5,8,0
+Santa Fe County,county,2021,injury_or_fatal,6,18,0
+Santa Fe County,county,2021,injury_or_fatal,7,45,0
+Santa Fe County,county,2021,injury_or_fatal,8,50,0
+Santa Fe County,county,2021,injury_or_fatal,9,52,0
+Santa Fe County,county,2021,injury_or_fatal,10,38,0
+Santa Fe County,county,2021,injury_or_fatal,11,60,0
+Santa Fe County,county,2021,injury_or_fatal,12,63,0
+Santa Fe County,county,2021,injury_or_fatal,13,64,0
+Santa Fe County,county,2021,injury_or_fatal,14,58,0
+Santa Fe County,county,2021,injury_or_fatal,15,79,0
+Santa Fe County,county,2021,injury_or_fatal,16,89,0
+Santa Fe County,county,2021,injury_or_fatal,17,92,0
+Santa Fe County,county,2021,injury_or_fatal,18,50,0
+Santa Fe County,county,2021,injury_or_fatal,19,35,0
+Santa Fe County,county,2021,injury_or_fatal,20,28,0
+Santa Fe County,county,2021,injury_or_fatal,21,36,0
+Santa Fe County,county,2021,injury_or_fatal,22,15,0
+Santa Fe County,county,2021,injury_or_fatal,23,22,0
+Santa Fe County,county,2021,vru,0,1,0
+Santa Fe County,county,2021,vru,1,1,0
+Santa Fe County,county,2021,vru,2,0,0
+Santa Fe County,county,2021,vru,3,0,0
+Santa Fe County,county,2021,vru,4,1,0
+Santa Fe County,county,2021,vru,5,0,0
+Santa Fe County,county,2021,vru,6,0,0
+Santa Fe County,county,2021,vru,7,2,0
+Santa Fe County,county,2021,vru,8,3,0
+Santa Fe County,county,2021,vru,9,5,0
+Santa Fe County,county,2021,vru,10,2,0
+Santa Fe County,county,2021,vru,11,6,0
+Santa Fe County,county,2021,vru,12,1,0
+Santa Fe County,county,2021,vru,13,6,0
+Santa Fe County,county,2021,vru,14,3,0
+Santa Fe County,county,2021,vru,15,3,0
+Santa Fe County,county,2021,vru,16,7,0
+Santa Fe County,county,2021,vru,17,6,0
+Santa Fe County,county,2021,vru,18,4,0
+Santa Fe County,county,2021,vru,19,5,0
+Santa Fe County,county,2021,vru,20,4,0
+Santa Fe County,county,2021,vru,21,5,0
+Santa Fe County,county,2021,vru,22,4,0
+Santa Fe County,county,2021,vru,23,1,0
+Santa Fe County,county,2021,dwi_arrests,0,53,37
+Santa Fe County,county,2021,dwi_arrests,1,59,37
+Santa Fe County,county,2021,dwi_arrests,2,42,37
+Santa Fe County,county,2021,dwi_arrests,3,25,37
+Santa Fe County,county,2021,dwi_arrests,4,15,37
+Santa Fe County,county,2021,dwi_arrests,5,9,37
+Santa Fe County,county,2021,dwi_arrests,6,10,37
+Santa Fe County,county,2021,dwi_arrests,7,10,37
+Santa Fe County,county,2021,dwi_arrests,8,7,37
+Santa Fe County,county,2021,dwi_arrests,9,6,37
+Santa Fe County,county,2021,dwi_arrests,10,5,37
+Santa Fe County,county,2021,dwi_arrests,11,5,37
+Santa Fe County,county,2021,dwi_arrests,12,9,37
+Santa Fe County,county,2021,dwi_arrests,13,11,37
+Santa Fe County,county,2021,dwi_arrests,14,16,37
+Santa Fe County,county,2021,dwi_arrests,15,10,37
+Santa Fe County,county,2021,dwi_arrests,16,23,37
+Santa Fe County,county,2021,dwi_arrests,17,20,37
+Santa Fe County,county,2021,dwi_arrests,18,31,37
+Santa Fe County,county,2021,dwi_arrests,19,29,37
+Santa Fe County,county,2021,dwi_arrests,20,44,37
+Santa Fe County,county,2021,dwi_arrests,21,53,37
+Santa Fe County,county,2021,dwi_arrests,22,58,37
+Santa Fe County,county,2021,dwi_arrests,23,73,37
+Los Alamos County,county,2016,all,0,1,1
+Los Alamos County,county,2016,all,1,2,1
+Los Alamos County,county,2016,all,2,0,1
+Los Alamos County,county,2016,all,3,0,1
+Los Alamos County,county,2016,all,4,0,1
+Los Alamos County,county,2016,all,5,0,1
+Los Alamos County,county,2016,all,6,4,1
+Los Alamos County,county,2016,all,7,15,1
+Los Alamos County,county,2016,all,8,10,1
+Los Alamos County,county,2016,all,9,7,1
+Los Alamos County,county,2016,all,10,9,1
+Los Alamos County,county,2016,all,11,8,1
+Los Alamos County,county,2016,all,12,5,1
+Los Alamos County,county,2016,all,13,3,1
+Los Alamos County,county,2016,all,14,7,1
+Los Alamos County,county,2016,all,15,11,1
+Los Alamos County,county,2016,all,16,9,1
+Los Alamos County,county,2016,all,17,19,1
+Los Alamos County,county,2016,all,18,8,1
+Los Alamos County,county,2016,all,19,3,1
+Los Alamos County,county,2016,all,20,1,1
+Los Alamos County,county,2016,all,21,0,1
+Los Alamos County,county,2016,all,22,1,1
+Los Alamos County,county,2016,all,23,1,1
+Los Alamos County,county,2016,alcohol,0,0,1
+Los Alamos County,county,2016,alcohol,1,2,1
+Los Alamos County,county,2016,alcohol,2,0,1
+Los Alamos County,county,2016,alcohol,3,0,1
+Los Alamos County,county,2016,alcohol,4,0,1
+Los Alamos County,county,2016,alcohol,5,0,1
+Los Alamos County,county,2016,alcohol,6,0,1
+Los Alamos County,county,2016,alcohol,7,0,1
+Los Alamos County,county,2016,alcohol,8,0,1
+Los Alamos County,county,2016,alcohol,9,0,1
+Los Alamos County,county,2016,alcohol,10,0,1
+Los Alamos County,county,2016,alcohol,11,0,1
+Los Alamos County,county,2016,alcohol,12,0,1
+Los Alamos County,county,2016,alcohol,13,0,1
+Los Alamos County,county,2016,alcohol,14,0,1
+Los Alamos County,county,2016,alcohol,15,0,1
+Los Alamos County,county,2016,alcohol,16,0,1
+Los Alamos County,county,2016,alcohol,17,1,1
+Los Alamos County,county,2016,alcohol,18,2,1
+Los Alamos County,county,2016,alcohol,19,0,1
+Los Alamos County,county,2016,alcohol,20,0,1
+Los Alamos County,county,2016,alcohol,21,0,1
+Los Alamos County,county,2016,alcohol,22,0,1
+Los Alamos County,county,2016,alcohol,23,0,1
+Los Alamos County,county,2016,injury_or_fatal,0,0,1
+Los Alamos County,county,2016,injury_or_fatal,1,0,1
+Los Alamos County,county,2016,injury_or_fatal,2,0,1
+Los Alamos County,county,2016,injury_or_fatal,3,0,1
+Los Alamos County,county,2016,injury_or_fatal,4,0,1
+Los Alamos County,county,2016,injury_or_fatal,5,0,1
+Los Alamos County,county,2016,injury_or_fatal,6,1,1
+Los Alamos County,county,2016,injury_or_fatal,7,5,1
+Los Alamos County,county,2016,injury_or_fatal,8,3,1
+Los Alamos County,county,2016,injury_or_fatal,9,2,1
+Los Alamos County,county,2016,injury_or_fatal,10,2,1
+Los Alamos County,county,2016,injury_or_fatal,11,1,1
+Los Alamos County,county,2016,injury_or_fatal,12,0,1
+Los Alamos County,county,2016,injury_or_fatal,13,0,1
+Los Alamos County,county,2016,injury_or_fatal,14,2,1
+Los Alamos County,county,2016,injury_or_fatal,15,4,1
+Los Alamos County,county,2016,injury_or_fatal,16,4,1
+Los Alamos County,county,2016,injury_or_fatal,17,10,1
+Los Alamos County,county,2016,injury_or_fatal,18,2,1
+Los Alamos County,county,2016,injury_or_fatal,19,1,1
+Los Alamos County,county,2016,injury_or_fatal,20,1,1
+Los Alamos County,county,2016,injury_or_fatal,21,0,1
+Los Alamos County,county,2016,injury_or_fatal,22,0,1
+Los Alamos County,county,2016,injury_or_fatal,23,0,1
+Los Alamos County,county,2016,vru,0,0,0
+Los Alamos County,county,2016,vru,1,0,0
+Los Alamos County,county,2016,vru,2,0,0
+Los Alamos County,county,2016,vru,3,0,0
+Los Alamos County,county,2016,vru,4,0,0
+Los Alamos County,county,2016,vru,5,0,0
+Los Alamos County,county,2016,vru,6,0,0
+Los Alamos County,county,2016,vru,7,0,0
+Los Alamos County,county,2016,vru,8,1,0
+Los Alamos County,county,2016,vru,9,0,0
+Los Alamos County,county,2016,vru,10,0,0
+Los Alamos County,county,2016,vru,11,0,0
+Los Alamos County,county,2016,vru,12,0,0
+Los Alamos County,county,2016,vru,13,0,0
+Los Alamos County,county,2016,vru,14,0,0
+Los Alamos County,county,2016,vru,15,0,0
+Los Alamos County,county,2016,vru,16,0,0
+Los Alamos County,county,2016,vru,17,0,0
+Los Alamos County,county,2016,vru,18,0,0
+Los Alamos County,county,2016,vru,19,0,0
+Los Alamos County,county,2016,vru,20,0,0
+Los Alamos County,county,2016,vru,21,0,0
+Los Alamos County,county,2016,vru,22,0,0
+Los Alamos County,county,2016,vru,23,0,0
+Los Alamos County,county,2016,dwi_arrests,0,0,14
+Los Alamos County,county,2016,dwi_arrests,1,10,14
+Los Alamos County,county,2016,dwi_arrests,2,2,14
+Los Alamos County,county,2016,dwi_arrests,3,2,14
+Los Alamos County,county,2016,dwi_arrests,4,3,14
+Los Alamos County,county,2016,dwi_arrests,5,1,14
+Los Alamos County,county,2016,dwi_arrests,6,1,14
+Los Alamos County,county,2016,dwi_arrests,7,1,14
+Los Alamos County,county,2016,dwi_arrests,8,1,14
+Los Alamos County,county,2016,dwi_arrests,9,0,14
+Los Alamos County,county,2016,dwi_arrests,10,0,14
+Los Alamos County,county,2016,dwi_arrests,11,0,14
+Los Alamos County,county,2016,dwi_arrests,12,2,14
+Los Alamos County,county,2016,dwi_arrests,13,1,14
+Los Alamos County,county,2016,dwi_arrests,14,1,14
+Los Alamos County,county,2016,dwi_arrests,15,1,14
+Los Alamos County,county,2016,dwi_arrests,16,1,14
+Los Alamos County,county,2016,dwi_arrests,17,3,14
+Los Alamos County,county,2016,dwi_arrests,18,3,14
+Los Alamos County,county,2016,dwi_arrests,19,2,14
+Los Alamos County,county,2016,dwi_arrests,20,4,14
+Los Alamos County,county,2016,dwi_arrests,21,10,14
+Los Alamos County,county,2016,dwi_arrests,22,7,14
+Los Alamos County,county,2016,dwi_arrests,23,8,14
+Los Alamos County,county,2019,all,0,1,0
+Los Alamos County,county,2019,all,1,0,0
+Los Alamos County,county,2019,all,2,1,0
+Los Alamos County,county,2019,all,3,2,0
+Los Alamos County,county,2019,all,4,0,0
+Los Alamos County,county,2019,all,5,0,0
+Los Alamos County,county,2019,all,6,6,0
+Los Alamos County,county,2019,all,7,16,0
+Los Alamos County,county,2019,all,8,9,0
+Los Alamos County,county,2019,all,9,10,0
+Los Alamos County,county,2019,all,10,4,0
+Los Alamos County,county,2019,all,11,10,0
+Los Alamos County,county,2019,all,12,8,0
+Los Alamos County,county,2019,all,13,5,0
+Los Alamos County,county,2019,all,14,8,0
+Los Alamos County,county,2019,all,15,9,0
+Los Alamos County,county,2019,all,16,11,0
+Los Alamos County,county,2019,all,17,13,0
+Los Alamos County,county,2019,all,18,9,0
+Los Alamos County,county,2019,all,19,6,0
+Los Alamos County,county,2019,all,20,4,0
+Los Alamos County,county,2019,all,21,2,0
+Los Alamos County,county,2019,all,22,0,0
+Los Alamos County,county,2019,all,23,2,0
+Los Alamos County,county,2019,alcohol,0,0,0
+Los Alamos County,county,2019,alcohol,1,0,0
+Los Alamos County,county,2019,alcohol,2,1,0
+Los Alamos County,county,2019,alcohol,3,0,0
+Los Alamos County,county,2019,alcohol,4,0,0
+Los Alamos County,county,2019,alcohol,5,0,0
+Los Alamos County,county,2019,alcohol,6,0,0
+Los Alamos County,county,2019,alcohol,7,0,0
+Los Alamos County,county,2019,alcohol,8,0,0
+Los Alamos County,county,2019,alcohol,9,0,0
+Los Alamos County,county,2019,alcohol,10,0,0
+Los Alamos County,county,2019,alcohol,11,0,0
+Los Alamos County,county,2019,alcohol,12,0,0
+Los Alamos County,county,2019,alcohol,13,1,0
+Los Alamos County,county,2019,alcohol,14,1,0
+Los Alamos County,county,2019,alcohol,15,1,0
+Los Alamos County,county,2019,alcohol,16,0,0
+Los Alamos County,county,2019,alcohol,17,1,0
+Los Alamos County,county,2019,alcohol,18,0,0
+Los Alamos County,county,2019,alcohol,19,0,0
+Los Alamos County,county,2019,alcohol,20,0,0
+Los Alamos County,county,2019,alcohol,21,1,0
+Los Alamos County,county,2019,alcohol,22,0,0
+Los Alamos County,county,2019,alcohol,23,1,0
+Los Alamos County,county,2019,injury_or_fatal,0,1,0
+Los Alamos County,county,2019,injury_or_fatal,1,0,0
+Los Alamos County,county,2019,injury_or_fatal,2,0,0
+Los Alamos County,county,2019,injury_or_fatal,3,2,0
+Los Alamos County,county,2019,injury_or_fatal,4,0,0
+Los Alamos County,county,2019,injury_or_fatal,5,0,0
+Los Alamos County,county,2019,injury_or_fatal,6,0,0
+Los Alamos County,county,2019,injury_or_fatal,7,7,0
+Los Alamos County,county,2019,injury_or_fatal,8,3,0
+Los Alamos County,county,2019,injury_or_fatal,9,1,0
+Los Alamos County,county,2019,injury_or_fatal,10,1,0
+Los Alamos County,county,2019,injury_or_fatal,11,2,0
+Los Alamos County,county,2019,injury_or_fatal,12,4,0
+Los Alamos County,county,2019,injury_or_fatal,13,4,0
+Los Alamos County,county,2019,injury_or_fatal,14,1,0
+Los Alamos County,county,2019,injury_or_fatal,15,3,0
+Los Alamos County,county,2019,injury_or_fatal,16,4,0
+Los Alamos County,county,2019,injury_or_fatal,17,4,0
+Los Alamos County,county,2019,injury_or_fatal,18,5,0
+Los Alamos County,county,2019,injury_or_fatal,19,1,0
+Los Alamos County,county,2019,injury_or_fatal,20,0,0
+Los Alamos County,county,2019,injury_or_fatal,21,1,0
+Los Alamos County,county,2019,injury_or_fatal,22,0,0
+Los Alamos County,county,2019,injury_or_fatal,23,1,0
+Los Alamos County,county,2019,vru,0,0,0
+Los Alamos County,county,2019,vru,1,0,0
+Los Alamos County,county,2019,vru,2,0,0
+Los Alamos County,county,2019,vru,3,0,0
+Los Alamos County,county,2019,vru,4,0,0
+Los Alamos County,county,2019,vru,5,0,0
+Los Alamos County,county,2019,vru,6,0,0
+Los Alamos County,county,2019,vru,7,1,0
+Los Alamos County,county,2019,vru,8,0,0
+Los Alamos County,county,2019,vru,9,0,0
+Los Alamos County,county,2019,vru,10,0,0
+Los Alamos County,county,2019,vru,11,0,0
+Los Alamos County,county,2019,vru,12,0,0
+Los Alamos County,county,2019,vru,13,0,0
+Los Alamos County,county,2019,vru,14,0,0
+Los Alamos County,county,2019,vru,15,0,0
+Los Alamos County,county,2019,vru,16,1,0
+Los Alamos County,county,2019,vru,17,1,0
+Los Alamos County,county,2019,vru,18,1,0
+Los Alamos County,county,2019,vru,19,0,0
+Los Alamos County,county,2019,vru,20,0,0
+Los Alamos County,county,2019,vru,21,0,0
+Los Alamos County,county,2019,vru,22,0,0
+Los Alamos County,county,2019,vru,23,0,0
+Los Alamos County,county,2019,dwi_arrests,0,1,1
+Los Alamos County,county,2019,dwi_arrests,1,2,1
+Los Alamos County,county,2019,dwi_arrests,2,0,1
+Los Alamos County,county,2019,dwi_arrests,3,1,1
+Los Alamos County,county,2019,dwi_arrests,4,0,1
+Los Alamos County,county,2019,dwi_arrests,5,0,1
+Los Alamos County,county,2019,dwi_arrests,6,0,1
+Los Alamos County,county,2019,dwi_arrests,7,0,1
+Los Alamos County,county,2019,dwi_arrests,8,0,1
+Los Alamos County,county,2019,dwi_arrests,9,2,1
+Los Alamos County,county,2019,dwi_arrests,10,0,1
+Los Alamos County,county,2019,dwi_arrests,11,0,1
+Los Alamos County,county,2019,dwi_arrests,12,0,1
+Los Alamos County,county,2019,dwi_arrests,13,1,1
+Los Alamos County,county,2019,dwi_arrests,14,0,1
+Los Alamos County,county,2019,dwi_arrests,15,1,1
+Los Alamos County,county,2019,dwi_arrests,16,1,1
+Los Alamos County,county,2019,dwi_arrests,17,0,1
+Los Alamos County,county,2019,dwi_arrests,18,1,1
+Los Alamos County,county,2019,dwi_arrests,19,0,1
+Los Alamos County,county,2019,dwi_arrests,20,1,1
+Los Alamos County,county,2019,dwi_arrests,21,1,1
+Los Alamos County,county,2019,dwi_arrests,22,3,1
+Los Alamos County,county,2019,dwi_arrests,23,2,1
+Los Alamos County,county,2020,all,0,1,0
+Los Alamos County,county,2020,all,1,3,0
+Los Alamos County,county,2020,all,2,0,0
+Los Alamos County,county,2020,all,3,1,0
+Los Alamos County,county,2020,all,4,0,0
+Los Alamos County,county,2020,all,5,0,0
+Los Alamos County,county,2020,all,6,7,0
+Los Alamos County,county,2020,all,7,19,0
+Los Alamos County,county,2020,all,8,4,0
+Los Alamos County,county,2020,all,9,8,0
+Los Alamos County,county,2020,all,10,7,0
+Los Alamos County,county,2020,all,11,1,0
+Los Alamos County,county,2020,all,12,7,0
+Los Alamos County,county,2020,all,13,8,0
+Los Alamos County,county,2020,all,14,1,0
+Los Alamos County,county,2020,all,15,11,0
+Los Alamos County,county,2020,all,16,6,0
+Los Alamos County,county,2020,all,17,12,0
+Los Alamos County,county,2020,all,18,3,0
+Los Alamos County,county,2020,all,19,2,0
+Los Alamos County,county,2020,all,20,3,0
+Los Alamos County,county,2020,all,21,3,0
+Los Alamos County,county,2020,all,22,5,0
+Los Alamos County,county,2020,all,23,0,0
+Los Alamos County,county,2020,alcohol,0,0,0
+Los Alamos County,county,2020,alcohol,1,2,0
+Los Alamos County,county,2020,alcohol,2,0,0
+Los Alamos County,county,2020,alcohol,3,1,0
+Los Alamos County,county,2020,alcohol,4,0,0
+Los Alamos County,county,2020,alcohol,5,0,0
+Los Alamos County,county,2020,alcohol,6,0,0
+Los Alamos County,county,2020,alcohol,7,0,0
+Los Alamos County,county,2020,alcohol,8,0,0
+Los Alamos County,county,2020,alcohol,9,0,0
+Los Alamos County,county,2020,alcohol,10,1,0
+Los Alamos County,county,2020,alcohol,11,0,0
+Los Alamos County,county,2020,alcohol,12,0,0
+Los Alamos County,county,2020,alcohol,13,0,0
+Los Alamos County,county,2020,alcohol,14,0,0
+Los Alamos County,county,2020,alcohol,15,0,0
+Los Alamos County,county,2020,alcohol,16,0,0
+Los Alamos County,county,2020,alcohol,17,0,0
+Los Alamos County,county,2020,alcohol,18,0,0
+Los Alamos County,county,2020,alcohol,19,1,0
+Los Alamos County,county,2020,alcohol,20,0,0
+Los Alamos County,county,2020,alcohol,21,0,0
+Los Alamos County,county,2020,alcohol,22,0,0
+Los Alamos County,county,2020,alcohol,23,0,0
+Los Alamos County,county,2020,injury_or_fatal,0,0,0
+Los Alamos County,county,2020,injury_or_fatal,1,1,0
+Los Alamos County,county,2020,injury_or_fatal,2,0,0
+Los Alamos County,county,2020,injury_or_fatal,3,0,0
+Los Alamos County,county,2020,injury_or_fatal,4,0,0
+Los Alamos County,county,2020,injury_or_fatal,5,0,0
+Los Alamos County,county,2020,injury_or_fatal,6,1,0
+Los Alamos County,county,2020,injury_or_fatal,7,5,0
+Los Alamos County,county,2020,injury_or_fatal,8,1,0
+Los Alamos County,county,2020,injury_or_fatal,9,2,0
+Los Alamos County,county,2020,injury_or_fatal,10,1,0
+Los Alamos County,county,2020,injury_or_fatal,11,1,0
+Los Alamos County,county,2020,injury_or_fatal,12,3,0
+Los Alamos County,county,2020,injury_or_fatal,13,3,0
+Los Alamos County,county,2020,injury_or_fatal,14,0,0
+Los Alamos County,county,2020,injury_or_fatal,15,1,0
+Los Alamos County,county,2020,injury_or_fatal,16,1,0
+Los Alamos County,county,2020,injury_or_fatal,17,4,0
+Los Alamos County,county,2020,injury_or_fatal,18,2,0
+Los Alamos County,county,2020,injury_or_fatal,19,0,0
+Los Alamos County,county,2020,injury_or_fatal,20,0,0
+Los Alamos County,county,2020,injury_or_fatal,21,3,0
+Los Alamos County,county,2020,injury_or_fatal,22,1,0
+Los Alamos County,county,2020,injury_or_fatal,23,0,0
+Los Alamos County,county,2020,vru,0,0,0
+Los Alamos County,county,2020,vru,1,0,0
+Los Alamos County,county,2020,vru,2,0,0
+Los Alamos County,county,2020,vru,3,0,0
+Los Alamos County,county,2020,vru,4,0,0
+Los Alamos County,county,2020,vru,5,0,0
+Los Alamos County,county,2020,vru,6,0,0
+Los Alamos County,county,2020,vru,7,2,0
+Los Alamos County,county,2020,vru,8,0,0
+Los Alamos County,county,2020,vru,9,0,0
+Los Alamos County,county,2020,vru,10,0,0
+Los Alamos County,county,2020,vru,11,0,0
+Los Alamos County,county,2020,vru,12,0,0
+Los Alamos County,county,2020,vru,13,0,0
+Los Alamos County,county,2020,vru,14,0,0
+Los Alamos County,county,2020,vru,15,0,0
+Los Alamos County,county,2020,vru,16,0,0
+Los Alamos County,county,2020,vru,17,0,0
+Los Alamos County,county,2020,vru,18,0,0
+Los Alamos County,county,2020,vru,19,0,0
+Los Alamos County,county,2020,vru,20,0,0
+Los Alamos County,county,2020,vru,21,0,0
+Los Alamos County,county,2020,vru,22,0,0
+Los Alamos County,county,2020,vru,23,0,0
+Los Alamos County,county,2020,dwi_arrests,0,1,4
+Los Alamos County,county,2020,dwi_arrests,1,2,4
+Los Alamos County,county,2020,dwi_arrests,2,1,4
+Los Alamos County,county,2020,dwi_arrests,3,2,4
+Los Alamos County,county,2020,dwi_arrests,4,0,4
+Los Alamos County,county,2020,dwi_arrests,5,1,4
+Los Alamos County,county,2020,dwi_arrests,6,0,4
+Los Alamos County,county,2020,dwi_arrests,7,0,4
+Los Alamos County,county,2020,dwi_arrests,8,0,4
+Los Alamos County,county,2020,dwi_arrests,9,0,4
+Los Alamos County,county,2020,dwi_arrests,10,0,4
+Los Alamos County,county,2020,dwi_arrests,11,0,4
+Los Alamos County,county,2020,dwi_arrests,12,1,4
+Los Alamos County,county,2020,dwi_arrests,13,1,4
+Los Alamos County,county,2020,dwi_arrests,14,1,4
+Los Alamos County,county,2020,dwi_arrests,15,0,4
+Los Alamos County,county,2020,dwi_arrests,16,2,4
+Los Alamos County,county,2020,dwi_arrests,17,3,4
+Los Alamos County,county,2020,dwi_arrests,18,1,4
+Los Alamos County,county,2020,dwi_arrests,19,1,4
+Los Alamos County,county,2020,dwi_arrests,20,1,4
+Los Alamos County,county,2020,dwi_arrests,21,2,4
+Los Alamos County,county,2020,dwi_arrests,22,2,4
+Los Alamos County,county,2020,dwi_arrests,23,3,4
+Los Alamos County,county,2021,all,0,0,0
+Los Alamos County,county,2021,all,1,1,0
+Los Alamos County,county,2021,all,2,0,0
+Los Alamos County,county,2021,all,3,2,0
+Los Alamos County,county,2021,all,4,0,0
+Los Alamos County,county,2021,all,5,0,0
+Los Alamos County,county,2021,all,6,5,0
+Los Alamos County,county,2021,all,7,11,0
+Los Alamos County,county,2021,all,8,7,0
+Los Alamos County,county,2021,all,9,4,0
+Los Alamos County,county,2021,all,10,3,0
+Los Alamos County,county,2021,all,11,12,0
+Los Alamos County,county,2021,all,12,9,0
+Los Alamos County,county,2021,all,13,4,0
+Los Alamos County,county,2021,all,14,5,0
+Los Alamos County,county,2021,all,15,11,0
+Los Alamos County,county,2021,all,16,2,0
+Los Alamos County,county,2021,all,17,5,0
+Los Alamos County,county,2021,all,18,4,0
+Los Alamos County,county,2021,all,19,3,0
+Los Alamos County,county,2021,all,20,4,0
+Los Alamos County,county,2021,all,21,1,0
+Los Alamos County,county,2021,all,22,1,0
+Los Alamos County,county,2021,all,23,1,0
+Los Alamos County,county,2021,alcohol,0,0,0
+Los Alamos County,county,2021,alcohol,1,0,0
+Los Alamos County,county,2021,alcohol,2,0,0
+Los Alamos County,county,2021,alcohol,3,0,0
+Los Alamos County,county,2021,alcohol,4,0,0
+Los Alamos County,county,2021,alcohol,5,0,0
+Los Alamos County,county,2021,alcohol,6,0,0
+Los Alamos County,county,2021,alcohol,7,0,0
+Los Alamos County,county,2021,alcohol,8,0,0
+Los Alamos County,county,2021,alcohol,9,0,0
+Los Alamos County,county,2021,alcohol,10,0,0
+Los Alamos County,county,2021,alcohol,11,1,0
+Los Alamos County,county,2021,alcohol,12,0,0
+Los Alamos County,county,2021,alcohol,13,0,0
+Los Alamos County,county,2021,alcohol,14,0,0
+Los Alamos County,county,2021,alcohol,15,0,0
+Los Alamos County,county,2021,alcohol,16,0,0
+Los Alamos County,county,2021,alcohol,17,0,0
+Los Alamos County,county,2021,alcohol,18,1,0
+Los Alamos County,county,2021,alcohol,19,0,0
+Los Alamos County,county,2021,alcohol,20,0,0
+Los Alamos County,county,2021,alcohol,21,0,0
+Los Alamos County,county,2021,alcohol,22,0,0
+Los Alamos County,county,2021,alcohol,23,1,0
+Los Alamos County,county,2021,injury_or_fatal,0,0,0
+Los Alamos County,county,2021,injury_or_fatal,1,1,0
+Los Alamos County,county,2021,injury_or_fatal,2,0,0
+Los Alamos County,county,2021,injury_or_fatal,3,2,0
+Los Alamos County,county,2021,injury_or_fatal,4,0,0
+Los Alamos County,county,2021,injury_or_fatal,5,0,0
+Los Alamos County,county,2021,injury_or_fatal,6,2,0
+Los Alamos County,county,2021,injury_or_fatal,7,4,0
+Los Alamos County,county,2021,injury_or_fatal,8,4,0
+Los Alamos County,county,2021,injury_or_fatal,9,0,0
+Los Alamos County,county,2021,injury_or_fatal,10,0,0
+Los Alamos County,county,2021,injury_or_fatal,11,3,0
+Los Alamos County,county,2021,injury_or_fatal,12,2,0
+Los Alamos County,county,2021,injury_or_fatal,13,2,0
+Los Alamos County,county,2021,injury_or_fatal,14,1,0
+Los Alamos County,county,2021,injury_or_fatal,15,4,0
+Los Alamos County,county,2021,injury_or_fatal,16,2,0
+Los Alamos County,county,2021,injury_or_fatal,17,3,0
+Los Alamos County,county,2021,injury_or_fatal,18,2,0
+Los Alamos County,county,2021,injury_or_fatal,19,1,0
+Los Alamos County,county,2021,injury_or_fatal,20,2,0
+Los Alamos County,county,2021,injury_or_fatal,21,0,0
+Los Alamos County,county,2021,injury_or_fatal,22,0,0
+Los Alamos County,county,2021,injury_or_fatal,23,1,0
+Los Alamos County,county,2021,vru,0,0,0
+Los Alamos County,county,2021,vru,1,0,0
+Los Alamos County,county,2021,vru,2,0,0
+Los Alamos County,county,2021,vru,3,0,0
+Los Alamos County,county,2021,vru,4,0,0
+Los Alamos County,county,2021,vru,5,0,0
+Los Alamos County,county,2021,vru,6,0,0
+Los Alamos County,county,2021,vru,7,1,0
+Los Alamos County,county,2021,vru,8,0,0
+Los Alamos County,county,2021,vru,9,0,0
+Los Alamos County,county,2021,vru,10,0,0
+Los Alamos County,county,2021,vru,11,2,0
+Los Alamos County,county,2021,vru,12,0,0
+Los Alamos County,county,2021,vru,13,1,0
+Los Alamos County,county,2021,vru,14,0,0
+Los Alamos County,county,2021,vru,15,0,0
+Los Alamos County,county,2021,vru,16,0,0
+Los Alamos County,county,2021,vru,17,0,0
+Los Alamos County,county,2021,vru,18,1,0
+Los Alamos County,county,2021,vru,19,0,0
+Los Alamos County,county,2021,vru,20,1,0
+Los Alamos County,county,2021,vru,21,0,0
+Los Alamos County,county,2021,vru,22,0,0
+Los Alamos County,county,2021,vru,23,0,0
+Los Alamos County,county,2021,dwi_arrests,0,1,3
+Los Alamos County,county,2021,dwi_arrests,1,1,3
+Los Alamos County,county,2021,dwi_arrests,2,1,3
+Los Alamos County,county,2021,dwi_arrests,3,0,3
+Los Alamos County,county,2021,dwi_arrests,4,0,3
+Los Alamos County,county,2021,dwi_arrests,5,0,3
+Los Alamos County,county,2021,dwi_arrests,6,0,3
+Los Alamos County,county,2021,dwi_arrests,7,0,3
+Los Alamos County,county,2021,dwi_arrests,8,1,3
+Los Alamos County,county,2021,dwi_arrests,9,0,3
+Los Alamos County,county,2021,dwi_arrests,10,0,3
+Los Alamos County,county,2021,dwi_arrests,11,0,3
+Los Alamos County,county,2021,dwi_arrests,12,1,3
+Los Alamos County,county,2021,dwi_arrests,13,1,3
+Los Alamos County,county,2021,dwi_arrests,14,2,3
+Los Alamos County,county,2021,dwi_arrests,15,1,3
+Los Alamos County,county,2021,dwi_arrests,16,0,3
+Los Alamos County,county,2021,dwi_arrests,17,4,3
+Los Alamos County,county,2021,dwi_arrests,18,2,3
+Los Alamos County,county,2021,dwi_arrests,19,2,3
+Los Alamos County,county,2021,dwi_arrests,20,1,3
+Los Alamos County,county,2021,dwi_arrests,21,3,3
+Los Alamos County,county,2021,dwi_arrests,22,3,3
+Los Alamos County,county,2021,dwi_arrests,23,1,3
+Rio Arriba County,county,2016,all,0,16,7
+Rio Arriba County,county,2016,all,1,12,7
+Rio Arriba County,county,2016,all,2,10,7
+Rio Arriba County,county,2016,all,3,4,7
+Rio Arriba County,county,2016,all,4,7,7
+Rio Arriba County,county,2016,all,5,12,7
+Rio Arriba County,county,2016,all,6,24,7
+Rio Arriba County,county,2016,all,7,33,7
+Rio Arriba County,county,2016,all,8,23,7
+Rio Arriba County,county,2016,all,9,36,7
+Rio Arriba County,county,2016,all,10,45,7
+Rio Arriba County,county,2016,all,11,36,7
+Rio Arriba County,county,2016,all,12,53,7
+Rio Arriba County,county,2016,all,13,47,7
+Rio Arriba County,county,2016,all,14,54,7
+Rio Arriba County,county,2016,all,15,58,7
+Rio Arriba County,county,2016,all,16,73,7
+Rio Arriba County,county,2016,all,17,78,7
+Rio Arriba County,county,2016,all,18,53,7
+Rio Arriba County,county,2016,all,19,56,7
+Rio Arriba County,county,2016,all,20,47,7
+Rio Arriba County,county,2016,all,21,39,7
+Rio Arriba County,county,2016,all,22,20,7
+Rio Arriba County,county,2016,all,23,16,7
+Rio Arriba County,county,2016,alcohol,0,2,0
+Rio Arriba County,county,2016,alcohol,1,2,0
+Rio Arriba County,county,2016,alcohol,2,1,0
+Rio Arriba County,county,2016,alcohol,3,1,0
+Rio Arriba County,county,2016,alcohol,4,0,0
+Rio Arriba County,county,2016,alcohol,5,1,0
+Rio Arriba County,county,2016,alcohol,6,0,0
+Rio Arriba County,county,2016,alcohol,7,1,0
+Rio Arriba County,county,2016,alcohol,8,1,0
+Rio Arriba County,county,2016,alcohol,9,0,0
+Rio Arriba County,county,2016,alcohol,10,4,0
+Rio Arriba County,county,2016,alcohol,11,2,0
+Rio Arriba County,county,2016,alcohol,12,1,0
+Rio Arriba County,county,2016,alcohol,13,0,0
+Rio Arriba County,county,2016,alcohol,14,3,0
+Rio Arriba County,county,2016,alcohol,15,1,0
+Rio Arriba County,county,2016,alcohol,16,11,0
+Rio Arriba County,county,2016,alcohol,17,5,0
+Rio Arriba County,county,2016,alcohol,18,3,0
+Rio Arriba County,county,2016,alcohol,19,6,0
+Rio Arriba County,county,2016,alcohol,20,6,0
+Rio Arriba County,county,2016,alcohol,21,5,0
+Rio Arriba County,county,2016,alcohol,22,3,0
+Rio Arriba County,county,2016,alcohol,23,4,0
+Rio Arriba County,county,2016,injury_or_fatal,0,5,2
+Rio Arriba County,county,2016,injury_or_fatal,1,3,2
+Rio Arriba County,county,2016,injury_or_fatal,2,2,2
+Rio Arriba County,county,2016,injury_or_fatal,3,2,2
+Rio Arriba County,county,2016,injury_or_fatal,4,0,2
+Rio Arriba County,county,2016,injury_or_fatal,5,1,2
+Rio Arriba County,county,2016,injury_or_fatal,6,7,2
+Rio Arriba County,county,2016,injury_or_fatal,7,6,2
+Rio Arriba County,county,2016,injury_or_fatal,8,5,2
+Rio Arriba County,county,2016,injury_or_fatal,9,5,2
+Rio Arriba County,county,2016,injury_or_fatal,10,18,2
+Rio Arriba County,county,2016,injury_or_fatal,11,16,2
+Rio Arriba County,county,2016,injury_or_fatal,12,15,2
+Rio Arriba County,county,2016,injury_or_fatal,13,15,2
+Rio Arriba County,county,2016,injury_or_fatal,14,21,2
+Rio Arriba County,county,2016,injury_or_fatal,15,19,2
+Rio Arriba County,county,2016,injury_or_fatal,16,27,2
+Rio Arriba County,county,2016,injury_or_fatal,17,36,2
+Rio Arriba County,county,2016,injury_or_fatal,18,10,2
+Rio Arriba County,county,2016,injury_or_fatal,19,17,2
+Rio Arriba County,county,2016,injury_or_fatal,20,17,2
+Rio Arriba County,county,2016,injury_or_fatal,21,9,2
+Rio Arriba County,county,2016,injury_or_fatal,22,4,2
+Rio Arriba County,county,2016,injury_or_fatal,23,8,2
+Rio Arriba County,county,2016,vru,0,0,0
+Rio Arriba County,county,2016,vru,1,0,0
+Rio Arriba County,county,2016,vru,2,0,0
+Rio Arriba County,county,2016,vru,3,0,0
+Rio Arriba County,county,2016,vru,4,0,0
+Rio Arriba County,county,2016,vru,5,0,0
+Rio Arriba County,county,2016,vru,6,0,0
+Rio Arriba County,county,2016,vru,7,0,0
+Rio Arriba County,county,2016,vru,8,0,0
+Rio Arriba County,county,2016,vru,9,0,0
+Rio Arriba County,county,2016,vru,10,0,0
+Rio Arriba County,county,2016,vru,11,0,0
+Rio Arriba County,county,2016,vru,12,0,0
+Rio Arriba County,county,2016,vru,13,0,0
+Rio Arriba County,county,2016,vru,14,1,0
+Rio Arriba County,county,2016,vru,15,1,0
+Rio Arriba County,county,2016,vru,16,0,0
+Rio Arriba County,county,2016,vru,17,1,0
+Rio Arriba County,county,2016,vru,18,1,0
+Rio Arriba County,county,2016,vru,19,2,0
+Rio Arriba County,county,2016,vru,20,1,0
+Rio Arriba County,county,2016,vru,21,1,0
+Rio Arriba County,county,2016,vru,22,1,0
+Rio Arriba County,county,2016,vru,23,0,0
+Rio Arriba County,county,2016,dwi_arrests,0,19,34
+Rio Arriba County,county,2016,dwi_arrests,1,15,34
+Rio Arriba County,county,2016,dwi_arrests,2,11,34
+Rio Arriba County,county,2016,dwi_arrests,3,6,34
+Rio Arriba County,county,2016,dwi_arrests,4,1,34
+Rio Arriba County,county,2016,dwi_arrests,5,1,34
+Rio Arriba County,county,2016,dwi_arrests,6,1,34
+Rio Arriba County,county,2016,dwi_arrests,7,1,34
+Rio Arriba County,county,2016,dwi_arrests,8,2,34
+Rio Arriba County,county,2016,dwi_arrests,9,0,34
+Rio Arriba County,county,2016,dwi_arrests,10,2,34
+Rio Arriba County,county,2016,dwi_arrests,11,7,34
+Rio Arriba County,county,2016,dwi_arrests,12,3,34
+Rio Arriba County,county,2016,dwi_arrests,13,5,34
+Rio Arriba County,county,2016,dwi_arrests,14,7,34
+Rio Arriba County,county,2016,dwi_arrests,15,5,34
+Rio Arriba County,county,2016,dwi_arrests,16,17,34
+Rio Arriba County,county,2016,dwi_arrests,17,17,34
+Rio Arriba County,county,2016,dwi_arrests,18,14,34
+Rio Arriba County,county,2016,dwi_arrests,19,15,34
+Rio Arriba County,county,2016,dwi_arrests,20,14,34
+Rio Arriba County,county,2016,dwi_arrests,21,21,34
+Rio Arriba County,county,2016,dwi_arrests,22,21,34
+Rio Arriba County,county,2016,dwi_arrests,23,16,34
+Rio Arriba County,county,2019,all,0,12,2
+Rio Arriba County,county,2019,all,1,11,2
+Rio Arriba County,county,2019,all,2,7,2
+Rio Arriba County,county,2019,all,3,8,2
+Rio Arriba County,county,2019,all,4,4,2
+Rio Arriba County,county,2019,all,5,7,2
+Rio Arriba County,county,2019,all,6,29,2
+Rio Arriba County,county,2019,all,7,36,2
+Rio Arriba County,county,2019,all,8,44,2
+Rio Arriba County,county,2019,all,9,37,2
+Rio Arriba County,county,2019,all,10,33,2
+Rio Arriba County,county,2019,all,11,33,2
+Rio Arriba County,county,2019,all,12,55,2
+Rio Arriba County,county,2019,all,13,52,2
+Rio Arriba County,county,2019,all,14,40,2
+Rio Arriba County,county,2019,all,15,45,2
+Rio Arriba County,county,2019,all,16,55,2
+Rio Arriba County,county,2019,all,17,86,2
+Rio Arriba County,county,2019,all,18,52,2
+Rio Arriba County,county,2019,all,19,43,2
+Rio Arriba County,county,2019,all,20,42,2
+Rio Arriba County,county,2019,all,21,26,2
+Rio Arriba County,county,2019,all,22,25,2
+Rio Arriba County,county,2019,all,23,20,2
+Rio Arriba County,county,2019,alcohol,0,3,0
+Rio Arriba County,county,2019,alcohol,1,1,0
+Rio Arriba County,county,2019,alcohol,2,2,0
+Rio Arriba County,county,2019,alcohol,3,0,0
+Rio Arriba County,county,2019,alcohol,4,0,0
+Rio Arriba County,county,2019,alcohol,5,1,0
+Rio Arriba County,county,2019,alcohol,6,0,0
+Rio Arriba County,county,2019,alcohol,7,1,0
+Rio Arriba County,county,2019,alcohol,8,0,0
+Rio Arriba County,county,2019,alcohol,9,3,0
+Rio Arriba County,county,2019,alcohol,10,2,0
+Rio Arriba County,county,2019,alcohol,11,1,0
+Rio Arriba County,county,2019,alcohol,12,4,0
+Rio Arriba County,county,2019,alcohol,13,0,0
+Rio Arriba County,county,2019,alcohol,14,1,0
+Rio Arriba County,county,2019,alcohol,15,1,0
+Rio Arriba County,county,2019,alcohol,16,1,0
+Rio Arriba County,county,2019,alcohol,17,3,0
+Rio Arriba County,county,2019,alcohol,18,3,0
+Rio Arriba County,county,2019,alcohol,19,1,0
+Rio Arriba County,county,2019,alcohol,20,5,0
+Rio Arriba County,county,2019,alcohol,21,2,0
+Rio Arriba County,county,2019,alcohol,22,4,0
+Rio Arriba County,county,2019,alcohol,23,1,0
+Rio Arriba County,county,2019,injury_or_fatal,0,3,0
+Rio Arriba County,county,2019,injury_or_fatal,1,5,0
+Rio Arriba County,county,2019,injury_or_fatal,2,2,0
+Rio Arriba County,county,2019,injury_or_fatal,3,1,0
+Rio Arriba County,county,2019,injury_or_fatal,4,0,0
+Rio Arriba County,county,2019,injury_or_fatal,5,2,0
+Rio Arriba County,county,2019,injury_or_fatal,6,8,0
+Rio Arriba County,county,2019,injury_or_fatal,7,5,0
+Rio Arriba County,county,2019,injury_or_fatal,8,10,0
+Rio Arriba County,county,2019,injury_or_fatal,9,10,0
+Rio Arriba County,county,2019,injury_or_fatal,10,16,0
+Rio Arriba County,county,2019,injury_or_fatal,11,10,0
+Rio Arriba County,county,2019,injury_or_fatal,12,24,0
+Rio Arriba County,county,2019,injury_or_fatal,13,24,0
+Rio Arriba County,county,2019,injury_or_fatal,14,12,0
+Rio Arriba County,county,2019,injury_or_fatal,15,12,0
+Rio Arriba County,county,2019,injury_or_fatal,16,14,0
+Rio Arriba County,county,2019,injury_or_fatal,17,21,0
+Rio Arriba County,county,2019,injury_or_fatal,18,14,0
+Rio Arriba County,county,2019,injury_or_fatal,19,17,0
+Rio Arriba County,county,2019,injury_or_fatal,20,9,0
+Rio Arriba County,county,2019,injury_or_fatal,21,5,0
+Rio Arriba County,county,2019,injury_or_fatal,22,10,0
+Rio Arriba County,county,2019,injury_or_fatal,23,5,0
+Rio Arriba County,county,2019,vru,0,1,0
+Rio Arriba County,county,2019,vru,1,0,0
+Rio Arriba County,county,2019,vru,2,0,0
+Rio Arriba County,county,2019,vru,3,0,0
+Rio Arriba County,county,2019,vru,4,0,0
+Rio Arriba County,county,2019,vru,5,0,0
+Rio Arriba County,county,2019,vru,6,0,0
+Rio Arriba County,county,2019,vru,7,0,0
+Rio Arriba County,county,2019,vru,8,0,0
+Rio Arriba County,county,2019,vru,9,0,0
+Rio Arriba County,county,2019,vru,10,0,0
+Rio Arriba County,county,2019,vru,11,1,0
+Rio Arriba County,county,2019,vru,12,0,0
+Rio Arriba County,county,2019,vru,13,0,0
+Rio Arriba County,county,2019,vru,14,2,0
+Rio Arriba County,county,2019,vru,15,0,0
+Rio Arriba County,county,2019,vru,16,0,0
+Rio Arriba County,county,2019,vru,17,0,0
+Rio Arriba County,county,2019,vru,18,2,0
+Rio Arriba County,county,2019,vru,19,0,0
+Rio Arriba County,county,2019,vru,20,1,0
+Rio Arriba County,county,2019,vru,21,0,0
+Rio Arriba County,county,2019,vru,22,0,0
+Rio Arriba County,county,2019,vru,23,0,0
+Rio Arriba County,county,2019,dwi_arrests,0,19,9
+Rio Arriba County,county,2019,dwi_arrests,1,8,9
+Rio Arriba County,county,2019,dwi_arrests,2,7,9
+Rio Arriba County,county,2019,dwi_arrests,3,4,9
+Rio Arriba County,county,2019,dwi_arrests,4,3,9
+Rio Arriba County,county,2019,dwi_arrests,5,0,9
+Rio Arriba County,county,2019,dwi_arrests,6,0,9
+Rio Arriba County,county,2019,dwi_arrests,7,0,9
+Rio Arriba County,county,2019,dwi_arrests,8,1,9
+Rio Arriba County,county,2019,dwi_arrests,9,2,9
+Rio Arriba County,county,2019,dwi_arrests,10,3,9
+Rio Arriba County,county,2019,dwi_arrests,11,1,9
+Rio Arriba County,county,2019,dwi_arrests,12,4,9
+Rio Arriba County,county,2019,dwi_arrests,13,2,9
+Rio Arriba County,county,2019,dwi_arrests,14,6,9
+Rio Arriba County,county,2019,dwi_arrests,15,5,9
+Rio Arriba County,county,2019,dwi_arrests,16,5,9
+Rio Arriba County,county,2019,dwi_arrests,17,6,9
+Rio Arriba County,county,2019,dwi_arrests,18,8,9
+Rio Arriba County,county,2019,dwi_arrests,19,10,9
+Rio Arriba County,county,2019,dwi_arrests,20,12,9
+Rio Arriba County,county,2019,dwi_arrests,21,9,9
+Rio Arriba County,county,2019,dwi_arrests,22,9,9
+Rio Arriba County,county,2019,dwi_arrests,23,7,9
+Rio Arriba County,county,2020,all,0,10,2
+Rio Arriba County,county,2020,all,1,11,2
+Rio Arriba County,county,2020,all,2,10,2
+Rio Arriba County,county,2020,all,3,4,2
+Rio Arriba County,county,2020,all,4,6,2
+Rio Arriba County,county,2020,all,5,13,2
+Rio Arriba County,county,2020,all,6,24,2
+Rio Arriba County,county,2020,all,7,21,2
+Rio Arriba County,county,2020,all,8,36,2
+Rio Arriba County,county,2020,all,9,20,2
+Rio Arriba County,county,2020,all,10,45,2
+Rio Arriba County,county,2020,all,11,22,2
+Rio Arriba County,county,2020,all,12,34,2
+Rio Arriba County,county,2020,all,13,31,2
+Rio Arriba County,county,2020,all,14,44,2
+Rio Arriba County,county,2020,all,15,51,2
+Rio Arriba County,county,2020,all,16,54,2
+Rio Arriba County,county,2020,all,17,49,2
+Rio Arriba County,county,2020,all,18,41,2
+Rio Arriba County,county,2020,all,19,37,2
+Rio Arriba County,county,2020,all,20,48,2
+Rio Arriba County,county,2020,all,21,26,2
+Rio Arriba County,county,2020,all,22,18,2
+Rio Arriba County,county,2020,all,23,10,2
+Rio Arriba County,county,2020,alcohol,0,2,0
+Rio Arriba County,county,2020,alcohol,1,0,0
+Rio Arriba County,county,2020,alcohol,2,3,0
+Rio Arriba County,county,2020,alcohol,3,0,0
+Rio Arriba County,county,2020,alcohol,4,1,0
+Rio Arriba County,county,2020,alcohol,5,0,0
+Rio Arriba County,county,2020,alcohol,6,2,0
+Rio Arriba County,county,2020,alcohol,7,1,0
+Rio Arriba County,county,2020,alcohol,8,0,0
+Rio Arriba County,county,2020,alcohol,9,1,0
+Rio Arriba County,county,2020,alcohol,10,2,0
+Rio Arriba County,county,2020,alcohol,11,0,0
+Rio Arriba County,county,2020,alcohol,12,0,0
+Rio Arriba County,county,2020,alcohol,13,2,0
+Rio Arriba County,county,2020,alcohol,14,1,0
+Rio Arriba County,county,2020,alcohol,15,6,0
+Rio Arriba County,county,2020,alcohol,16,9,0
+Rio Arriba County,county,2020,alcohol,17,2,0
+Rio Arriba County,county,2020,alcohol,18,2,0
+Rio Arriba County,county,2020,alcohol,19,3,0
+Rio Arriba County,county,2020,alcohol,20,4,0
+Rio Arriba County,county,2020,alcohol,21,2,0
+Rio Arriba County,county,2020,alcohol,22,0,0
+Rio Arriba County,county,2020,alcohol,23,2,0
+Rio Arriba County,county,2020,injury_or_fatal,0,1,0
+Rio Arriba County,county,2020,injury_or_fatal,1,3,0
+Rio Arriba County,county,2020,injury_or_fatal,2,2,0
+Rio Arriba County,county,2020,injury_or_fatal,3,2,0
+Rio Arriba County,county,2020,injury_or_fatal,4,2,0
+Rio Arriba County,county,2020,injury_or_fatal,5,3,0
+Rio Arriba County,county,2020,injury_or_fatal,6,6,0
+Rio Arriba County,county,2020,injury_or_fatal,7,7,0
+Rio Arriba County,county,2020,injury_or_fatal,8,9,0
+Rio Arriba County,county,2020,injury_or_fatal,9,4,0
+Rio Arriba County,county,2020,injury_or_fatal,10,12,0
+Rio Arriba County,county,2020,injury_or_fatal,11,6,0
+Rio Arriba County,county,2020,injury_or_fatal,12,10,0
+Rio Arriba County,county,2020,injury_or_fatal,13,13,0
+Rio Arriba County,county,2020,injury_or_fatal,14,11,0
+Rio Arriba County,county,2020,injury_or_fatal,15,15,0
+Rio Arriba County,county,2020,injury_or_fatal,16,22,0
+Rio Arriba County,county,2020,injury_or_fatal,17,18,0
+Rio Arriba County,county,2020,injury_or_fatal,18,16,0
+Rio Arriba County,county,2020,injury_or_fatal,19,12,0
+Rio Arriba County,county,2020,injury_or_fatal,20,12,0
+Rio Arriba County,county,2020,injury_or_fatal,21,10,0
+Rio Arriba County,county,2020,injury_or_fatal,22,3,0
+Rio Arriba County,county,2020,injury_or_fatal,23,2,0
+Rio Arriba County,county,2020,vru,0,0,0
+Rio Arriba County,county,2020,vru,1,1,0
+Rio Arriba County,county,2020,vru,2,0,0
+Rio Arriba County,county,2020,vru,3,0,0
+Rio Arriba County,county,2020,vru,4,0,0
+Rio Arriba County,county,2020,vru,5,0,0
+Rio Arriba County,county,2020,vru,6,0,0
+Rio Arriba County,county,2020,vru,7,1,0
+Rio Arriba County,county,2020,vru,8,1,0
+Rio Arriba County,county,2020,vru,9,0,0
+Rio Arriba County,county,2020,vru,10,0,0
+Rio Arriba County,county,2020,vru,11,0,0
+Rio Arriba County,county,2020,vru,12,0,0
+Rio Arriba County,county,2020,vru,13,0,0
+Rio Arriba County,county,2020,vru,14,0,0
+Rio Arriba County,county,2020,vru,15,0,0
+Rio Arriba County,county,2020,vru,16,0,0
+Rio Arriba County,county,2020,vru,17,1,0
+Rio Arriba County,county,2020,vru,18,0,0
+Rio Arriba County,county,2020,vru,19,1,0
+Rio Arriba County,county,2020,vru,20,1,0
+Rio Arriba County,county,2020,vru,21,0,0
+Rio Arriba County,county,2020,vru,22,0,0
+Rio Arriba County,county,2020,vru,23,0,0
+Rio Arriba County,county,2020,dwi_arrests,0,10,3
+Rio Arriba County,county,2020,dwi_arrests,1,4,3
+Rio Arriba County,county,2020,dwi_arrests,2,9,3
+Rio Arriba County,county,2020,dwi_arrests,3,4,3
+Rio Arriba County,county,2020,dwi_arrests,4,4,3
+Rio Arriba County,county,2020,dwi_arrests,5,2,3
+Rio Arriba County,county,2020,dwi_arrests,6,4,3
+Rio Arriba County,county,2020,dwi_arrests,7,2,3
+Rio Arriba County,county,2020,dwi_arrests,8,0,3
+Rio Arriba County,county,2020,dwi_arrests,9,1,3
+Rio Arriba County,county,2020,dwi_arrests,10,2,3
+Rio Arriba County,county,2020,dwi_arrests,11,1,3
+Rio Arriba County,county,2020,dwi_arrests,12,3,3
+Rio Arriba County,county,2020,dwi_arrests,13,2,3
+Rio Arriba County,county,2020,dwi_arrests,14,4,3
+Rio Arriba County,county,2020,dwi_arrests,15,9,3
+Rio Arriba County,county,2020,dwi_arrests,16,2,3
+Rio Arriba County,county,2020,dwi_arrests,17,9,3
+Rio Arriba County,county,2020,dwi_arrests,18,7,3
+Rio Arriba County,county,2020,dwi_arrests,19,16,3
+Rio Arriba County,county,2020,dwi_arrests,20,8,3
+Rio Arriba County,county,2020,dwi_arrests,21,12,3
+Rio Arriba County,county,2020,dwi_arrests,22,17,3
+Rio Arriba County,county,2020,dwi_arrests,23,20,3
+Rio Arriba County,county,2021,all,0,11,1
+Rio Arriba County,county,2021,all,1,10,1
+Rio Arriba County,county,2021,all,2,10,1
+Rio Arriba County,county,2021,all,3,8,1
+Rio Arriba County,county,2021,all,4,6,1
+Rio Arriba County,county,2021,all,5,14,1
+Rio Arriba County,county,2021,all,6,29,1
+Rio Arriba County,county,2021,all,7,23,1
+Rio Arriba County,county,2021,all,8,20,1
+Rio Arriba County,county,2021,all,9,23,1
+Rio Arriba County,county,2021,all,10,35,1
+Rio Arriba County,county,2021,all,11,44,1
+Rio Arriba County,county,2021,all,12,41,1
+Rio Arriba County,county,2021,all,13,33,1
+Rio Arriba County,county,2021,all,14,41,1
+Rio Arriba County,county,2021,all,15,46,1
+Rio Arriba County,county,2021,all,16,44,1
+Rio Arriba County,county,2021,all,17,64,1
+Rio Arriba County,county,2021,all,18,40,1
+Rio Arriba County,county,2021,all,19,27,1
+Rio Arriba County,county,2021,all,20,46,1
+Rio Arriba County,county,2021,all,21,31,1
+Rio Arriba County,county,2021,all,22,20,1
+Rio Arriba County,county,2021,all,23,14,1
+Rio Arriba County,county,2021,alcohol,0,2,0
+Rio Arriba County,county,2021,alcohol,1,1,0
+Rio Arriba County,county,2021,alcohol,2,1,0
+Rio Arriba County,county,2021,alcohol,3,0,0
+Rio Arriba County,county,2021,alcohol,4,0,0
+Rio Arriba County,county,2021,alcohol,5,1,0
+Rio Arriba County,county,2021,alcohol,6,0,0
+Rio Arriba County,county,2021,alcohol,7,0,0
+Rio Arriba County,county,2021,alcohol,8,0,0
+Rio Arriba County,county,2021,alcohol,9,0,0
+Rio Arriba County,county,2021,alcohol,10,1,0
+Rio Arriba County,county,2021,alcohol,11,1,0
+Rio Arriba County,county,2021,alcohol,12,1,0
+Rio Arriba County,county,2021,alcohol,13,0,0
+Rio Arriba County,county,2021,alcohol,14,4,0
+Rio Arriba County,county,2021,alcohol,15,4,0
+Rio Arriba County,county,2021,alcohol,16,3,0
+Rio Arriba County,county,2021,alcohol,17,5,0
+Rio Arriba County,county,2021,alcohol,18,1,0
+Rio Arriba County,county,2021,alcohol,19,1,0
+Rio Arriba County,county,2021,alcohol,20,7,0
+Rio Arriba County,county,2021,alcohol,21,3,0
+Rio Arriba County,county,2021,alcohol,22,3,0
+Rio Arriba County,county,2021,alcohol,23,3,0
+Rio Arriba County,county,2021,injury_or_fatal,0,2,0
+Rio Arriba County,county,2021,injury_or_fatal,1,3,0
+Rio Arriba County,county,2021,injury_or_fatal,2,3,0
+Rio Arriba County,county,2021,injury_or_fatal,3,2,0
+Rio Arriba County,county,2021,injury_or_fatal,4,0,0
+Rio Arriba County,county,2021,injury_or_fatal,5,2,0
+Rio Arriba County,county,2021,injury_or_fatal,6,4,0
+Rio Arriba County,county,2021,injury_or_fatal,7,8,0
+Rio Arriba County,county,2021,injury_or_fatal,8,7,0
+Rio Arriba County,county,2021,injury_or_fatal,9,4,0
+Rio Arriba County,county,2021,injury_or_fatal,10,8,0
+Rio Arriba County,county,2021,injury_or_fatal,11,16,0
+Rio Arriba County,county,2021,injury_or_fatal,12,16,0
+Rio Arriba County,county,2021,injury_or_fatal,13,10,0
+Rio Arriba County,county,2021,injury_or_fatal,14,11,0
+Rio Arriba County,county,2021,injury_or_fatal,15,15,0
+Rio Arriba County,county,2021,injury_or_fatal,16,9,0
+Rio Arriba County,county,2021,injury_or_fatal,17,22,0
+Rio Arriba County,county,2021,injury_or_fatal,18,14,0
+Rio Arriba County,county,2021,injury_or_fatal,19,3,0
+Rio Arriba County,county,2021,injury_or_fatal,20,8,0
+Rio Arriba County,county,2021,injury_or_fatal,21,4,0
+Rio Arriba County,county,2021,injury_or_fatal,22,4,0
+Rio Arriba County,county,2021,injury_or_fatal,23,1,0
+Rio Arriba County,county,2021,vru,0,0,0
+Rio Arriba County,county,2021,vru,1,0,0
+Rio Arriba County,county,2021,vru,2,0,0
+Rio Arriba County,county,2021,vru,3,0,0
+Rio Arriba County,county,2021,vru,4,0,0
+Rio Arriba County,county,2021,vru,5,0,0
+Rio Arriba County,county,2021,vru,6,0,0
+Rio Arriba County,county,2021,vru,7,0,0
+Rio Arriba County,county,2021,vru,8,0,0
+Rio Arriba County,county,2021,vru,9,1,0
+Rio Arriba County,county,2021,vru,10,0,0
+Rio Arriba County,county,2021,vru,11,2,0
+Rio Arriba County,county,2021,vru,12,0,0
+Rio Arriba County,county,2021,vru,13,0,0
+Rio Arriba County,county,2021,vru,14,0,0
+Rio Arriba County,county,2021,vru,15,0,0
+Rio Arriba County,county,2021,vru,16,0,0
+Rio Arriba County,county,2021,vru,17,1,0
+Rio Arriba County,county,2021,vru,18,2,0
+Rio Arriba County,county,2021,vru,19,0,0
+Rio Arriba County,county,2021,vru,20,1,0
+Rio Arriba County,county,2021,vru,21,0,0
+Rio Arriba County,county,2021,vru,22,0,0
+Rio Arriba County,county,2021,vru,23,0,0
+Rio Arriba County,county,2021,dwi_arrests,0,7,2
+Rio Arriba County,county,2021,dwi_arrests,1,12,2
+Rio Arriba County,county,2021,dwi_arrests,2,8,2
+Rio Arriba County,county,2021,dwi_arrests,3,4,2
+Rio Arriba County,county,2021,dwi_arrests,4,1,2
+Rio Arriba County,county,2021,dwi_arrests,5,1,2
+Rio Arriba County,county,2021,dwi_arrests,6,1,2
+Rio Arriba County,county,2021,dwi_arrests,7,1,2
+Rio Arriba County,county,2021,dwi_arrests,8,0,2
+Rio Arriba County,county,2021,dwi_arrests,9,1,2
+Rio Arriba County,county,2021,dwi_arrests,10,1,2
+Rio Arriba County,county,2021,dwi_arrests,11,3,2
+Rio Arriba County,county,2021,dwi_arrests,12,2,2
+Rio Arriba County,county,2021,dwi_arrests,13,3,2
+Rio Arriba County,county,2021,dwi_arrests,14,8,2
+Rio Arriba County,county,2021,dwi_arrests,15,12,2
+Rio Arriba County,county,2021,dwi_arrests,16,4,2
+Rio Arriba County,county,2021,dwi_arrests,17,10,2
+Rio Arriba County,county,2021,dwi_arrests,18,6,2
+Rio Arriba County,county,2021,dwi_arrests,19,13,2
+Rio Arriba County,county,2021,dwi_arrests,20,11,2
+Rio Arriba County,county,2021,dwi_arrests,21,15,2
+Rio Arriba County,county,2021,dwi_arrests,22,17,2
+Rio Arriba County,county,2021,dwi_arrests,23,19,2
+Santa Fe,city,2016,all,0,18,2
+Santa Fe,city,2016,all,1,16,2
+Santa Fe,city,2016,all,2,14,2
+Santa Fe,city,2016,all,3,9,2
+Santa Fe,city,2016,all,4,4,2
+Santa Fe,city,2016,all,5,10,2
+Santa Fe,city,2016,all,6,22,2
+Santa Fe,city,2016,all,7,113,2
+Santa Fe,city,2016,all,8,154,2
+Santa Fe,city,2016,all,9,121,2
+Santa Fe,city,2016,all,10,129,2
+Santa Fe,city,2016,all,11,115,2
+Santa Fe,city,2016,all,12,175,2
+Santa Fe,city,2016,all,13,186,2
+Santa Fe,city,2016,all,14,170,2
+Santa Fe,city,2016,all,15,190,2
+Santa Fe,city,2016,all,16,241,2
+Santa Fe,city,2016,all,17,244,2
+Santa Fe,city,2016,all,18,113,2
+Santa Fe,city,2016,all,19,77,2
+Santa Fe,city,2016,all,20,61,2
+Santa Fe,city,2016,all,21,54,2
+Santa Fe,city,2016,all,22,43,2
+Santa Fe,city,2016,all,23,27,2
+Santa Fe,city,2016,alcohol,0,9,2
+Santa Fe,city,2016,alcohol,1,3,2
+Santa Fe,city,2016,alcohol,2,5,2
+Santa Fe,city,2016,alcohol,3,3,2
+Santa Fe,city,2016,alcohol,4,1,2
+Santa Fe,city,2016,alcohol,5,2,2
+Santa Fe,city,2016,alcohol,6,1,2
+Santa Fe,city,2016,alcohol,7,2,2
+Santa Fe,city,2016,alcohol,8,0,2
+Santa Fe,city,2016,alcohol,9,1,2
+Santa Fe,city,2016,alcohol,10,2,2
+Santa Fe,city,2016,alcohol,11,1,2
+Santa Fe,city,2016,alcohol,12,1,2
+Santa Fe,city,2016,alcohol,13,3,2
+Santa Fe,city,2016,alcohol,14,5,2
+Santa Fe,city,2016,alcohol,15,8,2
+Santa Fe,city,2016,alcohol,16,9,2
+Santa Fe,city,2016,alcohol,17,3,2
+Santa Fe,city,2016,alcohol,18,4,2
+Santa Fe,city,2016,alcohol,19,3,2
+Santa Fe,city,2016,alcohol,20,2,2
+Santa Fe,city,2016,alcohol,21,9,2
+Santa Fe,city,2016,alcohol,22,17,2
+Santa Fe,city,2016,alcohol,23,7,2
+Santa Fe,city,2016,injury_or_fatal,0,7,0
+Santa Fe,city,2016,injury_or_fatal,1,3,0
+Santa Fe,city,2016,injury_or_fatal,2,3,0
+Santa Fe,city,2016,injury_or_fatal,3,0,0
+Santa Fe,city,2016,injury_or_fatal,4,1,0
+Santa Fe,city,2016,injury_or_fatal,5,7,0
+Santa Fe,city,2016,injury_or_fatal,6,7,0
+Santa Fe,city,2016,injury_or_fatal,7,42,0
+Santa Fe,city,2016,injury_or_fatal,8,60,0
+Santa Fe,city,2016,injury_or_fatal,9,37,0
+Santa Fe,city,2016,injury_or_fatal,10,35,0
+Santa Fe,city,2016,injury_or_fatal,11,38,0
+Santa Fe,city,2016,injury_or_fatal,12,64,0
+Santa Fe,city,2016,injury_or_fatal,13,69,0
+Santa Fe,city,2016,injury_or_fatal,14,58,0
+Santa Fe,city,2016,injury_or_fatal,15,55,0
+Santa Fe,city,2016,injury_or_fatal,16,86,0
+Santa Fe,city,2016,injury_or_fatal,17,86,0
+Santa Fe,city,2016,injury_or_fatal,18,36,0
+Santa Fe,city,2016,injury_or_fatal,19,22,0
+Santa Fe,city,2016,injury_or_fatal,20,21,0
+Santa Fe,city,2016,injury_or_fatal,21,18,0
+Santa Fe,city,2016,injury_or_fatal,22,15,0
+Santa Fe,city,2016,injury_or_fatal,23,10,0
+Santa Fe,city,2016,vru,0,0,0
+Santa Fe,city,2016,vru,1,0,0
+Santa Fe,city,2016,vru,2,0,0
+Santa Fe,city,2016,vru,3,0,0
+Santa Fe,city,2016,vru,4,0,0
+Santa Fe,city,2016,vru,5,0,0
+Santa Fe,city,2016,vru,6,1,0
+Santa Fe,city,2016,vru,7,4,0
+Santa Fe,city,2016,vru,8,4,0
+Santa Fe,city,2016,vru,9,0,0
+Santa Fe,city,2016,vru,10,5,0
+Santa Fe,city,2016,vru,11,3,0
+Santa Fe,city,2016,vru,12,4,0
+Santa Fe,city,2016,vru,13,4,0
+Santa Fe,city,2016,vru,14,4,0
+Santa Fe,city,2016,vru,15,3,0
+Santa Fe,city,2016,vru,16,6,0
+Santa Fe,city,2016,vru,17,6,0
+Santa Fe,city,2016,vru,18,2,0
+Santa Fe,city,2016,vru,19,4,0
+Santa Fe,city,2016,vru,20,3,0
+Santa Fe,city,2016,vru,21,3,0
+Santa Fe,city,2016,vru,22,3,0
+Santa Fe,city,2016,vru,23,2,0
+Santa Fe,city,2019,all,0,26,0
+Santa Fe,city,2019,all,1,13,0
+Santa Fe,city,2019,all,2,21,0
+Santa Fe,city,2019,all,3,11,0
+Santa Fe,city,2019,all,4,11,0
+Santa Fe,city,2019,all,5,6,0
+Santa Fe,city,2019,all,6,22,0
+Santa Fe,city,2019,all,7,132,0
+Santa Fe,city,2019,all,8,156,0
+Santa Fe,city,2019,all,9,120,0
+Santa Fe,city,2019,all,10,150,0
+Santa Fe,city,2019,all,11,138,0
+Santa Fe,city,2019,all,12,169,0
+Santa Fe,city,2019,all,13,160,0
+Santa Fe,city,2019,all,14,162,0
+Santa Fe,city,2019,all,15,180,0
+Santa Fe,city,2019,all,16,239,0
+Santa Fe,city,2019,all,17,232,0
+Santa Fe,city,2019,all,18,117,0
+Santa Fe,city,2019,all,19,68,0
+Santa Fe,city,2019,all,20,77,0
+Santa Fe,city,2019,all,21,63,0
+Santa Fe,city,2019,all,22,39,0
+Santa Fe,city,2019,all,23,23,0
+Santa Fe,city,2019,alcohol,0,7,0
+Santa Fe,city,2019,alcohol,1,5,0
+Santa Fe,city,2019,alcohol,2,9,0
+Santa Fe,city,2019,alcohol,3,4,0
+Santa Fe,city,2019,alcohol,4,2,0
+Santa Fe,city,2019,alcohol,5,2,0
+Santa Fe,city,2019,alcohol,6,5,0
+Santa Fe,city,2019,alcohol,7,4,0
+Santa Fe,city,2019,alcohol,8,0,0
+Santa Fe,city,2019,alcohol,9,1,0
+Santa Fe,city,2019,alcohol,10,1,0
+Santa Fe,city,2019,alcohol,11,1,0
+Santa Fe,city,2019,alcohol,12,2,0
+Santa Fe,city,2019,alcohol,13,2,0
+Santa Fe,city,2019,alcohol,14,4,0
+Santa Fe,city,2019,alcohol,15,3,0
+Santa Fe,city,2019,alcohol,16,4,0
+Santa Fe,city,2019,alcohol,17,7,0
+Santa Fe,city,2019,alcohol,18,7,0
+Santa Fe,city,2019,alcohol,19,6,0
+Santa Fe,city,2019,alcohol,20,9,0
+Santa Fe,city,2019,alcohol,21,13,0
+Santa Fe,city,2019,alcohol,22,12,0
+Santa Fe,city,2019,alcohol,23,6,0
+Santa Fe,city,2019,injury_or_fatal,0,9,0
+Santa Fe,city,2019,injury_or_fatal,1,6,0
+Santa Fe,city,2019,injury_or_fatal,2,5,0
+Santa Fe,city,2019,injury_or_fatal,3,4,0
+Santa Fe,city,2019,injury_or_fatal,4,6,0
+Santa Fe,city,2019,injury_or_fatal,5,1,0
+Santa Fe,city,2019,injury_or_fatal,6,7,0
+Santa Fe,city,2019,injury_or_fatal,7,51,0
+Santa Fe,city,2019,injury_or_fatal,8,44,0
+Santa Fe,city,2019,injury_or_fatal,9,41,0
+Santa Fe,city,2019,injury_or_fatal,10,45,0
+Santa Fe,city,2019,injury_or_fatal,11,46,0
+Santa Fe,city,2019,injury_or_fatal,12,42,0
+Santa Fe,city,2019,injury_or_fatal,13,49,0
+Santa Fe,city,2019,injury_or_fatal,14,60,0
+Santa Fe,city,2019,injury_or_fatal,15,76,0
+Santa Fe,city,2019,injury_or_fatal,16,76,0
+Santa Fe,city,2019,injury_or_fatal,17,72,0
+Santa Fe,city,2019,injury_or_fatal,18,36,0
+Santa Fe,city,2019,injury_or_fatal,19,23,0
+Santa Fe,city,2019,injury_or_fatal,20,39,0
+Santa Fe,city,2019,injury_or_fatal,21,24,0
+Santa Fe,city,2019,injury_or_fatal,22,10,0
+Santa Fe,city,2019,injury_or_fatal,23,8,0
+Santa Fe,city,2019,vru,0,0,0
+Santa Fe,city,2019,vru,1,1,0
+Santa Fe,city,2019,vru,2,0,0
+Santa Fe,city,2019,vru,3,0,0
+Santa Fe,city,2019,vru,4,0,0
+Santa Fe,city,2019,vru,5,0,0
+Santa Fe,city,2019,vru,6,1,0
+Santa Fe,city,2019,vru,7,2,0
+Santa Fe,city,2019,vru,8,1,0
+Santa Fe,city,2019,vru,9,2,0
+Santa Fe,city,2019,vru,10,2,0
+Santa Fe,city,2019,vru,11,3,0
+Santa Fe,city,2019,vru,12,4,0
+Santa Fe,city,2019,vru,13,4,0
+Santa Fe,city,2019,vru,14,6,0
+Santa Fe,city,2019,vru,15,4,0
+Santa Fe,city,2019,vru,16,7,0
+Santa Fe,city,2019,vru,17,6,0
+Santa Fe,city,2019,vru,18,7,0
+Santa Fe,city,2019,vru,19,1,0
+Santa Fe,city,2019,vru,20,2,0
+Santa Fe,city,2019,vru,21,3,0
+Santa Fe,city,2019,vru,22,1,0
+Santa Fe,city,2019,vru,23,1,0
+Santa Fe,city,2020,all,0,12,1
+Santa Fe,city,2020,all,1,9,1
+Santa Fe,city,2020,all,2,9,1
+Santa Fe,city,2020,all,3,7,1
+Santa Fe,city,2020,all,4,6,1
+Santa Fe,city,2020,all,5,8,1
+Santa Fe,city,2020,all,6,21,1
+Santa Fe,city,2020,all,7,71,1
+Santa Fe,city,2020,all,8,103,1
+Santa Fe,city,2020,all,9,84,1
+Santa Fe,city,2020,all,10,89,1
+Santa Fe,city,2020,all,11,108,1
+Santa Fe,city,2020,all,12,107,1
+Santa Fe,city,2020,all,13,136,1
+Santa Fe,city,2020,all,14,119,1
+Santa Fe,city,2020,all,15,121,1
+Santa Fe,city,2020,all,16,131,1
+Santa Fe,city,2020,all,17,135,1
+Santa Fe,city,2020,all,18,75,1
+Santa Fe,city,2020,all,19,48,1
+Santa Fe,city,2020,all,20,49,1
+Santa Fe,city,2020,all,21,43,1
+Santa Fe,city,2020,all,22,34,1
+Santa Fe,city,2020,all,23,27,1
+Santa Fe,city,2020,alcohol,0,6,0
+Santa Fe,city,2020,alcohol,1,3,0
+Santa Fe,city,2020,alcohol,2,4,0
+Santa Fe,city,2020,alcohol,3,3,0
+Santa Fe,city,2020,alcohol,4,1,0
+Santa Fe,city,2020,alcohol,5,0,0
+Santa Fe,city,2020,alcohol,6,1,0
+Santa Fe,city,2020,alcohol,7,1,0
+Santa Fe,city,2020,alcohol,8,2,0
+Santa Fe,city,2020,alcohol,9,1,0
+Santa Fe,city,2020,alcohol,10,3,0
+Santa Fe,city,2020,alcohol,11,3,0
+Santa Fe,city,2020,alcohol,12,2,0
+Santa Fe,city,2020,alcohol,13,1,0
+Santa Fe,city,2020,alcohol,14,2,0
+Santa Fe,city,2020,alcohol,15,0,0
+Santa Fe,city,2020,alcohol,16,2,0
+Santa Fe,city,2020,alcohol,17,5,0
+Santa Fe,city,2020,alcohol,18,4,0
+Santa Fe,city,2020,alcohol,19,4,0
+Santa Fe,city,2020,alcohol,20,7,0
+Santa Fe,city,2020,alcohol,21,7,0
+Santa Fe,city,2020,alcohol,22,11,0
+Santa Fe,city,2020,alcohol,23,8,0
+Santa Fe,city,2020,injury_or_fatal,0,3,0
+Santa Fe,city,2020,injury_or_fatal,1,2,0
+Santa Fe,city,2020,injury_or_fatal,2,3,0
+Santa Fe,city,2020,injury_or_fatal,3,2,0
+Santa Fe,city,2020,injury_or_fatal,4,3,0
+Santa Fe,city,2020,injury_or_fatal,5,4,0
+Santa Fe,city,2020,injury_or_fatal,6,5,0
+Santa Fe,city,2020,injury_or_fatal,7,26,0
+Santa Fe,city,2020,injury_or_fatal,8,26,0
+Santa Fe,city,2020,injury_or_fatal,9,25,0
+Santa Fe,city,2020,injury_or_fatal,10,36,0
+Santa Fe,city,2020,injury_or_fatal,11,34,0
+Santa Fe,city,2020,injury_or_fatal,12,41,0
+Santa Fe,city,2020,injury_or_fatal,13,45,0
+Santa Fe,city,2020,injury_or_fatal,14,46,0
+Santa Fe,city,2020,injury_or_fatal,15,36,0
+Santa Fe,city,2020,injury_or_fatal,16,38,0
+Santa Fe,city,2020,injury_or_fatal,17,55,0
+Santa Fe,city,2020,injury_or_fatal,18,33,0
+Santa Fe,city,2020,injury_or_fatal,19,23,0
+Santa Fe,city,2020,injury_or_fatal,20,19,0
+Santa Fe,city,2020,injury_or_fatal,21,19,0
+Santa Fe,city,2020,injury_or_fatal,22,19,0
+Santa Fe,city,2020,injury_or_fatal,23,8,0
+Santa Fe,city,2020,vru,0,0,0
+Santa Fe,city,2020,vru,1,0,0
+Santa Fe,city,2020,vru,2,0,0
+Santa Fe,city,2020,vru,3,0,0
+Santa Fe,city,2020,vru,4,0,0
+Santa Fe,city,2020,vru,5,0,0
+Santa Fe,city,2020,vru,6,1,0
+Santa Fe,city,2020,vru,7,2,0
+Santa Fe,city,2020,vru,8,1,0
+Santa Fe,city,2020,vru,9,3,0
+Santa Fe,city,2020,vru,10,1,0
+Santa Fe,city,2020,vru,11,2,0
+Santa Fe,city,2020,vru,12,1,0
+Santa Fe,city,2020,vru,13,5,0
+Santa Fe,city,2020,vru,14,3,0
+Santa Fe,city,2020,vru,15,1,0
+Santa Fe,city,2020,vru,16,2,0
+Santa Fe,city,2020,vru,17,4,0
+Santa Fe,city,2020,vru,18,7,0
+Santa Fe,city,2020,vru,19,1,0
+Santa Fe,city,2020,vru,20,2,0
+Santa Fe,city,2020,vru,21,7,0
+Santa Fe,city,2020,vru,22,1,0
+Santa Fe,city,2020,vru,23,0,0
+Santa Fe,city,2021,all,0,12,0
+Santa Fe,city,2021,all,1,16,0
+Santa Fe,city,2021,all,2,3,0
+Santa Fe,city,2021,all,3,8,0
+Santa Fe,city,2021,all,4,7,0
+Santa Fe,city,2021,all,5,6,0
+Santa Fe,city,2021,all,6,29,0
+Santa Fe,city,2021,all,7,85,0
+Santa Fe,city,2021,all,8,125,0
+Santa Fe,city,2021,all,9,92,0
+Santa Fe,city,2021,all,10,89,0
+Santa Fe,city,2021,all,11,108,0
+Santa Fe,city,2021,all,12,134,0
+Santa Fe,city,2021,all,13,141,0
+Santa Fe,city,2021,all,14,129,0
+Santa Fe,city,2021,all,15,156,0
+Santa Fe,city,2021,all,16,167,0
+Santa Fe,city,2021,all,17,149,0
+Santa Fe,city,2021,all,18,84,0
+Santa Fe,city,2021,all,19,60,0
+Santa Fe,city,2021,all,20,54,0
+Santa Fe,city,2021,all,21,59,0
+Santa Fe,city,2021,all,22,27,0
+Santa Fe,city,2021,all,23,33,0
+Santa Fe,city,2021,alcohol,0,0,0
+Santa Fe,city,2021,alcohol,1,6,0
+Santa Fe,city,2021,alcohol,2,2,0
+Santa Fe,city,2021,alcohol,3,3,0
+Santa Fe,city,2021,alcohol,4,0,0
+Santa Fe,city,2021,alcohol,5,2,0
+Santa Fe,city,2021,alcohol,6,2,0
+Santa Fe,city,2021,alcohol,7,1,0
+Santa Fe,city,2021,alcohol,8,1,0
+Santa Fe,city,2021,alcohol,9,2,0
+Santa Fe,city,2021,alcohol,10,1,0
+Santa Fe,city,2021,alcohol,11,1,0
+Santa Fe,city,2021,alcohol,12,2,0
+Santa Fe,city,2021,alcohol,13,1,0
+Santa Fe,city,2021,alcohol,14,1,0
+Santa Fe,city,2021,alcohol,15,3,0
+Santa Fe,city,2021,alcohol,16,2,0
+Santa Fe,city,2021,alcohol,17,7,0
+Santa Fe,city,2021,alcohol,18,5,0
+Santa Fe,city,2021,alcohol,19,5,0
+Santa Fe,city,2021,alcohol,20,4,0
+Santa Fe,city,2021,alcohol,21,9,0
+Santa Fe,city,2021,alcohol,22,7,0
+Santa Fe,city,2021,alcohol,23,7,0
+Santa Fe,city,2021,injury_or_fatal,0,3,0
+Santa Fe,city,2021,injury_or_fatal,1,4,0
+Santa Fe,city,2021,injury_or_fatal,2,1,0
+Santa Fe,city,2021,injury_or_fatal,3,4,0
+Santa Fe,city,2021,injury_or_fatal,4,4,0
+Santa Fe,city,2021,injury_or_fatal,5,1,0
+Santa Fe,city,2021,injury_or_fatal,6,8,0
+Santa Fe,city,2021,injury_or_fatal,7,34,0
+Santa Fe,city,2021,injury_or_fatal,8,36,0
+Santa Fe,city,2021,injury_or_fatal,9,37,0
+Santa Fe,city,2021,injury_or_fatal,10,23,0
+Santa Fe,city,2021,injury_or_fatal,11,47,0
+Santa Fe,city,2021,injury_or_fatal,12,46,0
+Santa Fe,city,2021,injury_or_fatal,13,48,0
+Santa Fe,city,2021,injury_or_fatal,14,43,0
+Santa Fe,city,2021,injury_or_fatal,15,63,0
+Santa Fe,city,2021,injury_or_fatal,16,62,0
+Santa Fe,city,2021,injury_or_fatal,17,66,0
+Santa Fe,city,2021,injury_or_fatal,18,30,0
+Santa Fe,city,2021,injury_or_fatal,19,24,0
+Santa Fe,city,2021,injury_or_fatal,20,24,0
+Santa Fe,city,2021,injury_or_fatal,21,27,0
+Santa Fe,city,2021,injury_or_fatal,22,9,0
+Santa Fe,city,2021,injury_or_fatal,23,13,0
+Santa Fe,city,2021,vru,0,0,0
+Santa Fe,city,2021,vru,1,0,0
+Santa Fe,city,2021,vru,2,0,0
+Santa Fe,city,2021,vru,3,0,0
+Santa Fe,city,2021,vru,4,1,0
+Santa Fe,city,2021,vru,5,0,0
+Santa Fe,city,2021,vru,6,0,0
+Santa Fe,city,2021,vru,7,2,0
+Santa Fe,city,2021,vru,8,3,0
+Santa Fe,city,2021,vru,9,3,0
+Santa Fe,city,2021,vru,10,2,0
+Santa Fe,city,2021,vru,11,6,0
+Santa Fe,city,2021,vru,12,1,0
+Santa Fe,city,2021,vru,13,6,0
+Santa Fe,city,2021,vru,14,3,0
+Santa Fe,city,2021,vru,15,3,0
+Santa Fe,city,2021,vru,16,6,0
+Santa Fe,city,2021,vru,17,5,0
+Santa Fe,city,2021,vru,18,3,0
+Santa Fe,city,2021,vru,19,4,0
+Santa Fe,city,2021,vru,20,4,0
+Santa Fe,city,2021,vru,21,5,0
+Santa Fe,city,2021,vru,22,3,0
+Santa Fe,city,2021,vru,23,1,0
+Española,city,2016,all,0,5,4
+Española,city,2016,all,1,3,4
+Española,city,2016,all,2,1,4
+Española,city,2016,all,3,1,4
+Española,city,2016,all,4,2,4
+Española,city,2016,all,5,2,4
+Española,city,2016,all,6,7,4
+Española,city,2016,all,7,17,4
+Española,city,2016,all,8,14,4
+Española,city,2016,all,9,20,4
+Española,city,2016,all,10,26,4
+Española,city,2016,all,11,24,4
+Española,city,2016,all,12,35,4
+Española,city,2016,all,13,36,4
+Española,city,2016,all,14,41,4
+Española,city,2016,all,15,44,4
+Española,city,2016,all,16,38,4
+Española,city,2016,all,17,53,4
+Española,city,2016,all,18,27,4
+Española,city,2016,all,19,30,4
+Española,city,2016,all,20,20,4
+Española,city,2016,all,21,8,4
+Española,city,2016,all,22,7,4
+Española,city,2016,all,23,2,4
+Española,city,2016,alcohol,0,2,0
+Española,city,2016,alcohol,1,0,0
+Española,city,2016,alcohol,2,1,0
+Española,city,2016,alcohol,3,0,0
+Española,city,2016,alcohol,4,0,0
+Española,city,2016,alcohol,5,0,0
+Española,city,2016,alcohol,6,0,0
+Española,city,2016,alcohol,7,0,0
+Española,city,2016,alcohol,8,0,0
+Española,city,2016,alcohol,9,0,0
+Española,city,2016,alcohol,10,2,0
+Española,city,2016,alcohol,11,2,0
+Española,city,2016,alcohol,12,1,0
+Española,city,2016,alcohol,13,0,0
+Española,city,2016,alcohol,14,1,0
+Española,city,2016,alcohol,15,0,0
+Española,city,2016,alcohol,16,3,0
+Española,city,2016,alcohol,17,0,0
+Española,city,2016,alcohol,18,2,0
+Española,city,2016,alcohol,19,4,0
+Española,city,2016,alcohol,20,3,0
+Española,city,2016,alcohol,21,3,0
+Española,city,2016,alcohol,22,0,0
+Española,city,2016,alcohol,23,1,0
+Española,city,2016,injury_or_fatal,0,2,2
+Española,city,2016,injury_or_fatal,1,0,2
+Española,city,2016,injury_or_fatal,2,0,2
+Española,city,2016,injury_or_fatal,3,1,2
+Española,city,2016,injury_or_fatal,4,1,2
+Española,city,2016,injury_or_fatal,5,0,2
+Española,city,2016,injury_or_fatal,6,2,2
+Española,city,2016,injury_or_fatal,7,3,2
+Española,city,2016,injury_or_fatal,8,5,2
+Española,city,2016,injury_or_fatal,9,4,2
+Española,city,2016,injury_or_fatal,10,11,2
+Española,city,2016,injury_or_fatal,11,10,2
+Española,city,2016,injury_or_fatal,12,9,2
+Española,city,2016,injury_or_fatal,13,13,2
+Española,city,2016,injury_or_fatal,14,17,2
+Española,city,2016,injury_or_fatal,15,18,2
+Española,city,2016,injury_or_fatal,16,11,2
+Española,city,2016,injury_or_fatal,17,28,2
+Española,city,2016,injury_or_fatal,18,5,2
+Española,city,2016,injury_or_fatal,19,11,2
+Española,city,2016,injury_or_fatal,20,8,2
+Española,city,2016,injury_or_fatal,21,4,2
+Española,city,2016,injury_or_fatal,22,0,2
+Española,city,2016,injury_or_fatal,23,2,2
+Española,city,2016,vru,0,0,0
+Española,city,2016,vru,1,0,0
+Española,city,2016,vru,2,0,0
+Española,city,2016,vru,3,0,0
+Española,city,2016,vru,4,0,0
+Española,city,2016,vru,5,0,0
+Española,city,2016,vru,6,0,0
+Española,city,2016,vru,7,0,0
+Española,city,2016,vru,8,0,0
+Española,city,2016,vru,9,0,0
+Española,city,2016,vru,10,0,0
+Española,city,2016,vru,11,0,0
+Española,city,2016,vru,12,0,0
+Española,city,2016,vru,13,0,0
+Española,city,2016,vru,14,1,0
+Española,city,2016,vru,15,0,0
+Española,city,2016,vru,16,0,0
+Española,city,2016,vru,17,1,0
+Española,city,2016,vru,18,1,0
+Española,city,2016,vru,19,2,0
+Española,city,2016,vru,20,1,0
+Española,city,2016,vru,21,0,0
+Española,city,2016,vru,22,0,0
+Española,city,2016,vru,23,0,0
+Española,city,2019,all,0,4,4
+Española,city,2019,all,1,5,4
+Española,city,2019,all,2,4,4
+Española,city,2019,all,3,0,4
+Española,city,2019,all,4,0,4
+Española,city,2019,all,5,0,4
+Española,city,2019,all,6,9,4
+Española,city,2019,all,7,13,4
+Española,city,2019,all,8,29,4
+Española,city,2019,all,9,21,4
+Española,city,2019,all,10,21,4
+Española,city,2019,all,11,23,4
+Española,city,2019,all,12,45,4
+Española,city,2019,all,13,35,4
+Española,city,2019,all,14,28,4
+Española,city,2019,all,15,36,4
+Española,city,2019,all,16,29,4
+Española,city,2019,all,17,56,4
+Española,city,2019,all,18,29,4
+Española,city,2019,all,19,17,4
+Española,city,2019,all,20,14,4
+Española,city,2019,all,21,7,4
+Española,city,2019,all,22,8,4
+Española,city,2019,all,23,1,4
+Española,city,2019,alcohol,0,2,0
+Española,city,2019,alcohol,1,1,0
+Española,city,2019,alcohol,2,2,0
+Española,city,2019,alcohol,3,0,0
+Española,city,2019,alcohol,4,0,0
+Española,city,2019,alcohol,5,0,0
+Española,city,2019,alcohol,6,0,0
+Española,city,2019,alcohol,7,0,0
+Española,city,2019,alcohol,8,0,0
+Española,city,2019,alcohol,9,2,0
+Española,city,2019,alcohol,10,0,0
+Española,city,2019,alcohol,11,0,0
+Española,city,2019,alcohol,12,3,0
+Española,city,2019,alcohol,13,0,0
+Española,city,2019,alcohol,14,0,0
+Española,city,2019,alcohol,15,0,0
+Española,city,2019,alcohol,16,0,0
+Española,city,2019,alcohol,17,1,0
+Española,city,2019,alcohol,18,1,0
+Española,city,2019,alcohol,19,1,0
+Española,city,2019,alcohol,20,2,0
+Española,city,2019,alcohol,21,0,0
+Española,city,2019,alcohol,22,1,0
+Española,city,2019,alcohol,23,0,0
+Española,city,2019,injury_or_fatal,0,2,0
+Española,city,2019,injury_or_fatal,1,1,0
+Española,city,2019,injury_or_fatal,2,1,0
+Española,city,2019,injury_or_fatal,3,0,0
+Española,city,2019,injury_or_fatal,4,0,0
+Española,city,2019,injury_or_fatal,5,0,0
+Española,city,2019,injury_or_fatal,6,3,0
+Española,city,2019,injury_or_fatal,7,1,0
+Española,city,2019,injury_or_fatal,8,7,0
+Española,city,2019,injury_or_fatal,9,7,0
+Española,city,2019,injury_or_fatal,10,8,0
+Española,city,2019,injury_or_fatal,11,6,0
+Española,city,2019,injury_or_fatal,12,19,0
+Española,city,2019,injury_or_fatal,13,15,0
+Española,city,2019,injury_or_fatal,14,9,0
+Española,city,2019,injury_or_fatal,15,8,0
+Española,city,2019,injury_or_fatal,16,8,0
+Española,city,2019,injury_or_fatal,17,14,0
+Española,city,2019,injury_or_fatal,18,5,0
+Española,city,2019,injury_or_fatal,19,4,0
+Española,city,2019,injury_or_fatal,20,3,0
+Española,city,2019,injury_or_fatal,21,2,0
+Española,city,2019,injury_or_fatal,22,1,0
+Española,city,2019,injury_or_fatal,23,0,0
+Española,city,2019,vru,0,1,0
+Española,city,2019,vru,1,0,0
+Española,city,2019,vru,2,0,0
+Española,city,2019,vru,3,0,0
+Española,city,2019,vru,4,0,0
+Española,city,2019,vru,5,0,0
+Española,city,2019,vru,6,0,0
+Española,city,2019,vru,7,0,0
+Española,city,2019,vru,8,0,0
+Española,city,2019,vru,9,0,0
+Española,city,2019,vru,10,0,0
+Española,city,2019,vru,11,0,0
+Española,city,2019,vru,12,0,0
+Española,city,2019,vru,13,0,0
+Española,city,2019,vru,14,2,0
+Española,city,2019,vru,15,0,0
+Española,city,2019,vru,16,0,0
+Española,city,2019,vru,17,0,0
+Española,city,2019,vru,18,1,0
+Española,city,2019,vru,19,0,0
+Española,city,2019,vru,20,1,0
+Española,city,2019,vru,21,0,0
+Española,city,2019,vru,22,0,0
+Española,city,2019,vru,23,0,0
+Española,city,2020,all,0,1,1
+Española,city,2020,all,1,3,1
+Española,city,2020,all,2,2,1
+Española,city,2020,all,3,2,1
+Española,city,2020,all,4,1,1
+Española,city,2020,all,5,0,1
+Española,city,2020,all,6,8,1
+Española,city,2020,all,7,9,1
+Española,city,2020,all,8,11,1
+Española,city,2020,all,9,9,1
+Española,city,2020,all,10,20,1
+Española,city,2020,all,11,14,1
+Española,city,2020,all,12,26,1
+Española,city,2020,all,13,19,1
+Española,city,2020,all,14,19,1
+Española,city,2020,all,15,31,1
+Española,city,2020,all,16,29,1
+Española,city,2020,all,17,24,1
+Española,city,2020,all,18,18,1
+Española,city,2020,all,19,18,1
+Española,city,2020,all,20,16,1
+Española,city,2020,all,21,6,1
+Española,city,2020,all,22,3,1
+Española,city,2020,all,23,3,1
+Española,city,2020,alcohol,0,0,0
+Española,city,2020,alcohol,1,0,0
+Española,city,2020,alcohol,2,0,0
+Española,city,2020,alcohol,3,0,0
+Española,city,2020,alcohol,4,0,0
+Española,city,2020,alcohol,5,0,0
+Española,city,2020,alcohol,6,2,0
+Española,city,2020,alcohol,7,0,0
+Española,city,2020,alcohol,8,0,0
+Española,city,2020,alcohol,9,1,0
+Española,city,2020,alcohol,10,1,0
+Española,city,2020,alcohol,11,0,0
+Española,city,2020,alcohol,12,0,0
+Española,city,2020,alcohol,13,1,0
+Española,city,2020,alcohol,14,0,0
+Española,city,2020,alcohol,15,1,0
+Española,city,2020,alcohol,16,1,0
+Española,city,2020,alcohol,17,0,0
+Española,city,2020,alcohol,18,0,0
+Española,city,2020,alcohol,19,1,0
+Española,city,2020,alcohol,20,2,0
+Española,city,2020,alcohol,21,1,0
+Española,city,2020,alcohol,22,0,0
+Española,city,2020,alcohol,23,1,0
+Española,city,2020,injury_or_fatal,0,0,0
+Española,city,2020,injury_or_fatal,1,1,0
+Española,city,2020,injury_or_fatal,2,1,0
+Española,city,2020,injury_or_fatal,3,1,0
+Española,city,2020,injury_or_fatal,4,1,0
+Española,city,2020,injury_or_fatal,5,0,0
+Española,city,2020,injury_or_fatal,6,2,0
+Española,city,2020,injury_or_fatal,7,3,0
+Española,city,2020,injury_or_fatal,8,2,0
+Española,city,2020,injury_or_fatal,9,1,0
+Española,city,2020,injury_or_fatal,10,4,0
+Española,city,2020,injury_or_fatal,11,6,0
+Española,city,2020,injury_or_fatal,12,4,0
+Española,city,2020,injury_or_fatal,13,3,0
+Española,city,2020,injury_or_fatal,14,3,0
+Española,city,2020,injury_or_fatal,15,10,0
+Española,city,2020,injury_or_fatal,16,8,0
+Española,city,2020,injury_or_fatal,17,8,0
+Española,city,2020,injury_or_fatal,18,8,0
+Española,city,2020,injury_or_fatal,19,7,0
+Española,city,2020,injury_or_fatal,20,5,0
+Española,city,2020,injury_or_fatal,21,2,0
+Española,city,2020,injury_or_fatal,22,0,0
+Española,city,2020,injury_or_fatal,23,1,0
+Española,city,2020,vru,0,0,0
+Española,city,2020,vru,1,1,0
+Española,city,2020,vru,2,0,0
+Española,city,2020,vru,3,0,0
+Española,city,2020,vru,4,0,0
+Española,city,2020,vru,5,0,0
+Española,city,2020,vru,6,0,0
+Española,city,2020,vru,7,0,0
+Española,city,2020,vru,8,0,0
+Española,city,2020,vru,9,0,0
+Española,city,2020,vru,10,0,0
+Española,city,2020,vru,11,0,0
+Española,city,2020,vru,12,0,0
+Española,city,2020,vru,13,0,0
+Española,city,2020,vru,14,0,0
+Española,city,2020,vru,15,0,0
+Española,city,2020,vru,16,0,0
+Española,city,2020,vru,17,1,0
+Española,city,2020,vru,18,0,0
+Española,city,2020,vru,19,1,0
+Española,city,2020,vru,20,1,0
+Española,city,2020,vru,21,0,0
+Española,city,2020,vru,22,0,0
+Española,city,2020,vru,23,0,0
+Española,city,2021,all,0,7,1
+Española,city,2021,all,1,3,1
+Española,city,2021,all,2,4,1
+Española,city,2021,all,3,2,1
+Española,city,2021,all,4,0,1
+Española,city,2021,all,5,2,1
+Española,city,2021,all,6,8,1
+Española,city,2021,all,7,12,1
+Española,city,2021,all,8,13,1
+Española,city,2021,all,9,14,1
+Española,city,2021,all,10,16,1
+Española,city,2021,all,11,23,1
+Española,city,2021,all,12,29,1
+Española,city,2021,all,13,23,1
+Española,city,2021,all,14,20,1
+Española,city,2021,all,15,25,1
+Española,city,2021,all,16,28,1
+Española,city,2021,all,17,36,1
+Española,city,2021,all,18,18,1
+Española,city,2021,all,19,7,1
+Española,city,2021,all,20,14,1
+Española,city,2021,all,21,10,1
+Española,city,2021,all,22,9,1
+Española,city,2021,all,23,6,1
+Española,city,2021,alcohol,0,2,0
+Española,city,2021,alcohol,1,1,0
+Española,city,2021,alcohol,2,1,0
+Española,city,2021,alcohol,3,0,0
+Española,city,2021,alcohol,4,0,0
+Española,city,2021,alcohol,5,1,0
+Española,city,2021,alcohol,6,0,0
+Española,city,2021,alcohol,7,0,0
+Española,city,2021,alcohol,8,0,0
+Española,city,2021,alcohol,9,0,0
+Española,city,2021,alcohol,10,0,0
+Española,city,2021,alcohol,11,1,0
+Española,city,2021,alcohol,12,0,0
+Española,city,2021,alcohol,13,1,0
+Española,city,2021,alcohol,14,1,0
+Española,city,2021,alcohol,15,1,0
+Española,city,2021,alcohol,16,1,0
+Española,city,2021,alcohol,17,4,0
+Española,city,2021,alcohol,18,0,0
+Española,city,2021,alcohol,19,1,0
+Española,city,2021,alcohol,20,2,0
+Española,city,2021,alcohol,21,2,0
+Española,city,2021,alcohol,22,1,0
+Española,city,2021,alcohol,23,2,0
+Española,city,2021,injury_or_fatal,0,1,0
+Española,city,2021,injury_or_fatal,1,2,0
+Española,city,2021,injury_or_fatal,2,3,0
+Española,city,2021,injury_or_fatal,3,0,0
+Española,city,2021,injury_or_fatal,4,0,0
+Española,city,2021,injury_or_fatal,5,1,0
+Española,city,2021,injury_or_fatal,6,2,0
+Española,city,2021,injury_or_fatal,7,5,0
+Española,city,2021,injury_or_fatal,8,8,0
+Española,city,2021,injury_or_fatal,9,5,0
+Española,city,2021,injury_or_fatal,10,4,0
+Española,city,2021,injury_or_fatal,11,5,0
+Española,city,2021,injury_or_fatal,12,9,0
+Española,city,2021,injury_or_fatal,13,9,0
+Española,city,2021,injury_or_fatal,14,5,0
+Española,city,2021,injury_or_fatal,15,6,0
+Española,city,2021,injury_or_fatal,16,7,0
+Española,city,2021,injury_or_fatal,17,12,0
+Española,city,2021,injury_or_fatal,18,7,0
+Española,city,2021,injury_or_fatal,19,1,0
+Española,city,2021,injury_or_fatal,20,2,0
+Española,city,2021,injury_or_fatal,21,1,0
+Española,city,2021,injury_or_fatal,22,2,0
+Española,city,2021,injury_or_fatal,23,1,0
+Española,city,2021,vru,0,0,0
+Española,city,2021,vru,1,0,0
+Española,city,2021,vru,2,0,0
+Española,city,2021,vru,3,0,0
+Española,city,2021,vru,4,0,0
+Española,city,2021,vru,5,0,0
+Española,city,2021,vru,6,0,0
+Española,city,2021,vru,7,0,0
+Española,city,2021,vru,8,0,0
+Española,city,2021,vru,9,1,0
+Española,city,2021,vru,10,0,0
+Española,city,2021,vru,11,1,0
+Española,city,2021,vru,12,0,0
+Española,city,2021,vru,13,0,0
+Española,city,2021,vru,14,0,0
+Española,city,2021,vru,15,0,0
+Española,city,2021,vru,16,0,0
+Española,city,2021,vru,17,1,0
+Española,city,2021,vru,18,2,0
+Española,city,2021,vru,19,1,0
+Española,city,2021,vru,20,0,0
+Española,city,2021,vru,21,0,0
+Española,city,2021,vru,22,0,0
+Española,city,2021,vru,23,0,0
+Los Alamos,city,2016,all,0,0,0
+Los Alamos,city,2016,all,1,2,0
+Los Alamos,city,2016,all,2,0,0
+Los Alamos,city,2016,all,3,0,0
+Los Alamos,city,2016,all,4,0,0
+Los Alamos,city,2016,all,5,0,0
+Los Alamos,city,2016,all,6,1,0
+Los Alamos,city,2016,all,7,10,0
+Los Alamos,city,2016,all,8,7,0
+Los Alamos,city,2016,all,9,5,0
+Los Alamos,city,2016,all,10,7,0
+Los Alamos,city,2016,all,11,6,0
+Los Alamos,city,2016,all,12,4,0
+Los Alamos,city,2016,all,13,2,0
+Los Alamos,city,2016,all,14,6,0
+Los Alamos,city,2016,all,15,9,0
+Los Alamos,city,2016,all,16,8,0
+Los Alamos,city,2016,all,17,16,0
+Los Alamos,city,2016,all,18,6,0
+Los Alamos,city,2016,all,19,2,0
+Los Alamos,city,2016,all,20,1,0
+Los Alamos,city,2016,all,21,0,0
+Los Alamos,city,2016,all,22,0,0
+Los Alamos,city,2016,all,23,1,0
+Los Alamos,city,2016,alcohol,0,0,0
+Los Alamos,city,2016,alcohol,1,2,0
+Los Alamos,city,2016,alcohol,2,0,0
+Los Alamos,city,2016,alcohol,3,0,0
+Los Alamos,city,2016,alcohol,4,0,0
+Los Alamos,city,2016,alcohol,5,0,0
+Los Alamos,city,2016,alcohol,6,0,0
+Los Alamos,city,2016,alcohol,7,0,0
+Los Alamos,city,2016,alcohol,8,0,0
+Los Alamos,city,2016,alcohol,9,0,0
+Los Alamos,city,2016,alcohol,10,0,0
+Los Alamos,city,2016,alcohol,11,0,0
+Los Alamos,city,2016,alcohol,12,0,0
+Los Alamos,city,2016,alcohol,13,0,0
+Los Alamos,city,2016,alcohol,14,0,0
+Los Alamos,city,2016,alcohol,15,0,0
+Los Alamos,city,2016,alcohol,16,0,0
+Los Alamos,city,2016,alcohol,17,1,0
+Los Alamos,city,2016,alcohol,18,1,0
+Los Alamos,city,2016,alcohol,19,0,0
+Los Alamos,city,2016,alcohol,20,0,0
+Los Alamos,city,2016,alcohol,21,0,0
+Los Alamos,city,2016,alcohol,22,0,0
+Los Alamos,city,2016,alcohol,23,0,0
+Los Alamos,city,2016,injury_or_fatal,0,0,0
+Los Alamos,city,2016,injury_or_fatal,1,0,0
+Los Alamos,city,2016,injury_or_fatal,2,0,0
+Los Alamos,city,2016,injury_or_fatal,3,0,0
+Los Alamos,city,2016,injury_or_fatal,4,0,0
+Los Alamos,city,2016,injury_or_fatal,5,0,0
+Los Alamos,city,2016,injury_or_fatal,6,0,0
+Los Alamos,city,2016,injury_or_fatal,7,3,0
+Los Alamos,city,2016,injury_or_fatal,8,2,0
+Los Alamos,city,2016,injury_or_fatal,9,1,0
+Los Alamos,city,2016,injury_or_fatal,10,1,0
+Los Alamos,city,2016,injury_or_fatal,11,1,0
+Los Alamos,city,2016,injury_or_fatal,12,0,0
+Los Alamos,city,2016,injury_or_fatal,13,0,0
+Los Alamos,city,2016,injury_or_fatal,14,2,0
+Los Alamos,city,2016,injury_or_fatal,15,3,0
+Los Alamos,city,2016,injury_or_fatal,16,4,0
+Los Alamos,city,2016,injury_or_fatal,17,9,0
+Los Alamos,city,2016,injury_or_fatal,18,1,0
+Los Alamos,city,2016,injury_or_fatal,19,1,0
+Los Alamos,city,2016,injury_or_fatal,20,1,0
+Los Alamos,city,2016,injury_or_fatal,21,0,0
+Los Alamos,city,2016,injury_or_fatal,22,0,0
+Los Alamos,city,2016,injury_or_fatal,23,0,0
+Los Alamos,city,2016,vru,0,0,0
+Los Alamos,city,2016,vru,1,0,0
+Los Alamos,city,2016,vru,2,0,0
+Los Alamos,city,2016,vru,3,0,0
+Los Alamos,city,2016,vru,4,0,0
+Los Alamos,city,2016,vru,5,0,0
+Los Alamos,city,2016,vru,6,0,0
+Los Alamos,city,2016,vru,7,0,0
+Los Alamos,city,2016,vru,8,0,0
+Los Alamos,city,2016,vru,9,0,0
+Los Alamos,city,2016,vru,10,0,0
+Los Alamos,city,2016,vru,11,0,0
+Los Alamos,city,2016,vru,12,0,0
+Los Alamos,city,2016,vru,13,0,0
+Los Alamos,city,2016,vru,14,0,0
+Los Alamos,city,2016,vru,15,0,0
+Los Alamos,city,2016,vru,16,0,0
+Los Alamos,city,2016,vru,17,0,0
+Los Alamos,city,2016,vru,18,0,0
+Los Alamos,city,2016,vru,19,0,0
+Los Alamos,city,2016,vru,20,0,0
+Los Alamos,city,2016,vru,21,0,0
+Los Alamos,city,2016,vru,22,0,0
+Los Alamos,city,2016,vru,23,0,0
+Los Alamos,city,2019,all,0,0,0
+Los Alamos,city,2019,all,1,0,0
+Los Alamos,city,2019,all,2,0,0
+Los Alamos,city,2019,all,3,2,0
+Los Alamos,city,2019,all,4,0,0
+Los Alamos,city,2019,all,5,0,0
+Los Alamos,city,2019,all,6,2,0
+Los Alamos,city,2019,all,7,10,0
+Los Alamos,city,2019,all,8,5,0
+Los Alamos,city,2019,all,9,8,0
+Los Alamos,city,2019,all,10,3,0
+Los Alamos,city,2019,all,11,10,0
+Los Alamos,city,2019,all,12,7,0
+Los Alamos,city,2019,all,13,2,0
+Los Alamos,city,2019,all,14,5,0
+Los Alamos,city,2019,all,15,8,0
+Los Alamos,city,2019,all,16,6,0
+Los Alamos,city,2019,all,17,11,0
+Los Alamos,city,2019,all,18,7,0
+Los Alamos,city,2019,all,19,5,0
+Los Alamos,city,2019,all,20,2,0
+Los Alamos,city,2019,all,21,2,0
+Los Alamos,city,2019,all,22,0,0
+Los Alamos,city,2019,all,23,1,0
+Los Alamos,city,2019,alcohol,0,0,0
+Los Alamos,city,2019,alcohol,1,0,0
+Los Alamos,city,2019,alcohol,2,0,0
+Los Alamos,city,2019,alcohol,3,0,0
+Los Alamos,city,2019,alcohol,4,0,0
+Los Alamos,city,2019,alcohol,5,0,0
+Los Alamos,city,2019,alcohol,6,0,0
+Los Alamos,city,2019,alcohol,7,0,0
+Los Alamos,city,2019,alcohol,8,0,0
+Los Alamos,city,2019,alcohol,9,0,0
+Los Alamos,city,2019,alcohol,10,0,0
+Los Alamos,city,2019,alcohol,11,0,0
+Los Alamos,city,2019,alcohol,12,0,0
+Los Alamos,city,2019,alcohol,13,0,0
+Los Alamos,city,2019,alcohol,14,0,0
+Los Alamos,city,2019,alcohol,15,0,0
+Los Alamos,city,2019,alcohol,16,0,0
+Los Alamos,city,2019,alcohol,17,1,0
+Los Alamos,city,2019,alcohol,18,0,0
+Los Alamos,city,2019,alcohol,19,0,0
+Los Alamos,city,2019,alcohol,20,0,0
+Los Alamos,city,2019,alcohol,21,1,0
+Los Alamos,city,2019,alcohol,22,0,0
+Los Alamos,city,2019,alcohol,23,1,0
+Los Alamos,city,2019,injury_or_fatal,0,0,0
+Los Alamos,city,2019,injury_or_fatal,1,0,0
+Los Alamos,city,2019,injury_or_fatal,2,0,0
+Los Alamos,city,2019,injury_or_fatal,3,2,0
+Los Alamos,city,2019,injury_or_fatal,4,0,0
+Los Alamos,city,2019,injury_or_fatal,5,0,0
+Los Alamos,city,2019,injury_or_fatal,6,0,0
+Los Alamos,city,2019,injury_or_fatal,7,6,0
+Los Alamos,city,2019,injury_or_fatal,8,2,0
+Los Alamos,city,2019,injury_or_fatal,9,1,0
+Los Alamos,city,2019,injury_or_fatal,10,0,0
+Los Alamos,city,2019,injury_or_fatal,11,2,0
+Los Alamos,city,2019,injury_or_fatal,12,3,0
+Los Alamos,city,2019,injury_or_fatal,13,1,0
+Los Alamos,city,2019,injury_or_fatal,14,1,0
+Los Alamos,city,2019,injury_or_fatal,15,2,0
+Los Alamos,city,2019,injury_or_fatal,16,2,0
+Los Alamos,city,2019,injury_or_fatal,17,4,0
+Los Alamos,city,2019,injury_or_fatal,18,4,0
+Los Alamos,city,2019,injury_or_fatal,19,1,0
+Los Alamos,city,2019,injury_or_fatal,20,0,0
+Los Alamos,city,2019,injury_or_fatal,21,1,0
+Los Alamos,city,2019,injury_or_fatal,22,0,0
+Los Alamos,city,2019,injury_or_fatal,23,1,0
+Los Alamos,city,2019,vru,0,0,0
+Los Alamos,city,2019,vru,1,0,0
+Los Alamos,city,2019,vru,2,0,0
+Los Alamos,city,2019,vru,3,0,0
+Los Alamos,city,2019,vru,4,0,0
+Los Alamos,city,2019,vru,5,0,0
+Los Alamos,city,2019,vru,6,0,0
+Los Alamos,city,2019,vru,7,1,0
+Los Alamos,city,2019,vru,8,0,0
+Los Alamos,city,2019,vru,9,0,0
+Los Alamos,city,2019,vru,10,0,0
+Los Alamos,city,2019,vru,11,0,0
+Los Alamos,city,2019,vru,12,0,0
+Los Alamos,city,2019,vru,13,0,0
+Los Alamos,city,2019,vru,14,0,0
+Los Alamos,city,2019,vru,15,0,0
+Los Alamos,city,2019,vru,16,0,0
+Los Alamos,city,2019,vru,17,1,0
+Los Alamos,city,2019,vru,18,1,0
+Los Alamos,city,2019,vru,19,0,0
+Los Alamos,city,2019,vru,20,0,0
+Los Alamos,city,2019,vru,21,0,0
+Los Alamos,city,2019,vru,22,0,0
+Los Alamos,city,2019,vru,23,0,0
+Los Alamos,city,2020,all,0,1,0
+Los Alamos,city,2020,all,1,2,0
+Los Alamos,city,2020,all,2,0,0
+Los Alamos,city,2020,all,3,0,0
+Los Alamos,city,2020,all,4,0,0
+Los Alamos,city,2020,all,5,0,0
+Los Alamos,city,2020,all,6,1,0
+Los Alamos,city,2020,all,7,8,0
+Los Alamos,city,2020,all,8,1,0
+Los Alamos,city,2020,all,9,6,0
+Los Alamos,city,2020,all,10,5,0
+Los Alamos,city,2020,all,11,0,0
+Los Alamos,city,2020,all,12,6,0
+Los Alamos,city,2020,all,13,6,0
+Los Alamos,city,2020,all,14,0,0
+Los Alamos,city,2020,all,15,10,0
+Los Alamos,city,2020,all,16,5,0
+Los Alamos,city,2020,all,17,9,0
+Los Alamos,city,2020,all,18,3,0
+Los Alamos,city,2020,all,19,2,0
+Los Alamos,city,2020,all,20,2,0
+Los Alamos,city,2020,all,21,3,0
+Los Alamos,city,2020,all,22,2,0
+Los Alamos,city,2020,all,23,0,0
+Los Alamos,city,2020,alcohol,0,0,0
+Los Alamos,city,2020,alcohol,1,2,0
+Los Alamos,city,2020,alcohol,2,0,0
+Los Alamos,city,2020,alcohol,3,0,0
+Los Alamos,city,2020,alcohol,4,0,0
+Los Alamos,city,2020,alcohol,5,0,0
+Los Alamos,city,2020,alcohol,6,0,0
+Los Alamos,city,2020,alcohol,7,0,0
+Los Alamos,city,2020,alcohol,8,0,0
+Los Alamos,city,2020,alcohol,9,0,0
+Los Alamos,city,2020,alcohol,10,1,0
+Los Alamos,city,2020,alcohol,11,0,0
+Los Alamos,city,2020,alcohol,12,0,0
+Los Alamos,city,2020,alcohol,13,0,0
+Los Alamos,city,2020,alcohol,14,0,0
+Los Alamos,city,2020,alcohol,15,0,0
+Los Alamos,city,2020,alcohol,16,0,0
+Los Alamos,city,2020,alcohol,17,0,0
+Los Alamos,city,2020,alcohol,18,0,0
+Los Alamos,city,2020,alcohol,19,1,0
+Los Alamos,city,2020,alcohol,20,0,0
+Los Alamos,city,2020,alcohol,21,0,0
+Los Alamos,city,2020,alcohol,22,0,0
+Los Alamos,city,2020,alcohol,23,0,0
+Los Alamos,city,2020,injury_or_fatal,0,0,0
+Los Alamos,city,2020,injury_or_fatal,1,0,0
+Los Alamos,city,2020,injury_or_fatal,2,0,0
+Los Alamos,city,2020,injury_or_fatal,3,0,0
+Los Alamos,city,2020,injury_or_fatal,4,0,0
+Los Alamos,city,2020,injury_or_fatal,5,0,0
+Los Alamos,city,2020,injury_or_fatal,6,0,0
+Los Alamos,city,2020,injury_or_fatal,7,2,0
+Los Alamos,city,2020,injury_or_fatal,8,1,0
+Los Alamos,city,2020,injury_or_fatal,9,2,0
+Los Alamos,city,2020,injury_or_fatal,10,0,0
+Los Alamos,city,2020,injury_or_fatal,11,0,0
+Los Alamos,city,2020,injury_or_fatal,12,2,0
+Los Alamos,city,2020,injury_or_fatal,13,2,0
+Los Alamos,city,2020,injury_or_fatal,14,0,0
+Los Alamos,city,2020,injury_or_fatal,15,1,0
+Los Alamos,city,2020,injury_or_fatal,16,0,0
+Los Alamos,city,2020,injury_or_fatal,17,3,0
+Los Alamos,city,2020,injury_or_fatal,18,2,0
+Los Alamos,city,2020,injury_or_fatal,19,0,0
+Los Alamos,city,2020,injury_or_fatal,20,0,0
+Los Alamos,city,2020,injury_or_fatal,21,3,0
+Los Alamos,city,2020,injury_or_fatal,22,0,0
+Los Alamos,city,2020,injury_or_fatal,23,0,0
+Los Alamos,city,2020,vru,0,0,0
+Los Alamos,city,2020,vru,1,0,0
+Los Alamos,city,2020,vru,2,0,0
+Los Alamos,city,2020,vru,3,0,0
+Los Alamos,city,2020,vru,4,0,0
+Los Alamos,city,2020,vru,5,0,0
+Los Alamos,city,2020,vru,6,0,0
+Los Alamos,city,2020,vru,7,1,0
+Los Alamos,city,2020,vru,8,0,0
+Los Alamos,city,2020,vru,9,0,0
+Los Alamos,city,2020,vru,10,0,0
+Los Alamos,city,2020,vru,11,0,0
+Los Alamos,city,2020,vru,12,0,0
+Los Alamos,city,2020,vru,13,0,0
+Los Alamos,city,2020,vru,14,0,0
+Los Alamos,city,2020,vru,15,0,0
+Los Alamos,city,2020,vru,16,0,0
+Los Alamos,city,2020,vru,17,0,0
+Los Alamos,city,2020,vru,18,0,0
+Los Alamos,city,2020,vru,19,0,0
+Los Alamos,city,2020,vru,20,0,0
+Los Alamos,city,2020,vru,21,0,0
+Los Alamos,city,2020,vru,22,0,0
+Los Alamos,city,2020,vru,23,0,0
+Los Alamos,city,2021,all,0,0,0
+Los Alamos,city,2021,all,1,1,0
+Los Alamos,city,2021,all,2,0,0
+Los Alamos,city,2021,all,3,1,0
+Los Alamos,city,2021,all,4,0,0
+Los Alamos,city,2021,all,5,0,0
+Los Alamos,city,2021,all,6,2,0
+Los Alamos,city,2021,all,7,6,0
+Los Alamos,city,2021,all,8,2,0
+Los Alamos,city,2021,all,9,4,0
+Los Alamos,city,2021,all,10,3,0
+Los Alamos,city,2021,all,11,10,0
+Los Alamos,city,2021,all,12,8,0
+Los Alamos,city,2021,all,13,3,0
+Los Alamos,city,2021,all,14,4,0
+Los Alamos,city,2021,all,15,9,0
+Los Alamos,city,2021,all,16,1,0
+Los Alamos,city,2021,all,17,3,0
+Los Alamos,city,2021,all,18,3,0
+Los Alamos,city,2021,all,19,2,0
+Los Alamos,city,2021,all,20,4,0
+Los Alamos,city,2021,all,21,0,0
+Los Alamos,city,2021,all,22,0,0
+Los Alamos,city,2021,all,23,1,0
+Los Alamos,city,2021,alcohol,0,0,0
+Los Alamos,city,2021,alcohol,1,0,0
+Los Alamos,city,2021,alcohol,2,0,0
+Los Alamos,city,2021,alcohol,3,0,0
+Los Alamos,city,2021,alcohol,4,0,0
+Los Alamos,city,2021,alcohol,5,0,0
+Los Alamos,city,2021,alcohol,6,0,0
+Los Alamos,city,2021,alcohol,7,0,0
+Los Alamos,city,2021,alcohol,8,0,0
+Los Alamos,city,2021,alcohol,9,0,0
+Los Alamos,city,2021,alcohol,10,0,0
+Los Alamos,city,2021,alcohol,11,1,0
+Los Alamos,city,2021,alcohol,12,0,0
+Los Alamos,city,2021,alcohol,13,0,0
+Los Alamos,city,2021,alcohol,14,0,0
+Los Alamos,city,2021,alcohol,15,0,0
+Los Alamos,city,2021,alcohol,16,0,0
+Los Alamos,city,2021,alcohol,17,0,0
+Los Alamos,city,2021,alcohol,18,1,0
+Los Alamos,city,2021,alcohol,19,0,0
+Los Alamos,city,2021,alcohol,20,0,0
+Los Alamos,city,2021,alcohol,21,0,0
+Los Alamos,city,2021,alcohol,22,0,0
+Los Alamos,city,2021,alcohol,23,1,0
+Los Alamos,city,2021,injury_or_fatal,0,0,0
+Los Alamos,city,2021,injury_or_fatal,1,1,0
+Los Alamos,city,2021,injury_or_fatal,2,0,0
+Los Alamos,city,2021,injury_or_fatal,3,1,0
+Los Alamos,city,2021,injury_or_fatal,4,0,0
+Los Alamos,city,2021,injury_or_fatal,5,0,0
+Los Alamos,city,2021,injury_or_fatal,6,0,0
+Los Alamos,city,2021,injury_or_fatal,7,2,0
+Los Alamos,city,2021,injury_or_fatal,8,1,0
+Los Alamos,city,2021,injury_or_fatal,9,0,0
+Los Alamos,city,2021,injury_or_fatal,10,0,0
+Los Alamos,city,2021,injury_or_fatal,11,2,0
+Los Alamos,city,2021,injury_or_fatal,12,2,0
+Los Alamos,city,2021,injury_or_fatal,13,2,0
+Los Alamos,city,2021,injury_or_fatal,14,1,0
+Los Alamos,city,2021,injury_or_fatal,15,3,0
+Los Alamos,city,2021,injury_or_fatal,16,1,0
+Los Alamos,city,2021,injury_or_fatal,17,2,0
+Los Alamos,city,2021,injury_or_fatal,18,2,0
+Los Alamos,city,2021,injury_or_fatal,19,0,0
+Los Alamos,city,2021,injury_or_fatal,20,2,0
+Los Alamos,city,2021,injury_or_fatal,21,0,0
+Los Alamos,city,2021,injury_or_fatal,22,0,0
+Los Alamos,city,2021,injury_or_fatal,23,1,0
+Los Alamos,city,2021,vru,0,0,0
+Los Alamos,city,2021,vru,1,0,0
+Los Alamos,city,2021,vru,2,0,0
+Los Alamos,city,2021,vru,3,0,0
+Los Alamos,city,2021,vru,4,0,0
+Los Alamos,city,2021,vru,5,0,0
+Los Alamos,city,2021,vru,6,0,0
+Los Alamos,city,2021,vru,7,1,0
+Los Alamos,city,2021,vru,8,0,0
+Los Alamos,city,2021,vru,9,0,0
+Los Alamos,city,2021,vru,10,0,0
+Los Alamos,city,2021,vru,11,1,0
+Los Alamos,city,2021,vru,12,0,0
+Los Alamos,city,2021,vru,13,1,0
+Los Alamos,city,2021,vru,14,0,0
+Los Alamos,city,2021,vru,15,0,0
+Los Alamos,city,2021,vru,16,0,0
+Los Alamos,city,2021,vru,17,0,0
+Los Alamos,city,2021,vru,18,1,0
+Los Alamos,city,2021,vru,19,0,0
+Los Alamos,city,2021,vru,20,1,0
+Los Alamos,city,2021,vru,21,0,0
+Los Alamos,city,2021,vru,22,0,0
+Los Alamos,city,2021,vru,23,0,0

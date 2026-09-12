@@ -954,6 +954,11 @@ def cmd_export(args) -> None:
         hours_page = (web.STATIC_DIR / "hours.html").read_text().replace(
             "<body>", "<body>\n<script>window.OTOWI_STATIC = true;</script>", 1)
         (out / "hours.html").write_text(hours_page)
+        sources_page = (web.STATIC_DIR / "sources.html").read_text().replace(
+            "<body>", "<body>\n<script>window.OTOWI_STATIC = true;</script>", 1)
+        (out / "sources.html").write_text(sources_page)
+        for name, rows in web.write_tables(data).items():
+            print(f"  {name}: {rows} rows", file=sys.stderr)
     except Exception as exc:                                   # noqa: BLE001
         print(f"walking page skipped: {exc}", file=sys.stderr)
 

@@ -201,6 +201,7 @@ class _Handler(http.server.SimpleHTTPRequestHandler):
     walk_path: Path
     walknet_path: Path
     risk_path: Path
+    tables_dir: Path
     summary: dict
     window: tuple[int, int]
 
@@ -236,6 +237,11 @@ class _Handler(http.server.SimpleHTTPRequestHandler):
             return self._send_file(STATIC_DIR / "walk.html", "text/html; charset=utf-8")
         if self.path.rstrip("/") in ("/hours", "/hours.html"):
             return self._send_file(STATIC_DIR / "hours.html", "text/html; charset=utf-8")
+        if self.path.rstrip("/") in ("/sources", "/sources.html"):
+            return self._send_file(STATIC_DIR / "sources.html", "text/html; charset=utf-8")
+        if self.path.endswith(".csv"):
+            name = self.path.lstrip("/").split("?")[0]
+            return self._send_file(self.tables_dir / name, "text/csv")
         if self.path in ("/", "/index.html"):
             return self._send_file(STATIC_DIR / "index.html", "text/html; charset=utf-8")
         self.send_error(404)
@@ -368,10 +374,19 @@ def serve(
         log.warning("walking routes unavailable: %s", exc)
         walknet_data = walknet_path()
 
+    # The sources page offers the processed tables for download, so they have
+    # to exist locally too -- otherwise that page works on the published copy
+    # and quietly 404s on the one being developed against.
+    tables = CACHE_DIR / "tables"
+    try:
+        write_tables(tables)
+    except Exception as exc:                                    # noqa: BLE001
+        log.warning("tables unavailable: %s", exc)
+
     handler = type("Handler", (_Handler,),
                    {"data_path": data_path, "walk_path": walk_data,
                     "walknet_path": walknet_data, "risk_path": risk_data,
-                    "summary": summary, "window": window})
+                    "tables_dir": tables, "summary": summary, "window": window})
 
     # Without this a restart inside the TIME_WAIT window fails with "Address
     # already in use", which for a tool you stop and start constantly is the
@@ -821,3 +836,72 @@ def build_walk_network(*, box=SANTA_FE_BBOX, force: bool = False
     log.info("wrote %s (%.1f MB, %d edges)", path.name,
              path.stat().st_size / 1e6, len(out_edges))
     return path, data
+
+
+# ------------------------------------------------------------- tables to keep
+#
+# The sources page links to where each dataset came from, which is the right
+# thing to do and is not quite enough: every original here needs either a
+# 35 MB national download, a PDF parsed off its bar charts, or an ArcGIS query
+# with a bounding box, before anybody can look at the study area. The
+# processed tables are small, so they ship with the site -- a reader can check
+# a number without running the pipeline, and that is the difference between a
+# published claim and a checkable one.
+
+
+def _csv(path: Path, header: list[str], rows) -> int:
+    import csv as csv_module
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    count = 0
+    with path.open("w", newline="") as handle:
+        writer = csv_module.writer(handle)
+        writer.writerow(header)
+        for row in rows:
+            writer.writerow(row)
+            count += 1
+    return count
+
+
+def write_tables(out: Path) -> dict[str, int]:
+    """The processed data, as CSV, next to the pages that use it."""
+    from . import tru, vru
+
+    written: dict[str, int] = {}
+
+    hourly, severity = tru.fetch()
+    written["tru-crashes-by-hour.csv"] = _csv(
+        out / "tru-crashes-by-hour.csv",
+        ["place", "scope", "year", "kind", "hour", "crashes", "hour_unknown"],
+        ((s.place, s.scope, s.year, s.kind, hour, s.counts[hour], s.missing)
+         for s in hourly for hour in range(24)))
+
+    written["tru-crashes-by-severity.csv"] = _csv(
+        out / "tru-crashes-by-severity.csv",
+        ["place", "scope", "year", "fatal", "injury", "property_damage", "total",
+         "alcohol_fatal", "alcohol_injury", "alcohol_property_damage",
+         "alcohol_total"],
+        ((s.place, s.scope, s.year, s.fatal, s.injury, s.property_damage, s.total,
+          s.alcohol_fatal, s.alcohol_injury, s.alcohol_property_damage,
+          s.alcohol_total) for s in severity))
+
+    crashes = vru.fetch()
+    written["vru-crashes.csv"] = _csv(
+        out / "vru-crashes.csv",
+        ["year", "hour", "day", "severity_kabco", "lighting", "alcohol",
+         "pedestrian", "pedalcycle", "county", "city", "street", "lat", "lon"],
+        ((c.year, "" if c.hour is None else c.hour, c.day, c.severity, c.lighting,
+          int(c.alcohol), int(c.pedestrian), int(c.pedalcycle), c.county, c.city,
+          c.street, round(c.lat, 5), round(c.lon, 5)) for c in crashes))
+
+    corridors = vru.fetch_corridors()
+    written["high-injury-network.csv"] = _csv(
+        out / "high-injury-network.csv",
+        ["road", "county", "city", "crash_severity_index", "length_mi",
+         "vru_crashes", "ped_ka_crashes", "bike_ka_crashes", "ksi", "aadt",
+         "speed_limit", "lanes"],
+        ((c.name, c.county, c.city, round(c.severity_index, 2),
+          round(c.length_mi, 3), c.vru_crashes, c.ped_ka, c.bike_ka, c.ksi,
+          c.aadt, c.speed_limit, c.lanes) for c in corridors))
+
+    return written

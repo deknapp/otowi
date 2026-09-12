@@ -1,0 +1,759 @@
+year,hour,day,severity_kabco,lighting,alcohol,pedestrian,pedalcycle,county,city,street,lat,lon
+2013,16,Wednesday,B,Daylight,0,0,1,Santa Fe,Espanola,State Road 68,35.99902,-106.06334
+2013,23,Wednesday,K,Dark-Not Lighted,0,1,0,Santa Fe,Santa Fe,State Road 14,35.59025,-106.05339
+2013,9,Friday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Cerrillos Road,35.66156,-105.97932
+2013,12,Saturday,A,Daylight,0,1,0,Santa Fe,Santa Fe,61 Calle Del Resplandor,35.67086,-105.9127
+2013,9,Thursday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Old Pecos Trail,35.65127,-105.93627
+2013,21,Sunday,B,Dark-Lighted,0,0,1,Santa Fe,Santa Fe,Paseo De Peralta,35.69067,-105.9541
+2013,17,Monday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Airport Road,35.63647,-106.03928
+2013,12,Saturday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Lincoln Ave,35.68785,-105.93884
+2013,11,Tuesday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Calle La Resolana,35.655,-105.99217
+2013,13,Tuesday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Vegas Veroles Drive,35.64438,-106.0093
+2013,10,Thursday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Paseo De Peralta,35.68103,-105.93507
+2013,9,Friday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Cerrillos Road,35.65807,-105.98622
+2013,11,Monday,A,Daylight,0,0,1,Santa Fe,Santa Fe,St Francis Drive,35.66588,-105.95622
+2013,15,Friday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Aqua Fria,35.66674,-105.99028
+2013,15,Tuesday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Avenida De Las Campanas,35.64213,-105.98995
+2013,13,Friday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Camino De Los Arroyos,35.63979,-106.01149
+2013,14,Monday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Old Las Vegas Highway,35.63214,-105.92453
+2013,5,Thursday,A,Dawn,1,0,1,Santa Fe,Tesuque Pueblo,Us 84/285,35.81168,-105.96799
+2013,17,Monday,C,Dark-Not Lighted,0,1,0,Santa Fe,Santa Fe,Solana,35.68772,-105.96092
+2013,14,Thursday,B,Daylight,0,1,0,Santa Fe,Santa Fe,138 Tesuque Village Road,35.67029,-105.96441
+2013,23,Saturday,A,Dark-Lighted,1,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.65591,-105.99055
+2013,17,Thursday,B,Daylight,0,0,1,Los Alamos,Los Alamos,Diamond Drive,35.88299,-106.31875
+2013,15,Tuesday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Fifth Street,35.66063,-105.97011
+2013,11,Saturday,C,Unknown or Not Reported,0,1,0,Santa Fe,Santa Fe,348 East De V Argas Stree,35.68632,-105.94399
+2013,15,Thursday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Paseo Del Sol West,35.62704,-106.06113
+2013,17,Wednesday,C,Daylight,0,1,0,Santa Fe,Santa Fe,3298 Cerrillos Road,35.64958,-106.00102
+2013,18,Saturday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Camino Carlos Rey,35.64963,-105.98473
+2013,20,Saturday,B,Dark-Lighted,1,1,0,Santa Fe,Santa Fe,Cerrillos Road,35.64629,-106.00636
+2013,18,Saturday,A,Dark-Lighted,1,1,0,Santa Fe,Santa Fe,Cerrillos Road,35.65761,-105.98719
+2013,13,Wednesday,B,Unknown or Not Reported,0,0,1,Santa Fe,Santa Fe,Siringo Rd,35.65214,-105.96299
+2013,16,Thursday,C,Unknown or Not Reported,0,0,1,Santa Fe,Santa Fe,Cerrillos Rd,35.62241,-106.02769
+2013,13,Monday,B,Daylight,1,0,1,Santa Fe,Santa Fe,Cerrillos Rd,35.64231,-106.01269
+2013,11,Monday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Washington Ave,35.68913,-105.93704
+2013,16,Friday,C,Daylight,1,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.6565,-105.98938
+2013,10,Wednesday,C,Unknown or Not Reported,0,0,1,Santa Fe,Santa Fe,Paseo De Peralta,35.68103,-105.93507
+2013,20,Saturday,K,Dark-Not Lighted,1,1,0,Santa Fe,Santa Fe,St Michaels Dr,35.65811,-105.94834
+2013,13,Friday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Rodeo Rd,35.63852,-106.0117
+2013,7,Thursday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Griffin Ave,35.68935,-105.94036
+2013,8,Thursday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Booth St,35.67949,-105.94142
+2013,2,Thursday,K,Dark-Not Lighted,1,1,0,Santa Fe,Santa Fe,St Francis Dr Us 84 / 285,35.6622,-105.95643
+2013,16,Thursday,C,Daylight,0,1,0,Santa Fe,Santa Fe,West San Mateo,35.66168,-105.95978
+2013,18,Thursday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Agua Fria,35.68429,-105.95487
+2013,17,Saturday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Alameda,35.68772,-105.96092
+2013,13,Monday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Airport Rd,35.63699,-106.03557
+2013,14,Thursday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Siringo Rd,35.65216,-105.97382
+2013,21,Friday,K,Dark-Not Lighted,1,1,0,Rio Arriba,Hernandez,United States Highway 84 / 285,36.05058,-106.11301
+2014,12,Sunday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Cerriuos Rd,35.65761,-105.98719
+2014,17,Tuesday,B,Daylight,1,0,1,Santa Fe,Santa Fe,Cerrillos Rd,35.66514,-105.97238
+2014,8,Tuesday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Washington Pl,35.68913,-105.93704
+2014,23,Sunday,K,Dark-Lighted,1,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.65207,-105.997
+2014,19,Wednesday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Camino Alire,35.68505,-105.96734
+2014,12,Friday,B,Daylight,0,1,0,Santa Fe,,State Rd 503,35.93041,-105.95929
+2014,17,Tuesday,A,Daylight,0,0,1,Santa Fe,Santa Fe,Old Las Vegas Hwy,35.571,-105.88831
+2014,15,Sunday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Rodeo Rd,35.63852,-106.0117
+2014,20,Sunday,C,Dark-Lighted,1,1,0,Santa Fe,Santa Fe,Cerrillos,35.67762,-105.95388
+2014,23,Saturday,C,Unknown or Not Reported,0,1,0,Santa Fe,Santa Fe,Airport Rd,35.6387,-106.02295
+2014,7,Tuesday,C,Daylight,0,1,0,Santa Fe,Santa Fe,4100 S Mdws,35.63699,-106.03557
+2014,8,Wednesday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Columbia St,35.66842,-105.95602
+2014,17,Wednesday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Hospiol Dr,35.66028,-105.94848
+2014,22,Thursday,B,Dark-Lighted,1,0,1,Santa Fe,Santa Fe,St Francis Dr,35.67621,-105.9536
+2014,14,Thursday,C,Daylight,0,1,0,Santa Fe,Santa Fe,5Th St,35.65934,-105.96956
+2014,15,Saturday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Unknown,35.65591,-105.99055
+2014,19,Friday,A,Dusk,0,0,1,Santa Fe,Espanola,Santa Cruz Rd,35.99776,-106.06411
+2014,17,Monday,C,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,Airport Rd,35.63637,-106.03996
+2014,15,Tuesday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Cerrillos Rd,35.63892,-106.01735
+2014,19,Sunday,A,Dark-Lighted,1,1,0,Santa Fe,Santa Fe,Cerillos Rd,35.64958,-106.00102
+2014,12,Monday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Saint Michaels Dr,35.66033,-105.9755
+2014,11,Sunday,A,Daylight,1,1,0,Santa Fe,Santa Fe,St Francis,35.65212,-105.95655
+2014,10,Tuesday,B,Daylight,0,1,0,Santa Fe,Santa Fe,West Alameda,35.68869,-105.95399
+2014,10,Sunday,C,Daylight,0,0,1,Santa Fe,Santa Fe,3251 Cerrillos Rd,35.6508,-105.99905
+2014,16,Thursday,C,Daylight,0,1,0,Santa Fe,Santa Fe,522 West Cordova Rd,35.67357,-105.95187
+2014,7,Monday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Nm 599,35.58796,-106.05362
+2014,11,Thursday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Market St,35.6852,-105.94669
+2014,15,Monday,B,Daylight,0,0,1,Santa Fe,Santa Fe,I 25,35.58695,-106.05744
+2014,15,Saturday,C,Daylight,1,1,0,Santa Fe,Santa Fe,Agua Fria,35.68655,-105.94487
+2014,15,Thursday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Galisteo,35.68569,-105.94146
+2014,18,Sunday,B,Daylight,0,1,0,Rio Arriba,Espanola,1610 N Riverside Dr,36.01572,-106.06447
+2014,18,Friday,B,Dark-Lighted,1,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.65736,-105.98768
+2014,14,Tuesday,C,Daylight,0,1,0,Santa Fe,Santa Fe,4201 Rodeo Rd,35.63881,-106.00832
+2014,17,Wednesday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Illegible,35.68134,-105.95232
+2014,15,Friday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Camino Lejo,35.66425,-105.93679
+2014,19,Friday,C,Dark-Not Lighted,0,1,0,Santa Fe,Santa Fe,Sabino St,35.69524,-105.95075
+2014,11,Wednesday,K,Daylight,0,1,0,Los Alamos,Los Alamos,Main St,35.8826,-106.30052
+2014,18,Friday,B,Daylight,0,1,0,Santa Fe,Santa Fe,St Iviichaels Dr,35.65952,-105.9738
+2014,21,Friday,B,Dark-Lighted,0,0,1,Santa Fe,Santa Fe,Cerrillos Rd,35.63892,-106.01735
+2014,15,Tuesday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Cerrillos Rd,35.66628,-105.97064
+2014,12,Thursday,B,Unknown or Not Reported,0,1,0,Santa Fe,Santa Fe,2Nd St,35.667,-105.9697
+2014,14,Wednesday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Jaguar Dr,35.61974,-106.06046
+2014,22,Sunday,K,Dark-Not Lighted,0,1,0,Santa Fe,Santa Fe,St Francis Dr,35.64218,-105.95639
+2014,13,Friday,A,Daylight,0,0,1,Santa Fe,Santa Fe,Callejon,35.68175,-105.94977
+2014,18,Monday,B,Unknown or Not Reported,1,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.65736,-105.98768
+2014,10,Saturday,C,Unknown or Not Reported,0,1,0,Santa Fe,Santa Fe,Camino De Los Arroyos,35.64008,-106.01061
+2014,11,Sunday,C,Unknown or Not Reported,0,0,1,Santa Fe,Santa Fe,Old Pecos Trl,35.64733,-105.93386
+2014,19,Saturday,C,Unknown or Not Reported,0,0,1,Santa Fe,Santa Fe,Avenida Cristobal Colon,35.67816,-105.96854
+2014,21,Friday,B,Daylight,0,1,0,Santa Fe,Santa Fe,711 St Michaels Dr,35.65938,-105.95998
+2014,7,Tuesday,C,Daylight,0,1,0,Santa Fe,Santa Fe,E Marcy St,35.68853,-105.93521
+2014,9,Tuesday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.65207,-105.997
+2014,18,Tuesday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Alta Vista St,35.67105,-105.95515
+2014,16,Saturday,C,Dark-Lighted,1,1,0,Santa Fe,Santa Fe,Calle Dulcinea,35.63766,-105.96768
+2014,21,Wednesday,A,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.64958,-106.00102
+2014,18,Wednesday,K,Dark-Lighted,1,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.65591,-105.99055
+2014,21,Monday,A,Dark-Lighted,0,1,0,Rio Arriba,Chili,Us 84,36.10635,-106.15099
+2015,9,Saturday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Shelby St,35.68609,-105.93835
+2015,14,Saturday,B,Daylight,0,0,1,Rio Arriba,,Cr142,36.17791,-106.18598
+2015,13,Friday,B,Daylight,0,0,1,Santa Fe,Santa Fe,200 Paseo Real,35.62268,-106.10541
+2015,8,Saturday,B,Daylight,0,0,1,Santa Fe,Eldorado At Santa Fe,Us 285 Sb,35.55489,-105.87871
+2015,19,Sunday,K,Dark-Not Lighted,0,1,0,Santa Fe,Santa Fe,Interstate 25 South,35.59322,-106.05855
+2015,1,Wednesday,A,Dark-Not Lighted,1,1,0,Santa Fe,Cuyamungue,Us 84 / 285 South,35.83643,-105.98607
+2015,14,Friday,C,Daylight,0,1,0,Santa Fe,Santa Fe,4851 Paseo Del Sol,35.62397,-106.04022
+2015,23,Friday,B,Dark-Lighted,1,0,1,Santa Fe,Santa Fe,Guadalupe,35.68826,-105.9434
+2015,15,Monday,C,Daylight,0,1,0,Santa Fe,Santa Fe,3533 Zafarano,35.64069,-106.01173
+2015,13,Saturday,B,Daylight,0,0,1,Santa Fe,Santa Fe,State Road 599,35.67284,-106.01564
+2015,9,Thursday,B,Daylight,0,0,1,Santa Fe,Santa Fe,State Road 599,35.67733,-106.0145
+2015,15,Tuesday,A,Daylight,1,0,1,Santa Fe,,New Mexico 14,35.56158,-106.05368
+2015,13,Monday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Cerrilos Rd,35.64958,-106.00102
+2015,8,Tuesday,B,Daylight,0,1,0,Santa Fe,Santa Fe,3299 Cerrillos Rd,35.64958,-106.00102
+2015,14,Monday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Cerrillos Rd,35.67762,-105.95388
+2015,13,Friday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Cerrillos Rd,35.66309,-105.97633
+2015,12,Thursday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Cerrillos,35.64958,-106.00102
+2015,14,Tuesday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Water Street,35.68691,-105.94132
+2015,9,Friday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Cliff Palace,35.63112,-105.98658
+2015,17,Saturday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Osage Avenue,35.66267,-105.97721
+2015,15,Friday,C,Daylight,0,1,0,Rio Arriba,Espanola,1111 El Llano Rd,36.00724,-106.04068
+2015,0,Saturday,B,Dark-Lighted,0,1,0,Santa Fe,Espanola,N Riverside Dr,35.99776,-106.06411
+2015,9,Friday,B,Daylight,0,0,1,Santa Fe,,Old Las Vegas Hwy,35.57768,-105.89438
+2015,15,Tuesday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Zepol/Spaces (1299 Zepol Road),35.64103,-106.02646
+2015,8,Tuesday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.63509,-106.01976
+2015,15,Sunday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Agua Fria St,35.66324,-105.99736
+2015,13,Monday,B,Daylight,1,1,0,Rio Arriba,Espanola,State Road 68,36.00634,-106.06511
+2015,16,Tuesday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Rufina Street,35.64714,-106.02052
+2015,3,Wednesday,B,Dark-Lighted,0,1,0,Rio Arriba,La Mesilla,State Road 369,35.97427,-106.07008
+2015,20,Friday,B,Dark-Not Lighted,0,1,0,Santa Fe,Nambe Pueblo,State Road 503,35.89748,-105.98789
+2015,17,Monday,C,Daylight,0,0,1,Los Alamos,White Rock,Grand Canyon,35.82066,-106.20599
+2015,17,Tuesday,B,Daylight,0,0,1,Santa Fe,Espanola,606 N Riverside Dr,35.99802,-106.06393
+2015,21,Friday,K,Dark-Lighted,1,1,0,Rio Arriba,Ohkay Owingeh,State Road 68 Milepost 3.5,36.04036,-106.06235
+2015,23,Thursday,K,Dark-Lighted,1,1,0,Santa Fe,Santa Fe,Airport Rd,35.63527,-106.04838
+2015,13,Monday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.66267,-105.97721
+2015,8,Tuesday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.65207,-105.997
+2015,7,Monday,B,Daylight,0,1,0,Santa Fe,Santa Fe,3470 Cerrillos Rd,35.64693,-106.00534
+2015,10,Saturday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Montezuma Ave,35.68496,-105.94563
+2015,14,Saturday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Calle Contento,35.65388,-105.9614
+2015,14,Saturday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Zia Rd,35.64703,-105.95645
+2015,21,Monday,A,Dark-Not Lighted,0,1,0,Santa Fe,Santa Fe,West Alameda,35.68853,-105.94664
+2015,16,Friday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Llano,35.65931,-105.97276
+2015,7,Tuesday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Hospital Dr,35.66028,-105.94848
+2015,8,Monday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.655,-105.99217
+2015,17,Tuesday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Saint Francis Drive,35.68157,-105.95465
+2015,18,Tuesday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Sandoval St,35.68463,-105.94418
+2015,20,Friday,C,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,West Ave,35.68874,-105.95715
+2015,10,Monday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Palace Ave,35.68159,-105.92369
+2015,10,Thursday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Grant Ave,35.68833,-105.94064
+2015,2,Wednesday,B,Dark-Lighted,1,1,0,Santa Fe,Santa Fe,Galisteo St,35.68752,-105.94056
+2015,17,Saturday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Sandovol,35.68789,-105.94183
+2015,16,Sunday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Camino De Los Arroyos,35.63979,-106.01149
+2015,11,Monday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Alamosa Dr,35.64963,-105.98473
+2015,1,Sunday,K,Dark-Not Lighted,1,1,0,Santa Fe,Santa Fe,I 25 South-Bd Fw,35.60564,-106.03495
+2015,20,Saturday,A,Dark-Lighted,1,1,0,Santa Fe,Santa Fe,3000 Cerrillos Rd,35.655,-105.99217
+2015,17,Wednesday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Llano,35.6546,-105.97131
+2015,15,Wednesday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Calle Jenah,35.63648,-106.05659
+2015,15,Tuesday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Paseo De Los Chamisos,35.64709,-105.97543
+2015,8,Thursday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Camino De La Crucitas,35.69067,-105.9541
+2015,10,Saturday,A,Daylight,0,1,0,Santa Fe,Santa Fe,I 25 North Bd Fw,35.62585,-105.98086
+2015,9,Friday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Oancing Ground,35.62544,-106.01266
+2015,19,Sunday,B,Dusk,0,0,1,Santa Fe,Santa Fe,Via Berrenda,35.63459,-105.97081
+2015,15,Monday,A,Daylight,0,0,1,Santa Fe,Santa Fe,Yucca St,35.64561,-105.97381
+2015,16,Monday,C,Daylight,0,1,0,Santa Fe,Santa Fe,St Frances Dr,35.67413,-105.95368
+2015,10,Thursday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Pacheco St,35.65933,-105.95937
+2015,21,Sunday,C,Dark-Lighted,0,0,1,Santa Fe,Santa Fe,1201Cerrillos Road,35.67275,-105.96147
+2015,15,Monday,B,Daylight,0,0,1,Santa Fe,Santa Fe,St Frances Dr,35.67105,-105.95515
+2015,17,Tuesday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Siler Rd,35.65591,-105.99055
+2015,17,Thursday,B,Daylight,0,0,1,Santa Fe,Santa Fe,St Francis Dr Us 84/285,35.6622,-105.95643
+2015,12,Wednesday,B,Daylight,0,1,0,Santa Fe,Santa Fe,St Mlchael S Dr,35.66267,-105.97721
+2015,17,Sunday,C,Daylight,0,1,0,Santa Fe,Santa Fe,2778 Sawmill Drive,35.63911,-105.95863
+2015,22,Saturday,C,Dark-Lighted,0,0,1,Santa Fe,Santa Fe,Guadalupe St,35.68826,-105.9434
+2015,14,Tuesday,C,Daylight,0,1,0,Santa Fe,Santa Fe,3251 Cerrillos Rd,35.6508,-105.99905
+2015,7,Thursday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Alameda Rd,35.68149,-105.97686
+2015,13,Sunday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Guadalupe Ave,35.68178,-105.9485
+2015,13,Thursday,B,Daylight,0,1,0,Santa Fe,Santa Fe,515 Don Gaspar,35.68122,-105.94105
+2015,19,Wednesday,K,Dark-Not Lighted,1,1,0,Santa Fe,Santa Fe,Nm 599,35.63789,-106.07011
+2015,13,Thursday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Placita De Vida,35.65568,-105.95872
+2015,18,Saturday,A,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.64231,-106.01269
+2015,19,Monday,K,Dark-Not Lighted,0,1,0,Santa Fe,Santa Fe,Nterstate 25,35.6086,-106.03
+2015,15,Tuesday,B,Daylight,1,0,1,Santa Fe,Santa Fe,Cerrillos Rd,35.64958,-106.00102
+2016,19,Wednesday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.66794,-105.96835
+2016,17,Friday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.67995,-105.94927
+2016,22,Thursday,K,Dark-Not Lighted,1,1,0,Rio Arriba,,Us Highway 84,36.14949,-106.17455
+2016,19,Tuesday,B,Dusk,0,0,1,Santa Fe,La Cienega,19 Los Pinos,35.58987,-106.06948
+2016,17,Friday,B,Daylight,0,1,0,Rio Arriba,Espanola,1804 N Mccurdy Rd,36.01909,-106.05776
+2016,11,Sunday,A,Daylight,0,1,0,Santa Fe,Santa Fe,Carillos Rd,35.655,-105.99217
+2016,7,Wednesday,C,Daylight,0,1,0,Santa Fe,,Avineda Del Sur,35.59895,-106.00483
+2016,21,Tuesday,B,Dark-Not Lighted,0,1,0,Santa Fe,El Valle De Arroyo Seco,84 / 285 East Frontage Road,35.96728,-106.03547
+2016,13,Friday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Agua Fria,35.65473,-106.02278
+2016,8,Monday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Bishops Lodge Rd.,35.71166,-105.89757
+2016,20,Thursday,B,Dark-Not Lighted,0,0,1,Santa Fe,Santa Fe,Agua Fria St,35.65473,-106.02278
+2016,9,Monday,A,Daylight,0,0,1,Santa Fe,,Caja Del Rio,35.67365,-106.06728
+2016,6,Friday,C,Daylight,0,1,0,Santa Fe,El Valle De Arroyo Seco,Boneyard Rd,35.96855,-106.03825
+2016,19,Friday,B,Dark-Lighted,1,1,0,Santa Fe,El Valle De Arroyo Seco,U.S. 84-285,35.96896,-106.03775
+2016,20,Thursday,B,Dark-Not Lighted,1,0,1,Rio Arriba,Espanola,2615N Mccurdy Rd,36.02611,-106.06004
+2016,19,Sunday,A,Dark-Not Lighted,1,1,0,Rio Arriba,Espanola,Paseo De Onate,35.99639,-106.08402
+2016,16,Thursday,A,Daylight,0,1,0,Santa Fe,Santa Fe,N. Guadalupe,35.68178,-105.9485
+2016,18,Monday,B,Daylight,0,1,0,Rio Arriba,Espanola,Fairview Ln,36.00815,-106.06507
+2016,14,Saturday,B,Daylight,0,1,0,Rio Arriba,Espanola,Paseo De Onate,35.99639,-106.08402
+2016,16,Saturday,B,Daylight,0,1,0,Sandoval,Pena Blanca,Callie Esquela Vieija,35.57461,-106.33959
+2016,8,Friday,B,Daylight,0,0,1,Los Alamos,,Pajarito Rd,35.82622,-106.23197
+2016,7,Sunday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Richards Ave,35.62785,-106.00061
+2016,11,Thursday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Rodeo Rd,35.63891,-106.01734
+2016,12,Thursday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Cerrillos Rd,35.64958,-106.00102
+2016,10,Thursday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Cerrillos Rd,35.66034,-105.98173
+2016,6,Tuesday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Paseo De Peralta,35.69227,-105.94734
+2016,23,Tuesday,C,Dark-Lighted,0,0,1,Santa Fe,Santa Fe,Cerrillos Rd,35.65591,-105.99055
+2016,13,Thursday,C,Daylight,0,1,0,Santa Fe,Santa Fe,West San Francisco,35.68699,-105.93812
+2016,18,Monday,B,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,Richard St,35.65404,-106.00092
+2016,21,Tuesday,B,Dark-Not Lighted,0,0,1,Santa Fe,Santa Fe,Cerrillos Rd,35.65591,-105.99055
+2016,14,Saturday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Don Diego Ave,35.67331,-105.94847
+2016,7,Thursday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Cordova Ave Ne,35.67448,-105.95597
+2016,22,Monday,C,Dark-Lighted,1,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.65736,-105.98768
+2016,19,Thursday,B,Dark-Lighted,0,0,1,Santa Fe,Santa Fe,St Michaels Dr,35.65952,-105.9738
+2016,14,Friday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Paseo De Peralta,35.68156,-105.93806
+2016,18,Sunday,C,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.667,-105.9697
+2016,22,Monday,A,Dark-Not Lighted,0,1,0,Santa Fe,Santa Fe,I 25 South-Bd Fw,35.60718,-106.03308
+2016,17,Tuesday,B,Dusk,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.63029,-106.02274
+2016,16,Tuesday,A,Daylight,0,0,1,Santa Fe,Santa Fe,Camino Cruz Blanca,35.66986,-105.90387
+2016,17,Thursday,C,Dark-Lighted,0,0,1,Santa Fe,Santa Fe,Cordova Rd,35.67397,-105.95274
+2016,23,Friday,C,Dark-Lighted,0,0,1,Santa Fe,Santa Fe,Cerrillos Rd,35.68017,-105.94846
+2016,12,Tuesday,B,Daylight,0,0,1,Santa Fe,Santa Fe,1600 Saint Michaels Drive,35.66033,-105.9755
+2016,8,Wednesday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Airport Rd,35.63605,-106.04248
+2016,19,Tuesday,B,Dark-Not Lighted,1,1,0,Rio Arriba,Espanola,Paseo De Onate,35.99717,-106.08445
+2016,15,Monday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.64231,-106.01269
+2016,10,Wednesday,B,Daylight,0,0,1,Santa Fe,Santa Fe,5Th St,35.66514,-105.97238
+2016,20,Friday,A,Dusk,0,0,1,Santa Fe,Santa Fe,Third Street,35.66298,-105.96671
+2016,17,Wednesday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Guadalupe Ave,35.68028,-105.94807
+2016,15,Saturday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Buckman Rd,35.70174,-105.96983
+2016,17,Tuesday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Paseo De Peralta,35.68156,-105.93908
+2016,8,Tuesday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Cerrillos Rd,35.63891,-106.01734
+2016,16,Wednesday,C,Daylight,0,1,0,Santa Fe,Santa Fe,San Mateo Rd,35.66132,-105.96332
+2016,22,Friday,C,Dark-Lighted,0,0,1,Santa Fe,Santa Fe,Cerrillos Rd,35.65336,-105.99489
+2016,17,Thursday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Rodeo Rd,35.63887,-105.98619
+2016,13,Friday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Nusbaum St,35.68798,-105.93538
+2016,12,Monday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Cerrillos Rd,35.64958,-106.00102
+2016,8,Wednesday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Rodeo Rd,35.63881,-106.00832
+2016,10,Wednesday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Cerrillos Rd,35.64831,-106.00311
+2016,16,Friday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Alamo Dr,35.69635,-105.95482
+2016,11,Friday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Airport Rd,35.63699,-106.03557
+2016,21,Tuesday,B,Dark-Lighted,1,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.64958,-106.00102
+2016,15,Thursday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Agua Fria,35.66821,-105.98845
+2016,7,Monday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Calle Po' Ae Pi,35.64188,-106.03083
+2016,10,Thursday,B,Daylight,0,1,0,Santa Fe,Santa Fe,St Michaels Dr,35.65939,-105.96723
+2016,7,Tuesday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Siringo Rd,35.65213,-105.97034
+2016,16,Wednesday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Cerrillos Rd,35.66628,-105.97064
+2016,10,Wednesday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Paseo De Peralta,35.68971,-105.93452
+2016,19,Thursday,K,Dark-Lighted,1,1,0,Santa Fe,Santa Fe,N. Guadalupe,35.68178,-105.9485
+2016,16,Sunday,B,Daylight,1,1,0,Santa Fe,Santa Fe,St Frances Dr,35.67413,-105.95368
+2016,13,Tuesday,C,Unknown or Not Reported,0,0,1,Santa Fe,Santa Fe,Don Gaspar Ave,35.68052,-105.94122
+2016,12,Friday,C,Daylight,0,1,0,Santa Fe,Santa Fe,St Francis Dr  Us 84/285,35.69645,-105.95372
+2016,14,Tuesday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Sawmill Rd,35.63859,-105.95858
+2016,21,Wednesday,K,Dark-Not Lighted,1,1,0,Rio Arriba,San Jose,Us 84/285 Milepost 193,36.04492,-106.10628
+2017,11,Tuesday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Saint Michaels Drive,35.65933,-105.95937
+2017,3,Saturday,A,Dark-Lighted,1,1,0,Rio Arriba,Espanola,Fairview Ln,36.00803,-106.05903
+2017,6,Wednesday,A,Daylight,1,1,0,Santa Fe,Tesuque Pueblo,Us 84/285 Frontage Road,35.80029,-105.9598
+2017,17,Thursday,B,Daylight,0,0,1,Santa Fe,Santa Fe,West Frontage Rd,35.66793,-106.0218
+2017,17,Wednesday,B,Dark-Not Lighted,1,0,1,Rio Arriba,Espanola,Riverside Dr,36.00522,-106.06466
+2017,15,Monday,C,Daylight,0,1,0,Rio Arriba,Espanola,Vietnam Veterans Rd,35.99639,-106.08402
+2017,8,Wednesday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Agua Fria Street,35.66007,-106.00521
+2017,19,Saturday,A,Daylight,0,1,0,Santa Fe,El Valle De Arroyo Seco,Unknown,35.96001,-106.03877
+2017,23,Friday,K,Dark-Lighted,1,1,0,Santa Fe,Santa Fe,Cerrillos Road,35.65736,-105.98768
+2017,15,Monday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Rancho Viejo Blvd,35.59889,-106.03922
+2017,15,Tuesday,C,Daylight,0,0,1,Santa Fe,Espanola,N Riverside Dr,36.00022,-106.06296
+2017,15,Friday,B,Daylight,0,0,1,Rio Arriba,Espanola,129 N Riverside Dr,35.99183,-106.06813
+2017,1,Monday,B,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,Galisteo St,35.66569,-105.94753
+2017,17,Monday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Siringo Rd,35.65211,-105.95845
+2017,2,Sunday,C,Dark-Lighted,0,0,1,Santa Fe,Santa Fe,2900 Cerrillos Road,35.65547,-105.99138
+2017,20,Tuesday,B,Dark-Not Lighted,0,1,0,Santa Fe,Santa Fe,Saint Francis Drive,35.65212,-105.95655
+2017,20,Tuesday,C,Dark-Lighted,1,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.67223,-105.96221
+2017,9,Monday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Grant Ave,35.69215,-105.9396
+2017,15,Saturday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Cerrillos Rd,35.67223,-105.96221
+2017,18,Wednesday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Rodeo Rd,35.63852,-106.0117
+2017,11,Monday,B,Daylight,0,0,1,Santa Fe,Santa Fe,St Michaels Dr,35.65939,-105.96723
+2017,20,Sunday,K,Dark-Lighted,1,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.64438,-106.0093
+2017,19,Wednesday,C,Dusk,0,0,1,Santa Fe,Santa Fe,Agua Fria,35.67816,-105.96854
+2017,21,Friday,K,Dark-Lighted,1,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.65591,-105.99055
+2017,22,Friday,B,Dark-Not Lighted,0,1,0,Santa Fe,Santa Fe,Siringo Rd,35.65216,-105.97382
+2017,6,Tuesday,B,Dark-Lighted,0,0,1,Santa Fe,Santa Fe,Guadalupe,35.69668,-105.95155
+2017,18,Sunday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Cerrillos Rd,35.64322,-106.01121
+2017,15,Monday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Paseo De Peralta,35.69215,-105.94273
+2017,12,Thursday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Cordova Rd,35.6753,-105.95132
+2017,11,Friday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Palace Ave,35.68706,-105.93566
+2017,10,Wednesday,C,Daylight,0,0,1,Santa Fe,Santa Fe,St Francis Dr  Us 84/285,35.67413,-105.95368
+2017,14,Thursday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Airport,35.63629,-106.0407
+2017,14,Monday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Osage Ave,35.66729,-105.97905
+2017,16,Monday,C,Daylight,0,0,1,Santa Fe,Santa Fe,111 Washington Ave,35.68791,-105.93759
+2017,19,Tuesday,A,Dark-Lighted,1,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.65591,-105.99055
+2017,22,Wednesday,B,Dark-Lighted,0,0,1,Santa Fe,Santa Fe,Siringo Rd,35.65143,-105.99079
+2017,8,Thursday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Camino Alire,35.68321,-105.96547
+2017,12,Sunday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Canyon Rd,35.68072,-105.9255
+2017,13,Friday,C,Daylight,1,0,1,Santa Fe,Santa Fe,St Michaels Dr,35.65948,-105.9636
+2017,15,Monday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Llano St,35.65329,-105.97072
+2017,7,Thursday,C,Dark-Lighted,0,0,1,Santa Fe,Santa Fe,Rufina St,35.64616,-106.02321
+2017,0,Wednesday,C,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,Guadalupe St,35.68178,-105.9485
+2017,21,Friday,A,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.6576,-105.98719
+2017,12,Thursday,B,Daylight,1,1,0,Santa Fe,Santa Fe,Cerrillos Rd.,35.65591,-105.99055
+2017,12,Tuesday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Cerrillos Rd,35.655,-105.99217
+2017,15,Tuesday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Vereda De Valencia,35.63814,-106.02718
+2017,9,Wednesday,C,Daylight,0,0,1,Santa Fe,Santa Fe,St Frances Dr,35.67413,-105.95368
+2017,10,Thursday,C,Daylight,0,1,0,Santa Fe,Santa Fe,1670 Upper Canyon Road,35.68592,-105.89575
+2017,12,Friday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Airport Rd,35.63729,-106.03343
+2017,22,Thursday,C,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,Airport Rd,35.63918,-106.01932
+2017,5,Friday,C,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.65591,-105.99055
+2017,6,Tuesday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Camino Sierra Vista,35.67943,-105.95839
+2017,18,Friday,K,Daylight,0,1,0,Santa Fe,Santa Fe,Paseo De Peralta,35.69215,-105.94273
+2017,6,Saturday,B,Dark-Not Lighted,0,0,1,Santa Fe,Santa Fe,West Frontage Road,35.61002,-106.03561
+2017,8,Thursday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Airport Rd,35.63637,-106.03997
+2017,10,Friday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Richard Ave,35.65404,-106.00092
+2017,12,Friday,B,Daylight,0,0,1,Santa Fe,Santa Fe,St Francis Dr  Us 84/285,35.67919,-105.95419
+2017,21,Thursday,A,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,St Frances Dr,35.68157,-105.95465
+2017,18,Wednesday,B,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,Airport Rd,35.6336,-106.06075
+2017,20,Friday,C,Dark-Lighted,1,1,0,Santa Fe,Santa Fe,Airport Rd,35.63789,-106.02907
+2017,19,Tuesday,B,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.65951,-105.98333
+2017,18,Wednesday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Siringo Rd,35.65143,-105.99079
+2017,17,Sunday,B,Dark-Lighted,0,0,1,Santa Fe,Santa Fe,Osage Ave,35.66545,-105.97817
+2017,20,Wednesday,B,Dark-Lighted,0,0,1,Santa Fe,Santa Fe,Zafarano Drive,35.64231,-106.01269
+2017,17,Wednesday,A,Dark-Not Lighted,0,1,0,Santa Fe,Santa Fe,Calle Mejia,35.69649,-105.95416
+2017,20,Friday,B,Dark-Lighted,1,1,0,Santa Fe,Santa Fe,Don Diego Ave,35.67867,-105.948
+2017,0,Sunday,C,Dark-Lighted,1,1,0,Santa Fe,Santa Fe,Zafarano Drive,35.64231,-106.01269
+2017,15,Wednesday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Cerrillos Rd,35.63509,-106.01976
+2017,17,Thursday,B,Daylight,0,0,1,Santa Fe,Santa Fe,St Michaels Dr,35.65948,-105.9636
+2017,13,Friday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Zafarano Drive,35.64231,-106.01269
+2017,16,Thursday,C,Daylight,0,0,1,Santa Fe,Santa Fe,St Michaels Dr,35.66033,-105.9755
+2017,7,Friday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Mercer St,35.67919,-105.95419
+2017,12,Friday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Pacheco St,35.65568,-105.95859
+2017,15,Thursday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Paseo De Peralta,35.68158,-105.94613
+2017,17,Monday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Guadalupe St,35.68178,-105.9485
+2017,13,Saturday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Calle Del Cielo,35.65336,-105.99489
+2017,16,Tuesday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.65336,-105.99489
+2017,16,Friday,A,Daylight,0,0,1,Santa Fe,Santa Fe,W. Alameda,35.669,-106.00088
+2017,13,Wednesday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.67918,-105.95096
+2017,16,Wednesday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Jemez Rd,35.64321,-106.0361
+2017,10,Friday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Siringo Rd,35.64862,-105.97757
+2017,8,Friday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Baca St,35.67289,-105.96247
+2017,2,Saturday,K,Dark-Not Lighted,1,1,0,Santa Fe,Cuyamungue,Us Ramp,35.84885,-105.99478
+2017,15,Sunday,B,Daylight,0,0,1,Los Alamos,Los Alamos,Diamond Dr,35.90007,-106.31599
+2017,16,Thursday,B,Daylight,0,0,1,Los Alamos,Los Alamos,Nm 502,35.88128,-106.30606
+2017,15,Friday,B,Daylight,0,0,1,Los Alamos,Los Alamos,Barranca Rd,35.902,-106.27939
+2017,8,Tuesday,C,Daylight,0,1,0,Los Alamos,Los Alamos,Diamond Dr,35.88788,-106.31858
+2017,17,Friday,B,Dusk,0,0,1,Los Alamos,Los Alamos,Trinity Dr,35.88299,-106.31875
+2017,14,Friday,B,Daylight,0,0,1,Los Alamos,White Rock,Rover Blvd,35.81993,-106.20575
+2017,11,Saturday,B,Daylight,0,0,1,Los Alamos,White Rock,Piedra Loop,35.81642,-106.21946
+2017,14,Friday,B,Daylight,0,0,1,Los Alamos,Los Alamos,Diamond Dr,35.90014,-106.30242
+2018,18,Tuesday,B,Dark-Not Lighted,0,1,0,Santa Fe,Santa Fe,Highwy 14,35.59604,-106.04714
+2019,18,Thursday,K,Dark-Not Lighted,1,1,0,Rio Arriba,Ohkay Owingeh,State Road 68,36.04238,-106.06195
+2018,21,Friday,K,Dark-Not Lighted,1,1,0,Rio Arriba,Hernandez,Us Hwy 84/285,36.05146,-106.11374
+2018,18,Wednesday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Agua Fria St.,35.65959,-106.00814
+2018,12,Friday,A,Daylight,0,0,1,Santa Fe,Santa Fe,Hyde Park Road,35.72589,-105.89126
+2018,21,Wednesday,K,Dark-Not Lighted,1,1,0,Rio Arriba,La Villita,State Rd 68,36.09627,-106.0444
+2018,7,Friday,B,Daylight,0,1,0,Santa Fe,Nambe Pueblo,Nm 503,35.89844,-105.97909
+2018,21,Monday,A,Dark-Not Lighted,1,1,0,Rio Arriba,Espanola,1702 N Riverside Dr,36.01682,-106.06439
+2019,18,Friday,K,Dark-Not Lighted,0,1,0,Rio Arriba,Espanola,Fairview Ln,36.0054,-106.08022
+2020,20,Sunday,K,Dark-Not Lighted,1,1,0,Rio Arriba,Espanola,N. Riverside Drive,36.01678,-106.06442
+2019,20,Monday,C,Dark-Lighted,1,1,0,Rio Arriba,Espanola,N Riverside Dr,35.99652,-106.06513
+2020,19,Tuesday,B,Dark-Lighted,1,1,0,Rio Arriba,Espanola,N. Riverside Drive,36.00207,-106.06317
+2020,1,Wednesday,C,Dark-Not Lighted,0,0,1,Rio Arriba,Espanola,North Paseo De Onate,36.00814,-106.08783
+2021,18,Monday,B,Dark-Lighted,0,1,0,Rio Arriba,Espanola,North Riverside Drive,36.00207,-106.06317
+2021,19,Saturday,A,Dark-Lighted,1,1,0,Santa Fe,Espanola,N Riverside Drive,36.00023,-106.06296
+2019,12,Friday,C,Daylight,0,0,1,Santa Fe,Rio En Medio,Nm 592,35.82624,-105.90541
+2019,12,Friday,B,Daylight,0,1,0,Santa Fe,La Cienega,Paseo Real,35.5756,-106.11254
+2020,14,Saturday,B,Daylight,0,0,1,Santa Fe,,Richards,35.58907,-105.99778
+2019,4,Sunday,A,Dark-Not Lighted,0,1,0,Santa Fe,El Valle De Arroyo Seco,Us 84 - 285,35.96094,-106.02735
+2019,20,Tuesday,B,Dark-Lighted,0,1,0,Santa Fe,,84-285 Frontage Road,35.85592,-105.99752
+2019,19,Saturday,B,Dark-Lighted,1,0,1,Santa Fe,Cuyamungue,Us 84/285,35.84871,-105.99472
+2018,16,Friday,B,Daylight,0,1,0,Santa Fe,,Caja Del Rio,35.68932,-106.07159
+2018,19,Friday,A,Dark-Not Lighted,0,1,0,Santa Fe,,Nm State Road 14,35.56323,-106.05368
+2018,17,Tuesday,A,Daylight,1,1,0,Santa Fe,San Ildefonso Pueblo,24 Cities Of Gold Rd - Kokomans,35.88681,-106.10743
+2022,22,Wednesday,B,Dark-Not Lighted,1,1,0,Rio Arriba,Alcalde,Cr 40,36.08626,-106.05742
+2018,14,Sunday,C,Daylight,0,0,1,Santa Fe,Espanola,State Road 76,35.98783,-106.04175
+2019,14,Tuesday,B,Daylight,0,1,0,Rio Arriba,Espanola,Fairview Ln,36.00815,-106.06507
+2019,14,Sunday,B,Daylight,0,1,0,Santa Fe,Espanola,Riverside Dr Sw,36.00023,-106.06296
+2020,19,Sunday,C,Daylight,0,1,0,Santa Fe,Jaconita,County Road 84,35.88696,-106.07098
+2020,19,Saturday,A,Dusk,0,1,0,Santa Fe,La Cienega,32B Camino Colores,35.59151,-106.08286
+2020,9,Saturday,B,Daylight,0,0,1,Santa Fe,San Ildefonso Pueblo,State Road 30,35.90517,-106.13124
+2020,14,Sunday,K,Daylight,0,1,0,Santa Fe,Santa Fe,Tesuque Village Road,35.7602,-105.93323
+2021,18,Friday,B,Dark-Not Lighted,1,1,0,Santa Fe,Agua Fria,West Alameda St.,35.66901,-106.00886
+2021,16,Wednesday,B,Daylight,0,0,1,Santa Fe,,Interstate 25 East Frontage Road,35.58557,-106.06898
+2021,9,Saturday,A,Daylight,0,0,1,Santa Fe,El Valle De Arroyo Seco,Highway 84/285 E Frontage Road,35.94858,-106.02052
+2021,1,Thursday,A,Dark-Not Lighted,0,1,0,Santa Fe,,Us 84/285,35.87273,-106.00593
+2022,13,Sunday,C,Daylight,0,1,0,Santa Fe,Pojoaque,W Gutierrez Street,35.88244,-106.01096
+2021,11,Sunday,B,Daylight,0,0,1,Rio Arriba,Espanola,819 N Riverside Drive,36.00226,-106.06324
+2021,18,Sunday,A,Dark-Not Lighted,0,1,0,Rio Arriba,Espanola,1505 Paseo De Onate,36.01265,-106.08893
+2021,17,Tuesday,A,Daylight,0,1,0,Santa Fe,Espanola,Canada Court,36.00011,-106.03944
+2021,9,Monday,K,Daylight,0,1,0,Rio Arriba,Espanola,El Llano,36.00365,-106.04069
+2022,7,Sunday,A,Daylight,0,1,0,Santa Fe,Espanola,N Riverside Drive,35.99775,-106.06411
+2022,19,Tuesday,A,Dark-Not Lighted,0,1,0,Santa Fe,Espanola,State Road 76,35.99047,-106.05108
+2022,20,Sunday,A,Dark-Lighted,0,1,0,Rio Arriba,Espanola,N Riverside Dr,36.01678,-106.06443
+2022,13,Friday,C,Daylight,0,1,0,Rio Arriba,Espanola,North Riverside Drive,36.01584,-106.06446
+2022,21,Thursday,A,Dark-Not Lighted,0,1,0,Santa Fe,Agua Fria,Agua Fria Rd,35.66082,-106.00285
+2019,0,Wednesday,K,Dark-Lighted,1,1,0,Rio Arriba,Espanola,209 N Riverside Dr.,35.99297,-106.06804
+2020,8,Monday,K,Daylight,1,1,0,Santa Fe,,I-25,35.58377,-106.07172
+2018,16,Sunday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Nm 599,35.59109,-106.06276
+2018,14,Monday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Off Road,35.64914,-106.00175
+2018,22,Monday,B,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.67496,-105.95812
+2018,21,Monday,B,Dark-Lighted,0,0,1,Santa Fe,Santa Fe,Cerrillos Rd,35.67223,-105.96221
+2019,1,Friday,B,Dark-Lighted,1,0,1,Santa Fe,Santa Fe,Cerrillos Rd,35.67349,-105.96037
+2018,21,Sunday,C,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,St Francis Drive,35.67621,-105.9536
+2018,17,Friday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Cerrillos Rd,35.68022,-105.94843
+2018,18,Saturday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Walnut St,35.64767,-106.04468
+2018,17,Sunday,A,Daylight,1,1,0,Santa Fe,Santa Fe,St Frances Dr,35.65837,-105.95744
+2018,20,Wednesday,B,Dark-Not Lighted,1,1,0,Santa Fe,Santa Fe,Guadalupe St,35.68029,-105.94846
+2018,7,Tuesday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Siringo Rd,35.65216,-105.97382
+2019,16,Thursday,B,Daylight,0,0,1,Santa Fe,Santa Fe,St. Michaels Drive,35.65948,-105.9636
+2020,22,Sunday,A,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,Lincoln Ave,35.68785,-105.93884
+2019,18,Friday,C,Dark-Not Lighted,0,1,0,Santa Fe,Santa Fe,3900 Paseo Del Sol,35.63585,-106.04403
+2018,19,Friday,A,Daylight,0,1,0,Santa Fe,Santa Fe,Yucatan St,35.63256,-106.00574
+2018,20,Sunday,B,Dark-Lighted,1,1,0,Santa Fe,Santa Fe,Old Pecos Trail,35.65127,-105.93627
+2019,7,Wednesday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Cordova Rd,35.67225,-105.949
+2018,19,Wednesday,C,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,Monterey Dr,35.67185,-105.96277
+2018,18,Tuesday,C,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,Old Pecos Trail,35.65452,-105.9387
+2018,16,Thursday,C,Daylight,0,0,1,Santa Fe,Santa Fe,St Francis Dr  Us 84/285,35.66555,-105.95621
+2019,11,Saturday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Cerrillos Rd,35.68158,-105.94611
+2018,20,Saturday,K,Dark-Lighted,1,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.64438,-106.0093
+2018,21,Sunday,B,Dark-Lighted,0,0,1,Santa Fe,Santa Fe,Palace Ave,35.68684,-105.93477
+2018,18,Thursday,K,Dark-Lighted,1,0,1,Santa Fe,Santa Fe,Cerrillos Rd,35.65951,-105.98333
+2019,7,Saturday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Richards Ave,35.64958,-106.00102
+2018,14,Monday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Alta Vista St,35.66903,-105.94625
+2018,17,Wednesday,B,Dark-Lighted,0,0,1,Santa Fe,Santa Fe,Don Diego Ave,35.67332,-105.94847
+2018,17,Thursday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Airport Rd,35.63918,-106.01932
+2018,15,Wednesday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Galisteo St,35.68111,-105.94316
+2018,17,Monday,C,Daylight,1,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.65591,-105.99055
+2018,17,Sunday,K,Daylight,0,1,0,Santa Fe,Santa Fe,Paseo De Peralta,35.68178,-105.9485
+2018,19,Thursday,B,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,Cordova Dr,35.67413,-105.95368
+2018,17,Saturday,K,Daylight,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.65807,-105.98622
+2018,20,Wednesday,B,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.63509,-106.01976
+2018,18,Friday,B,Daylight,0,1,0,Santa Fe,Santa Fe,St Michaels Dr,35.65948,-105.96168
+2019,12,Friday,B,Daylight,0,1,0,Santa Fe,Santa Fe,St Michaels Dr,35.66138,-105.97646
+2018,13,Wednesday,B,Daylight,0,1,0,Rio Arriba,San Jose,Us Hwy 84/285,36.02741,-106.09276
+2018,15,Tuesday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Llano St,35.66294,-105.97622
+2020,17,Saturday,B,Daylight,0,0,1,Rio Arriba,Espanola,Paso De Dios,35.98585,-106.06284
+2018,17,Thursday,B,Daylight,0,0,1,Los Alamos,Los Alamos,Central Ave,35.88127,-106.2936
+2018,17,Thursday,B,Daylight,0,1,0,Los Alamos,Los Alamos,Nm 502,35.88171,-106.28628
+2018,16,Wednesday,B,Daylight,0,0,1,Los Alamos,Los Alamos,Nm 501,35.88299,-106.31875
+2021,20,Tuesday,C,Dark-Lighted,0,0,1,Los Alamos,Los Alamos,Trinity Dr,35.88297,-106.31871
+2021,13,Wednesday,A,Daylight,0,0,1,Los Alamos,Los Alamos,35Th St,35.90006,-106.31598
+2021,11,Friday,B,Daylight,0,1,0,Los Alamos,Los Alamos,East Dr,35.88131,-106.28132
+2021,18,Monday,K,Daylight,0,1,0,Los Alamos,Los Alamos,Piedra Loop,35.81638,-106.22209
+2019,7,Thursday,B,Daylight,0,0,1,Los Alamos,Los Alamos,Nm 501,35.8873,-106.31831
+2020,7,Friday,C,Daylight,0,0,1,Los Alamos,Los Alamos,Nm 502,35.87729,-106.26274
+2019,17,Tuesday,B,Daylight,0,0,1,Los Alamos,Los Alamos,Sandia Dr,35.88787,-106.31858
+2019,16,Sunday,K,Daylight,0,1,0,Los Alamos,White Rock,Ridgecrest Ave,35.8211,-106.1931
+2020,7,Friday,C,Daylight,0,0,1,Los Alamos,,Nmsr4,35.83421,-106.36091
+2019,18,Wednesday,C,Dusk,0,0,1,Los Alamos,Los Alamos,Central Ave,35.88143,-106.30176
+2021,7,Tuesday,B,Daylight,0,0,1,Los Alamos,Los Alamos,Canyon Rd,35.88324,-106.30748
+2022,17,Tuesday,B,Daylight,0,0,1,Los Alamos,Los Alamos,El Rayo,35.90361,-106.29049
+2022,11,Wednesday,B,Daylight,0,0,1,Los Alamos,Los Alamos,Trinity Dr,35.88273,-106.31104
+2022,13,Tuesday,B,Daylight,0,0,1,Los Alamos,Los Alamos,Trinity Dr,35.88288,-106.31499
+2021,11,Monday,B,Daylight,0,0,1,Los Alamos,,Westbound State Hwy 4,35.8182,-106.30837
+2022,17,Wednesday,C,Daylight,0,0,1,Los Alamos,Los Alamos,Trinity Dr,35.88191,-106.30775
+2022,7,Tuesday,C,Daylight,0,1,0,Los Alamos,Los Alamos,Arkansas Ave,35.89931,-106.31881
+2022,10,Monday,A,Daylight,0,0,1,Los Alamos,,Nm Highway 4,35.82369,-106.31589
+2022,17,Thursday,B,Daylight,0,0,1,Los Alamos,Los Alamos,Trinity Dr,35.88235,-106.32368
+2019,14,Friday,A,Daylight,0,1,0,Rio Arriba,,Nm 96,36.23441,-106.49253
+2020,8,Wednesday,A,Daylight,0,0,1,Rio Arriba,Chimayo,Nm 76,36.00338,-105.94031
+2020,7,Monday,C,Daylight,0,1,0,Rio Arriba,Chimayo,Nm Highway 76,36.00385,-105.96753
+2022,7,Wednesday,A,Daylight,1,1,0,Rio Arriba,Chili,Us Highway 84,36.08702,-106.13266
+2018,16,Monday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Rufina Cr,35.64263,-106.03811
+2019,19,Wednesday,B,Daylight,1,0,1,Santa Fe,Santa Fe,1600 Saint Michael'S Driv,35.66033,-105.9755
+2019,17,Thursday,A,Dusk,0,0,1,Santa Fe,Santa Fe,Hickox St,35.68085,-105.96015
+2020,18,Monday,B,Dark-Not Lighted,1,1,0,Santa Fe,Santa Fe,Hickox St,35.68149,-105.95666
+2018,9,Monday,C,Dawn,0,1,0,Santa Fe,Santa Fe,Don Gaspar Ave,35.68446,-105.94037
+2019,17,Monday,B,Dusk,0,0,1,Santa Fe,Santa Fe,4265 Entrada Sonata,35.62917,-106.00379
+2019,18,Thursday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Paseo De Peralta,35.6844,-105.93399
+2019,10,Saturday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Airport Rd,35.63699,-106.03557
+2018,13,Wednesday,K,Daylight,0,1,0,Santa Fe,Santa Fe,St Michaels Dr,35.65952,-105.9738
+2018,2,Thursday,B,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,Cerrillos Road,35.64438,-106.0093
+2018,14,Tuesday,C,Daylight,0,1,0,Santa Fe,Santa Fe,301 Griffin St.,35.69121,-105.94182
+2018,12,Tuesday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Airport Rd,35.63918,-106.01932
+2018,13,Wednesday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Alameda St,35.67501,-105.98599
+2019,18,Friday,A,Dark-Not Lighted,0,1,0,Santa Fe,Santa Fe,Paseo De Peralta,35.68111,-105.94316
+2019,13,Sunday,C,Daylight,0,1,0,Santa Fe,Santa Fe,E Alameda St,35.68441,-105.93393
+2019,21,Thursday,B,Dark-Not Lighted,0,0,1,Santa Fe,Santa Fe,Us 84,35.67418,-105.95367
+2018,12,Saturday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Richards Ave,35.64787,-105.99899
+2019,14,Sunday,B,Daylight,0,1,0,Santa Fe,Santa Fe,2800 Cerrillos Road,35.65748,-105.98744
+2019,18,Monday,B,Daylight,1,0,1,Santa Fe,Santa Fe,753 Cerrillos Rd,35.67937,-105.95059
+2019,18,Sunday,C,Dark-Lighted,1,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.65761,-105.98719
+2018,9,Saturday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Paseo Real,35.63173,-106.07415
+2019,8,Tuesday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.667,-105.9697
+2019,14,Friday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Richard Ave,35.63883,-106.00053
+2018,16,Saturday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Saint Michaels Drive,35.66142,-105.97655
+2018,16,Sunday,B,Dusk,0,1,0,Santa Fe,Santa Fe,Galisteo St,35.64702,-105.95809
+2018,17,Thursday,B,Dusk,0,1,0,Santa Fe,Santa Fe,Siler Rd,35.65591,-105.99055
+2018,10,Monday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Alameda,35.6844,-105.93399
+2018,6,Monday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.65807,-105.98622
+2018,18,Wednesday,C,Dusk,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.65807,-105.98622
+2018,16,Sunday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Camino De Las Crucitas,35.69601,-105.95977
+2018,11,Saturday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.64438,-106.0093
+2019,20,Tuesday,C,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,Airport Rd,35.6387,-106.02295
+2019,23,Saturday,C,Dark-Lighted,1,1,0,Santa Fe,Santa Fe,San Francisco Ave,35.68752,-105.94056
+2018,19,Tuesday,C,Dark-Lighted,1,1,0,Santa Fe,Santa Fe,Saint Francis Drive,35.68961,-105.95399
+2018,14,Thursday,B,Daylight,0,0,1,Santa Fe,Santa Fe,4851 Paseo Del Sol,35.62397,-106.04022
+2018,14,Wednesday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Cerrillos Rd,35.64958,-106.00102
+2018,15,Monday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Airport Rd,35.63605,-106.04248
+2018,19,Saturday,K,Dark-Lighted,1,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.65337,-105.99489
+2019,15,Friday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Grant Ave,35.69109,-105.93987
+2018,15,Monday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Rodeo Rd,35.63884,-105.99116
+2018,12,Tuesday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Cerrillos Rd,35.67937,-105.95059
+2018,12,Tuesday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Hyde Park Rd  Nm 475,35.70991,-105.89907
+2018,16,Thursday,A,Dusk,0,1,0,Santa Fe,Santa Fe,Old Pecos Trail,35.65452,-105.9387
+2019,14,Wednesday,A,Daylight,0,0,1,Santa Fe,Santa Fe,Cerrillos Rd,35.63029,-106.02272
+2020,16,Sunday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Palace Avenue,35.68662,-105.93377
+2019,14,Saturday,B,Daylight,1,1,0,Santa Fe,Santa Fe,West Cordova,35.67413,-105.95368
+2020,20,Saturday,B,Dusk,0,0,1,Santa Fe,Santa Fe,San Felipe,35.63476,-106.05203
+2019,6,Wednesday,B,Dark-Not Lighted,1,1,0,Santa Fe,Santa Fe,Hickox St,35.68085,-105.96015
+2019,20,Saturday,B,Dark-Not Lighted,0,1,0,Santa Fe,Santa Fe,Old Pecos Trail,35.66389,-105.93692
+2019,22,Wednesday,B,Dark-Not Lighted,0,0,1,Santa Fe,Santa Fe,Siringo Rd,35.64636,-105.99832
+2019,15,Thursday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Cordova Ave Ne,35.6725,-105.94992
+2019,15,Monday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Cerrillos Rd,35.66514,-105.97238
+2019,16,Friday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Guadalupe Ave,35.68826,-105.9434
+2019,18,Tuesday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Camino De Las Crucitas,35.69448,-105.95793
+2020,18,Thursday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Contenta Ridge,35.62393,-106.06357
+2019,10,Monday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.65704,-105.98831
+2019,19,Monday,B,Daylight,0,0,1,Santa Fe,,Agua Fria,35.64698,-106.04033
+2019,12,Tuesday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Hickox St,35.68149,-105.95666
+2019,14,Thursday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Cordova Rd,35.67225,-105.949
+2019,9,Monday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Mimbres Dr,35.63881,-106.00832
+2019,12,Tuesday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.66535,-105.97201
+2019,11,Wednesday,B,Daylight,0,1,0,Santa Fe,Santa Fe,St Francis Dr  Us 84/285,35.67621,-105.9536
+2019,16,Friday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Saint Michaels Drive,35.66267,-105.97721
+2019,14,Wednesday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Zafarano Dr,35.64231,-106.01269
+2019,21,Wednesday,K,Dark-Lighted,1,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.64958,-106.00102
+2019,15,Wednesday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Camino Corrales,35.67143,-105.9301
+2019,12,Thursday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Cerrillos Road,35.64958,-106.00102
+2019,16,Wednesday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Siringo Rd,35.65216,-105.97382
+2019,16,Wednesday,B,Daylight,0,0,1,Santa Fe,Santa Fe,1474 Rodeo Road,35.63872,-105.96242
+2020,7,Friday,B,Daylight,0,1,0,Santa Fe,Santa Fe,West Alameda Street,35.68651,-105.96432
+2019,18,Saturday,C,Dark-Not Lighted,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.64438,-106.0093
+2019,17,Tuesday,C,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,Cathedral Pl,35.68458,-105.93569
+2019,13,Tuesday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Rodeo Rd,35.63884,-105.99023
+2019,17,Monday,B,Daylight,0,1,0,Santa Fe,Santa Fe,St Michaels Dr,35.66267,-105.97721
+2019,13,Friday,C,Daylight,0,0,1,Santa Fe,Santa Fe,St Francis Dr  Us 84/285,35.67105,-105.95515
+2019,17,Tuesday,C,Dusk,0,1,0,Santa Fe,Santa Fe,E. Alameda,35.68486,-105.93764
+2020,17,Friday,B,Dusk,0,1,0,Santa Fe,Santa Fe,St Michaels Dr,35.65933,-105.95937
+2020,21,Tuesday,B,Dark-Lighted,1,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.64438,-106.0093
+2020,13,Saturday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Lincoln Ave,35.68785,-105.93884
+2020,13,Friday,B,Daylight,1,1,0,Santa Fe,Santa Fe,Harrison Rd,35.65761,-105.98719
+2019,16,Monday,B,Dusk,0,1,0,Santa Fe,Santa Fe,3281 Cerrillos Road,35.65004,-106.00028
+2020,18,Wednesday,C,Dark-Not Lighted,0,0,1,Santa Fe,Santa Fe,Calle Atajo,35.6387,-106.02295
+2021,19,Tuesday,B,Daylight,0,0,1,Santa Fe,Santa Fe,St Francis Dr  Us 84/285,35.68869,-105.95399
+2021,7,Thursday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Dail Circle,35.64542,-106.03237
+2021,11,Saturday,B,Daylight,0,1,0,Santa Fe,Santa Fe,St Francis Dr  Us 84/285,35.66842,-105.95602
+2022,9,Saturday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Mann St,35.66063,-105.97011
+2020,15,Thursday,B,Daylight,0,1,0,Santa Fe,Santa Fe,St Michaels Dr,35.65933,-105.95937
+2020,12,Tuesday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Cerrillos Rd,35.64958,-106.00102
+2020,9,Monday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Camino Carlos Rey,35.65547,-105.98488
+2020,13,Tuesday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Richard Ave,35.64958,-106.00102
+2020,6,Sunday,C,Dawn,0,0,1,Santa Fe,Santa Fe,Pacheco St,35.65933,-105.95937
+2021,18,Sunday,C,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.64438,-106.0093
+2021,19,Thursday,C,Dusk,0,0,1,Santa Fe,Santa Fe,Agua Fria St  Nm 588,35.67976,-105.96579
+2020,17,Sunday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.65875,-105.98492
+2020,17,Sunday,C,Daylight,0,1,0,Santa Fe,Santa Fe,East Alameda Street,35.6844,-105.93399
+2020,19,Friday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Old Santa Fe Tr,35.68156,-105.93806
+2022,10,Thursday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Lincoln Ave,35.68942,-105.93816
+2021,8,Saturday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Cielo Ct,35.65416,-105.99362
+2022,6,Wednesday,C,Dark-Lighted,0,0,1,Santa Fe,Santa Fe,Cerrillos Rd,35.65591,-105.99055
+2020,18,Wednesday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Cerrillos Rd,35.64231,-106.01269
+2022,13,Saturday,A,Daylight,0,1,0,Santa Fe,Santa Fe,Paseo De Peralta,35.6844,-105.93399
+2020,8,Friday,K,Daylight,0,0,1,Santa Fe,Santa Fe,Yucca St,35.64398,-105.97385
+2022,16,Monday,C,Daylight,0,0,1,Santa Fe,Santa Fe,1820 Cerrillos Road,35.6651,-105.97246
+2021,17,Tuesday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Via Caballero Del Sur,35.63362,-105.97455
+2020,7,Monday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Paseo Real,35.63115,-106.07818
+2021,16,Wednesday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Airport Rd,35.63799,-106.02831
+2021,16,Monday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Paseo De Peralta,35.6844,-105.93399
+2021,17,Saturday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Vegas Verdes Dr,35.64438,-106.0093
+2020,17,Saturday,B,Daylight,0,0,1,Santa Fe,,Airport Rd,35.63647,-106.03928
+2022,20,Thursday,B,Dark-Not Lighted,0,0,1,Santa Fe,Santa Fe,Saint Francis,35.68869,-105.95399
+2022,20,Sunday,B,Dusk,0,0,1,Santa Fe,Santa Fe,Siringo Rd,35.65213,-105.97034
+2020,21,Friday,B,Dark-Not Lighted,0,0,1,Santa Fe,Santa Fe,Rodeo Rd,35.63852,-106.0117
+2021,13,Saturday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Webber St,35.68156,-105.93908
+2020,21,Thursday,B,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,Camino Consuelo,35.65207,-105.997
+2020,18,Thursday,C,Dark-Not Lighted,0,1,0,Santa Fe,Santa Fe,1117 Maez Road,35.66776,-105.98826
+2021,19,Tuesday,B,Dusk,0,1,0,Santa Fe,Santa Fe,Camino Cabestro,35.63965,-105.97121
+2020,20,Thursday,B,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,3011 Cerrillos Road,35.65416,-105.99362
+2020,21,Friday,B,Dark-Not Lighted,0,1,0,Santa Fe,Santa Fe,7462 Riverside Loop,35.6364,-106.06276
+2021,19,Sunday,C,Dusk,0,1,0,Santa Fe,Santa Fe,Zepol Rd,35.63838,-106.02537
+2021,11,Monday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Camino Alire,35.68037,-105.96281
+2020,16,Friday,C,Daylight,0,1,0,Santa Fe,,Nm 599 Frontage Road,35.68156,-106.00919
+2020,9,Thursday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.64438,-106.0093
+2020,16,Saturday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.65337,-105.99489
+2022,2,Sunday,K,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.64231,-106.01269
+2020,13,Friday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Hickox St,35.68157,-105.95465
+2020,11,Wednesday,B,Daylight,0,0,1,Santa Fe,Santa Fe,West Zia,35.64703,-105.95645
+2019,11,Sunday,B,Daylight,0,0,1,Rio Arriba,,State Road 75,36.20658,-105.84955
+2020,18,Tuesday,K,Dark-Not Lighted,0,1,0,Santa Fe,Santa Fe,State Road 14,35.59884,-106.03933
+2020,21,Friday,K,Dark-Not Lighted,0,1,0,Santa Fe,,Nm 14,35.56313,-106.05368
+2021,17,Wednesday,B,Daylight,0,1,0,Rio Arriba,Hernandez,Us Hwy 84,36.05177,-106.11399
+2021,20,Tuesday,A,Dusk,0,1,0,Rio Arriba,,County Road 141,36.18019,-106.21029
+2021,21,Monday,K,Dark-Not Lighted,0,1,0,Santa Fe,Santa Fe,Nm Highway 14,35.5759,-106.05359
+2022,15,Wednesday,K,Unknown or Not Reported,1,1,0,Santa Fe,Santa Fe Foothills,Interstate 25,35.63135,-105.92479
+2021,21,Monday,A,Dark-Not Lighted,1,1,0,Santa Fe,Santa Fe,Saint Michaels Dr,35.65943,-105.9654
+2021,22,Wednesday,B,Dark-Lighted,1,1,0,Santa Fe,Santa Fe,Nm Highway 14,35.6546,-105.9929
+2022,21,Monday,C,Dark-Lighted,1,1,0,Santa Fe,Santa Fe,St Francis,35.67633,-105.95362
+2022,19,Thursday,B,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.65533,-105.99164
+2022,21,Wednesday,A,Dark-Not Lighted,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.65655,-105.98928
+2022,23,Saturday,B,Dark-Not Lighted,0,1,0,Santa Fe,Santa Fe,Saint Michaels Drive,35.65676,-105.9441
+2022,21,Monday,B,Dark-Not Lighted,1,1,0,Santa Fe,Santa Fe,Richard Ave,35.64787,-105.99899
+2022,23,Monday,A,Dark-Not Lighted,0,1,0,Santa Fe,Santa Fe,I-25 North-Bd Fw,35.61359,-106.01925
+2021,20,Monday,B,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.64438,-106.0093
+2021,22,Monday,B,Dark-Not Lighted,0,1,0,Santa Fe,Santa Fe,Calle Po Ae Pi,35.63983,-106.02993
+2021,14,Wednesday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Rufina St,35.65404,-106.00091
+2020,21,Tuesday,A,Dark-Lighted,1,1,0,Santa Fe,Santa Fe,Pacheco St,35.65933,-105.95937
+2022,20,Saturday,B,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.63892,-106.01735
+2020,21,Saturday,A,Dark-Lighted,0,0,1,Santa Fe,Santa Fe,Airport Rd,35.63892,-106.01735
+2021,16,Monday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Zafarano Dr,35.64231,-106.01269
+2022,23,Thursday,B,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.64438,-106.0093
+2022,18,Thursday,A,Daylight,0,1,0,Santa Fe,Santa Fe,St. Francis Dr,35.64703,-105.95645
+2020,18,Tuesday,B,Daylight,1,1,0,Santa Fe,Santa Fe,St Francis Dr  Us 84/285,35.67413,-105.95368
+2020,11,Thursday,B,Daylight,0,1,0,Santa Fe,Santa Fe,St Michaels Dr,35.66267,-105.97721
+2020,10,Monday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Camino De Las Crucitas,35.69466,-105.95798
+2021,11,Monday,C,Daylight,0,0,1,Santa Fe,Santa Fe,St Michaels Dr,35.65931,-105.97276
+2021,21,Saturday,B,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,Water St,35.68606,-105.93797
+2020,9,Thursday,B,Daylight,0,1,0,Santa Fe,Santa Fe,1116 East Alameda,35.68047,-105.9189
+2021,23,Tuesday,B,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,Saint Michaels Drive,35.65948,-105.9636
+2021,18,Friday,A,Daylight,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.64231,-106.01269
+2021,4,Saturday,A,Dark-Unknown Lighting,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.65591,-105.99055
+2021,20,Tuesday,A,Dark-Not Lighted,0,1,0,Santa Fe,Santa Fe,Rufina St,35.65404,-106.00091
+2020,13,Saturday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Cristos Rd,35.63029,-106.02272
+2022,13,Tuesday,A,Daylight,0,0,1,Santa Fe,Santa Fe,Osage Ave,35.67197,-105.98132
+2021,21,Sunday,C,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,Zepol Rd,35.63838,-106.02537
+2021,14,Thursday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.65807,-105.98622
+2021,17,Thursday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Primo Colores,35.64643,-106.03918
+2021,15,Tuesday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Columbia St,35.66836,-105.95178
+2021,10,Friday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Canyon Rd,35.6804,-105.92488
+2021,8,Saturday,A,Daylight,0,0,1,Santa Fe,Santa Fe,St Michaels Dr,35.65934,-105.96956
+2021,12,Friday,K,Daylight,0,1,0,Santa Fe,Santa Fe,Saint Michaels Drive,35.65867,-105.95178
+2021,20,Wednesday,B,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,3153 Cerrillos Rd,35.65229,-105.99664
+2022,16,Wednesday,B,Daylight,1,1,0,Santa Fe,Santa Fe,Saint Francis Dr,35.65212,-105.95655
+2021,21,Friday,A,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,St Francis Dr  Us 84/285,35.67621,-105.9536
+2021,7,Wednesday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Cordova Rd,35.67496,-105.95812
+2021,16,Tuesday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Camino Carlos Rey,35.65208,-105.98488
+2021,13,Tuesday,B,Daylight,0,1,0,Santa Fe,Santa Fe,4042 Cerrillos Rd,35.64089,-106.01503
+2021,14,Wednesday,B,Daylight,0,1,0,Santa Fe,Santa Fe,La Madera Rd,35.68542,-105.9615
+2021,15,Wednesday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Rodeo Rd,35.63878,-105.96404
+2021,17,Sunday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Paseo De Peralta,35.6844,-105.93399
+2021,13,Friday,C,Daylight,0,0,1,Santa Fe,Santa Fe,St Frances Dr,35.66842,-105.95602
+2022,19,Monday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Cerrillos Rd Sw,35.65337,-105.99489
+2021,13,Friday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Camino Entrada,35.63511,-106.02467
+2022,17,Tuesday,C,Dark-Not Lighted,0,0,1,Santa Fe,Santa Fe,Jaguar  Rd,35.6178,-106.06766
+2021,15,Tuesday,K,Daylight,0,0,1,Santa Fe,Santa Fe,Vuelta De Las Acequias,35.64845,-106.02323
+2021,9,Friday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Galisteo St,35.68215,-105.94286
+2021,8,Wednesday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Harrison Rd,35.65761,-105.98719
+2022,15,Friday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.66267,-105.97721
+2021,13,Wednesday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Rodeo Rd,35.6388,-106.00607
+2021,16,Monday,A,Daylight,0,1,0,Santa Fe,Santa Fe,Richards Ave,35.62432,-106.00058
+2021,11,Thursday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Apache Ave,35.66332,-105.9799
+2022,8,Monday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Ocate Rd,35.62241,-106.02769
+2022,5,Tuesday,A,Dark-Not Lighted,0,1,0,Santa Fe,Santa Fe,Rufina St,35.65507,-105.99784
+2022,19,Thursday,C,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.65112,-105.99853
+2021,11,Wednesday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Jorgensen,35.65736,-105.98768
+2021,22,Saturday,K,Dark-Lighted,1,1,0,Santa Fe,Santa Fe,St Francis Dr  Us 84/285,35.67413,-105.95368
+2021,9,Wednesday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Camino Carlos Rey,35.63843,-105.98271
+2021,9,Friday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Siringo Rd,35.65208,-105.98488
+2021,16,Wednesday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Camino Alire,35.68321,-105.96547
+2022,2,Monday,K,Dark-Not Lighted,1,1,0,Santa Fe,Santa Fe,I-25 South-Bd Fw,35.62516,-105.98463
+2021,20,Tuesday,C,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.65337,-105.99489
+2022,8,Monday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Richard Ave,35.64958,-106.00102
+2022,20,Saturday,B,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,Paseo De Peralta,35.69147,-105.95043
+2022,18,Wednesday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Gonzales Rd,35.68635,-105.91621
+2022,19,Thursday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.66267,-105.97721
+2021,13,Tuesday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Siler Rd,35.66222,-105.99636
+2021,11,Thursday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Osage Ave,35.66383,-105.97762
+2021,17,Wednesday,C,Dark-Lighted,1,1,0,Santa Fe,Santa Fe,Agua Fria,35.68244,-105.9606
+2022,11,Tuesday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.64231,-106.01269
+2022,18,Monday,K,Dusk,0,1,0,Santa Fe,Santa Fe,St. Michaels Drive,35.65931,-105.97276
+2022,15,Saturday,B,Daylight,1,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.65875,-105.98492
+2022,13,Saturday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Botulph Rd,35.652,-105.94817
+2022,16,Saturday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Paseo De Peralta,35.68158,-105.94611
+2022,12,Friday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Las Solaras,35.6204,-106.02891
+2021,10,Friday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Cordova Rd,35.67413,-105.95368
+2022,12,Wednesday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.64081,-106.0153
+2022,8,Tuesday,A,Daylight,0,0,1,Santa Fe,Santa Fe,Agua Fria,35.67296,-105.97872
+2022,12,Wednesday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.66267,-105.97721
+2022,15,Friday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Don Gaspar Ave,35.68513,-105.94016
+2022,8,Saturday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Paseo De Peralta,35.68175,-105.94977
+2022,12,Thursday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Cerrillos Rd,35.63509,-106.01976
+2022,12,Wednesday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Saint Michaels,35.65952,-105.9738
+2022,17,Tuesday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Rufina St,35.64711,-106.0205
+2022,17,Friday,A,Daylight,0,1,0,Santa Fe,Santa Fe,Rodeo Rd,35.63884,-105.99023
+2022,9,Thursday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Llano St,35.65952,-105.9738
+2022,17,Tuesday,B,Daylight,0,1,0,Santa Fe,Santa Fe,St Francis Dr  Us 84/285,35.67413,-105.95368
+2022,14,Wednesday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Vegas Verdes Dr,35.6414,-106.00836
+2022,20,Tuesday,A,Dark-Not Lighted,1,1,0,Santa Fe,Santa Fe,Mutt Nelson Rd,35.60978,-106.04227
+2022,21,Tuesday,C,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,Camino Carlos Rey,35.65547,-105.98488
+2022,11,Wednesday,C,Daylight,0,0,1,Santa Fe,Santa Fe,West Zia Rd,35.646,-105.96442
+2022,16,Tuesday,B,Daylight,0,1,0,Santa Fe,Santa Fe,St Francis Dr  Us 84/285,35.68869,-105.95399
+2022,11,Wednesday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.61723,-106.03086
+2022,10,Thursday,C,Daylight,1,0,1,Santa Fe,Santa Fe,Richards Ave,35.62785,-106.00061
+2022,15,Thursday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Paseo De Peralta,35.6844,-105.93399
+2022,19,Friday,K,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.65438,-105.99327
+2022,16,Monday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Mutt Nelson,35.60982,-106.04707
+2022,12,Wednesday,C,Daylight,0,0,1,Santa Fe,Santa Fe,West San Francisco,35.68789,-105.94183
+2022,17,Monday,C,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,Saint Michaels Dr.,35.65413,-105.9566
+2022,18,Tuesday,C,Daylight,0,1,0,Santa Fe,Santa Fe,East Marcy,35.68913,-105.93704
+2022,16,Thursday,C,Daylight,0,0,1,Santa Fe,Santa Fe,St Michaels Dr,35.66138,-105.97646
+2022,21,Wednesday,C,Dark-Lighted,1,1,0,Santa Fe,Santa Fe,Saint Michaels Dr,35.6594,-105.96688
+2022,19,Saturday,K,Dark-Not Lighted,1,1,0,Santa Fe,,Interstate 25,35.55074,-106.12235
+2023,20,Thursday,A,Dark-Not Lighted,1,1,0,Rio Arriba,Espanola,1616 N. Riverside Dr.,36.01582,-106.06446
+2023,2,Sunday,A,Dark-Lighted,1,1,0,Santa Fe,Santa Fe,W Frontage Rd,35.5994,-106.0487
+2023,12,Tuesday,B,Daylight,0,1,0,Santa Fe,Agua Fria,Henry Lynch Road,35.66082,-106.00285
+2023,18,Wednesday,B,Daylight,0,0,1,Los Alamos,Los Alamos,San Ildefonso Rd,35.89144,-106.28484
+2023,10,Sunday,B,Daylight,0,0,1,Los Alamos,Los Alamos,Sioux St.,35.88952,-106.26982
+2023,17,Tuesday,B,Daylight,0,0,1,Los Alamos,Los Alamos,Trinity Dr,35.87984,-106.29987
+2023,19,Monday,B,Daylight,0,0,1,Los Alamos,Los Alamos,Villa St,35.89651,-106.31818
+2023,20,Monday,K,Dark-Not Lighted,1,1,0,Rio Arriba,La Villita,State Road 68,36.0991,-106.04117
+2023,14,Wednesday,A,Daylight,0,1,0,Rio Arriba,Hernandez,Us Highway 84,36.05139,-106.11369
+2023,20,Saturday,K,Dark-Not Lighted,0,1,0,Rio Arriba,Chili,Us Highway 84,36.10811,-106.15256
+2023,6,Friday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Camino Carlos Rey,35.65807,-105.98622
+2023,19,Friday,B,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,Guadalupe St,35.68728,-105.94398
+2023,17,Monday,B,Daylight,0,1,0,Santa Fe,Santa Fe,W Alameda St,35.68513,-105.94016
+2023,19,Monday,B,Dark-Not Lighted,0,1,0,Santa Fe,Santa Fe,Agua Fria,35.63609,-106.05932
+2023,21,Thursday,B,Dark-Lighted,0,0,1,Santa Fe,Santa Fe,Cerrillos Rd,35.65646,-105.98944
+2023,7,Friday,C,Dawn,0,1,0,Santa Fe,Santa Fe,Siler Rd,35.65591,-105.99055
+2023,18,Sunday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Camino Carlos Rey(Trail),35.66148,-105.98723
+2023,22,Saturday,B,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.65591,-105.99055
+2023,21,Sunday,B,Dark-Lighted,0,0,1,Santa Fe,Santa Fe,Cerrillos Rd,35.68085,-105.94696
+2023,6,Saturday,B,Dark-Not Lighted,0,1,0,Santa Fe,Santa Fe,Washington Avenue,35.69104,-105.93636
+2023,19,Friday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Chili Line Rd,35.68284,-105.94825
+2023,20,Monday,A,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.64958,-106.00102
+2023,12,Tuesday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.64231,-106.01269
+2023,16,Sunday,B,Daylight,0,0,1,Santa Fe,Santa Fe,San Jose Ave,35.66535,-105.97201
+2023,14,Sunday,A,Daylight,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.66074,-105.98092
+2023,21,Thursday,K,Daylight,1,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.65646,-105.98944
+2023,21,Monday,K,Dark-Not Lighted,0,1,0,Santa Fe,Santa Fe,Us 84/285,35.71763,-105.93534
+2023,16,Thursday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Airport Rd,35.63851,-106.02442
+2023,7,Friday,B,Daylight,0,1,0,Santa Fe,Santa Fe,1714 Agua Fria Street,35.67405,-105.97614
+2023,19,Thursday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Agua Frie Street,35.68662,-105.94619
+2023,13,Friday,C,Daylight,0,0,1,Santa Fe,Santa Fe,Cerrillos Rd,35.64438,-106.0093
+2023,15,Sunday,C,Daylight,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.64958,-106.00102
+2023,11,Saturday,B,Daylight,0,1,0,Santa Fe,Santa Fe,3542 Zafarano Dr,35.64013,-106.01158
+2023,17,Friday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Hickox St,35.68153,-105.95567
+2023,21,Tuesday,B,Dark-Lighted,0,0,1,Santa Fe,Santa Fe,Cerrillos Rd,35.65207,-105.997
+2023,18,Saturday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Airport,35.63605,-106.04248
+2023,6,Tuesday,A,Daylight,0,0,1,Santa Fe,Santa Fe,Old Pecos Trail,35.64048,-105.92962
+2023,15,Friday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Camino De Cruz Blanca,35.66972,-105.91433
+2023,15,Friday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Camino Don Miguel,35.67708,-105.9224
+2023,15,Thursday,A,Daylight,0,1,0,Santa Fe,Santa Fe,West Alameda St,35.68869,-105.95399
+2023,3,Wednesday,K,Dark-Not Lighted,0,1,0,Santa Fe,Santa Fe,St Francis Dr  Us 84/285,35.64218,-105.95639
+2023,15,Monday,B,Daylight,0,1,0,Santa Fe,Santa Fe,W Palace Ave,35.68785,-105.93884
+2023,16,Saturday,B,Daylight,0,0,1,Santa Fe,Santa Fe,San Mateo Rd,35.66425,-105.93679
+2023,16,Tuesday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Yucca St,35.65216,-105.97382
+2023,16,Wednesday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Guadalupe St,35.68178,-105.9485
+2023,17,Tuesday,B,Daylight,0,0,1,Santa Fe,Santa Fe,St Francis Dr  Us 84/285,35.68869,-105.95399
+2023,19,Tuesday,B,Dusk,0,1,0,Santa Fe,Santa Fe,Airport Rd,35.63838,-106.02537
+2023,17,Wednesday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Declovina St,35.66034,-105.98173
+2023,20,Thursday,K,Dark-Unknown Lighting,0,1,0,Santa Fe,Santa Fe,Nm Highway 14,35.58799,-106.0535
+2023,16,Saturday,B,Other,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.66074,-105.98092
+2023,15,Monday,B,Daylight,0,0,1,Santa Fe,Santa Fe,Camino Carlos Ray,35.66148,-105.98723
+2023,19,Monday,C,Dark-Lighted,0,1,0,Santa Fe,Santa Fe,W San Francisco St,35.68826,-105.9434
+2023,9,Monday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.66156,-105.97932
+2023,22,Tuesday,B,Dark-Not Lighted,0,1,0,Santa Fe,Santa Fe,W San Mateo Rd,35.66313,-105.95241
+2023,8,Friday,B,Daylight,0,1,0,Santa Fe,Santa Fe,South Meadows Rd,35.64604,-106.03959
+2023,18,Thursday,B,Dark-Not Lighted,1,0,1,Santa Fe,Santa Fe,Espinacitas St,35.66255,-105.96758
+2023,19,Sunday,C,Dark-Lighted,1,1,0,Santa Fe,Santa Fe,S Saint Francis Dr,35.67762,-105.95388
+2023,9,Wednesday,B,Daylight,0,1,0,Santa Fe,Santa Fe,Cerrillos Rd,35.655,-105.99217

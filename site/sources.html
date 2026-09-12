@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Santa Fe &amp; Northern NM Traffic Safety — data sources</title>
+<style>
+  :root {
+    --bg: #0e1116; --panel: #141a22; --border: #2b3340;
+    --text: #e7ecf3; --muted: #93a1b4; --accent: #6ea8fe; --foot: #f0a35e;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg); color: var(--text); padding: 0 0 70px;
+    font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
+  a { color: var(--accent); }
+  a:hover { color: #9cc4ff; }
+
+  header { padding: 22px 0 4px; }
+  h1 { font-size: 21px; margin: 0 0 4px; letter-spacing: .2px; }
+  .sub { color: var(--muted); font-size: 13px; max-width: 700px; }
+
+  .views { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0;
+           margin: 16px 0 24px; border: 1px solid var(--border);
+           border-radius: 8px; overflow: hidden; max-width: 620px; }
+  .views a {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 9px 6px; min-height: 40px; font-size: 12px; line-height: 1.15;
+    font-weight: 600; text-align: center; text-decoration: none;
+    color: var(--muted); background: var(--panel); transition: all .12s;
+  }
+  .views a:hover { background: #1b232e; color: var(--text); }
+  .views a.here { background: var(--accent); color: #0b1017; cursor: default; }
+  .views a.wide { grid-column: 1 / -1; border-top: 1px solid var(--border); }
+  .views a svg { width: 15px; height: 15px; flex: none; }
+
+  .byline {
+    display: flex; flex-wrap: wrap; gap: 16px; align-items: center;
+    justify-content: space-between; margin: 4px 0 10px; padding: 16px 18px;
+    background: linear-gradient(135deg, #16202b, #141a22);
+    border: 1px solid #2f4055; border-radius: 10px;
+  }
+  .bylabel { font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase;
+             color: var(--muted); }
+  .byname { font-size: 17px; font-weight: 600; margin: 1px 0 3px; }
+  .bynote { font-size: 12.5px; color: var(--muted); max-width: 420px; }
+  .bylinks { display: flex; flex-wrap: wrap; gap: 8px; }
+  .bybtn {
+    display: inline-flex; align-items: center; gap: 7px; padding: 9px 14px;
+    border-radius: 8px; font-size: 12.5px; font-weight: 600; text-decoration: none;
+    border: 1px solid var(--border); background: #111820; color: var(--text);
+    transition: all .12s;
+  }
+  .bybtn:hover { border-color: var(--accent); color: var(--text); }
+  .bybtn.primary { background: var(--accent); border-color: var(--accent); color: #0b1017; }
+  .bybtn.primary:hover { background: #85b6ff; color: #0b1017; }
+  .bybtn svg { width: 16px; height: 16px; fill: currentColor; flex: none; }
+
+  h2 { font-size: 15px; margin: 30px 0 4px; }
+  h2 .tag { font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase;
+            color: var(--muted); font-weight: 500; margin-left: 8px; }
+  .lede { color: var(--muted); font-size: 13px; margin: 0 0 14px; max-width: 760px; }
+
+  .src { background: var(--panel); border: 1px solid var(--border);
+         border-radius: 10px; padding: 14px 16px; margin-bottom: 12px; }
+  .src h3 { font-size: 13.5px; margin: 0 0 4px; }
+  .src p { margin: 0 0 9px; color: var(--muted); font-size: 12.5px; max-width: 760px; }
+  .src p b { color: var(--text); font-weight: 600; }
+  .meta { display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 5px; padding: 4px 9px;
+    border: 1px solid var(--border); border-radius: 999px; font-size: 11.5px;
+    color: var(--muted); text-decoration: none; background: #111820;
+  }
+  a.pill:hover { border-color: var(--accent); color: var(--text); }
+  .pill.plain { cursor: default; }
+  .pill.file { border-color: #2f4055; color: #9fc6ff; }
+  .pill b { color: var(--text); font-weight: 600; }
+
+  .warn { background: #1d1712; border: 1px solid #4a3a20; border-radius: 10px;
+          padding: 13px 16px; margin: 22px 0 6px; font-size: 12.5px; color: #e8d3ad; }
+  .warn b { color: #ffd88a; }
+  .foot { color: var(--muted); font-size: 12px; margin-top: 34px;
+          border-top: 1px solid var(--border); padding-top: 16px; max-width: 760px; }
+  code { background: #0b1017; border: 1px solid var(--border); border-radius: 4px;
+         padding: 1px 5px; font-size: 12px; color: #cfe0f5; }
+  @media (max-width: 700px) { .views { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<script>window.OTOWI_STATIC = true;</script>
+<div class="wrap">
+  <header>
+    <h1>Where the data comes from</h1>
+    <p class="sub">Every number on this site is computed from one of the sources
+      below. Nothing is hand-entered, and nothing is copied from a report — each
+      one is fetched by a named module in the repository, so a figure can be
+      traced from the page to the code to the file it came out of.</p>
+
+    <div class="views">
+      <a id="v-drive" href="index.html"></a>
+      <a id="v-walk" href="walk.html"></a>
+      <a id="v-hours" href="hours.html"></a>
+      <a class="here wide" aria-current="page">Data sources</a>
+    </div>
+  </header>
+
+  <div class="byline">
+    <div>
+      <div class="bylabel">Built by</div>
+      <div class="byname">Nathaniel Knapp</div>
+      <div class="bynote">Traffic simulation, data pipelines and a handful of
+        other things in the open.</div>
+    </div>
+    <div class="bylinks">
+      <a class="bybtn primary" href="https://github.com/deknapp" target="_blank" rel="noopener">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+        All my projects &middot; github.com/deknapp
+      </a>
+      <a class="bybtn" href="https://github.com/deknapp/otowi" target="_blank" rel="noopener">
+        This project's source
+      </a>
+    </div>
+  </div>
+
+  <h2>What this site publishes <span class="tag">processed, small, checkable</span></h2>
+  <p class="lede">Every original below needs either a 35 MB national download, a
+    PDF read off its bar charts, or a bounding-box query before anybody can see
+    the study area in it. These are the same data after that step — small enough
+    to open in a spreadsheet, and the fastest way to check a number on this site
+    without running the pipeline.</p>
+
+  <div class="src">
+    <h3>Tables</h3>
+    <div class="meta">
+      <a class="pill file" href="data/vru-crashes.csv" download>vru-crashes.csv <b>758 rows</b></a>
+      <a class="pill file" href="data/high-injury-network.csv" download>high-injury-network.csv <b>89</b></a>
+      <a class="pill file" href="data/tru-crashes-by-hour.csv" download>tru-crashes-by-hour.csv <b>2,592</b></a>
+      <a class="pill file" href="data/tru-crashes-by-severity.csv" download>tru-crashes-by-severity.csv <b>90</b></a>
+    </div>
+  </div>
+
+  <div class="src">
+    <h3>What the pages load</h3>
+    <p>The same files the maps read, unmodified.</p>
+    <div class="meta">
+      <a class="pill file" href="data/risk.json">risk.json</a>
+      <a class="pill file" href="data/walk.json">walk.json</a>
+      <a class="pill file" href="data/walknet.json">walknet.json</a>
+      <a class="pill file" href="data/map.geojson">map.geojson</a>
+      <a class="pill file" href="data/plans.json">plans.json</a>
+      <a class="pill file" href="data/summary.json">summary.json</a>
+    </div>
+  </div>
+
+  <h2>Crashes</h2>
+  <p class="lede">Three separate crash files, because no one of them answers the
+    question on its own. FARS has a coordinate on every death and nothing below
+    a death. The state's file has everything and, in published form, no
+    coordinates. The vulnerable-road-user assessment has both, for pedestrians
+    and cyclists only.</p>
+
+  <div class="src">
+    <h3>NHTSA Fatality Analysis Reporting System (FARS)</h3>
+    <p>A census — not a sample — of every crash on a US public road that killed
+      somebody within thirty days. Used for <b>where</b> people are killed and
+      the per-corridor death rate. <b>147 crashes, 161 deaths</b> inside the
+      study area, 2018–2023.</p>
+    <div class="meta">
+      <a class="pill" href="https://www.nhtsa.gov/research-data/fatality-analysis-reporting-system-fars" target="_blank" rel="noopener">NHTSA FARS</a>
+      <a class="pill" href="https://static.nhtsa.gov/nhtsa/downloads/FARS/2022/National/FARS2022NationalCSV.zip">the annual archive</a>
+      <span class="pill plain">federal · public domain</span>
+      <a class="pill" href="https://github.com/deknapp/otowi/blob/main/otowi/fatalities.py" target="_blank" rel="noopener">otowi/fatalities.py</a>
+    </div>
+  </div>
+
+  <div class="src">
+    <h3>NMDOT crash file, via UNM's Traffic Research Unit</h3>
+    <p>Every Uniform Crash Report the state holds — any incident on a public road
+      with a death, an injury, or $500 of damage — published back as a report per
+      county and per town under NMDOT contract. Used for the hourly curves that
+      need <b>no exposure denominator</b>: drink as a share of each hour's
+      crashes, the injury share, and the all-severity hourly shape.
+      <b>59,849 crashes, 2007–2021</b> across the three counties. The numbers are
+      read off the bar charts in the PDFs and checked against each report's own
+      Table 1 — 72 checks, all exact.</p>
+    <div class="meta">
+      <a class="pill" href="https://gps.unm.edu/tru/reports/" target="_blank" rel="noopener">UNM TRU reports</a>
+      <a class="pill" href="https://gps.unm.edu/tru/reports/community-reports/2021/counties/county_santafe-2021.pdf" target="_blank" rel="noopener">Santa Fe County 2021 (PDF)</a>
+      <span class="pill plain">years published: 2016, 2019–2021</span>
+      <a class="pill" href="https://github.com/deknapp/otowi/blob/main/otowi/tru.py" target="_blank" rel="noopener">otowi/tru.py</a>
+    </div>
+  </div>
+
+  <div class="src">
+    <h3>NMDOT Vulnerable Road User Safety Assessment</h3>
+    <p>Federally mandated under the infrastructure act, and New Mexico published
+      the underlying records as an open map service rather than only a PDF. Every
+      pedestrian and pedalcycle crash from 2013 with a latitude, an hour, a KABCO
+      severity and the lighting condition — <b>758 inside the study area</b>,
+      against FARS's 40 deaths, and unlike those it includes the people who were
+      hit and lived. The companion layer is the state's own <b>High Injury
+      Network</b>: 89 corridor segments here, each with a crash severity index.</p>
+    <div class="meta">
+      <a class="pill" href="https://services.arcgis.com/hOpd7wfnKm16p9D9/arcgis/rest/services/VRU_crashes/FeatureServer/0" target="_blank" rel="noopener">VRU_crashes layer</a>
+      <a class="pill" href="https://services.arcgis.com/hOpd7wfnKm16p9D9/arcgis/rest/services/High_Injury_Network_Corridor_Segments/FeatureServer/1" target="_blank" rel="noopener">High Injury Network layer</a>
+      <a class="pill" href="https://experience.arcgis.com/experience/629675caab04433aa6835221137cc8aa" target="_blank" rel="noopener">NMDOT's own map</a>
+      <a class="pill" href="https://github.com/deknapp/otowi/blob/main/otowi/vru.py" target="_blank" rel="noopener">otowi/vru.py</a>
+    </div>
+  </div>
+
+  <h2>What is built on the street</h2>
+  <div class="src">
+    <h3>NMDOT roadway asset inventory</h3>
+    <p>Sidewalks, bike lanes and marked crossings on state routes, with a shape,
+      a type and a condition on each. Used to measure how far a crash was from
+      the nearest marked crossing, and to draw the gaps. <b>2,827 sidewalk runs,
+      796 bike lane runs, 7,964 crossings</b> inside the study area.
+      <b>State highways only</b> — the arterials that carry the
+      killed-and-seriously-hurt are covered and a residential street is not in
+      it at all, which is why every figure computed from it reports how much of
+      its own evidence sits on a surveyed road.</p>
+    <div class="meta">
+      <a class="pill" href="https://services.arcgis.com/hOpd7wfnKm16p9D9/arcgis/rest/services/Sidewalk/FeatureServer/0" target="_blank" rel="noopener">Sidewalk</a>
+      <a class="pill" href="https://services.arcgis.com/hOpd7wfnKm16p9D9/arcgis/rest/services/Bike_Lane/FeatureServer/0" target="_blank" rel="noopener">Bike_Lane</a>
+      <a class="pill" href="https://services.arcgis.com/hOpd7wfnKm16p9D9/arcgis/rest/services/Crosswalk/FeatureServer/0" target="_blank" rel="noopener">Crosswalk</a>
+      <a class="pill" href="https://services.arcgis.com/hOpd7wfnKm16p9D9/arcgis/rest/services" target="_blank" rel="noopener">all 199 NMDOT layers</a>
+      <a class="pill" href="https://github.com/deknapp/otowi/blob/main/otowi/walking.py" target="_blank" rel="noopener">otowi/walking.py</a>
+    </div>
+  </div>
+
+  <h2>The model</h2>
+  <div class="src">
+    <h3>OpenStreetMap, via Overpass</h3>
+    <p>The road network the simulation runs on: <b>32,877 edges, 22,760
+      junctions, 164 traffic lights</b>. Also the street names the walking
+      router reports, and — through Nominatim — the addresses it accepts.</p>
+    <div class="meta">
+      <a class="pill" href="https://www.openstreetmap.org/" target="_blank" rel="noopener">OpenStreetMap</a>
+      <a class="pill" href="https://overpass-api.de/api/interpreter" target="_blank" rel="noopener">Overpass API</a>
+      <a class="pill" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap contributors · ODbL</a>
+      <a class="pill" href="https://github.com/deknapp/otowi/blob/main/otowi/network.py" target="_blank" rel="noopener">otowi/network.py</a>
+    </div>
+  </div>
+
+  <div class="src">
+    <h3>Census LEHD LODES — where people live and work</h3>
+    <p>Home-to-work flows at block level, which is the whole of this model's
+      demand. <b>85,717 commute pairs, 99,580 workers.</b> It is also this
+      model's biggest limitation: LODES knows the drive to work and nothing
+      about freight, shopping, school runs or tourism, which is why the
+      simulation carries about 14% of measured traffic and why its hourly shape
+      has a hole in the middle of the day.</p>
+    <div class="meta">
+      <a class="pill" href="https://lehd.ces.census.gov/data/" target="_blank" rel="noopener">LEHD LODES8</a>
+      <a class="pill" href="https://lehd.ces.census.gov/data/lodes/LODES8/nm/" target="_blank" rel="noopener">New Mexico files</a>
+      <span class="pill plain">2022 vintage · public domain</span>
+      <a class="pill" href="https://github.com/deknapp/otowi/blob/main/otowi/demand.py" target="_blank" rel="noopener">otowi/demand.py</a>
+    </div>
+  </div>
+
+  <div class="src">
+    <h3>American Community Survey B08302 — departure times</h3>
+    <p>When people leave for work, which shapes the morning peak. The return
+      trip has no equivalent published anywhere, so it is an assumption and is
+      labelled as one wherever it appears.</p>
+    <div class="meta">
+      <a class="pill" href="https://www.census.gov/programs-surveys/acs" target="_blank" rel="noopener">American Community Survey</a>
+      <a class="pill" href="https://data.census.gov/table/ACSDT5Y2022.B08302" target="_blank" rel="noopener">table B08302</a>
+      <span class="pill plain">2022 5-year · public domain</span>
+      <a class="pill" href="https://github.com/deknapp/otowi/blob/main/otowi/departure.py" target="_blank" rel="noopener">otowi/departure.py</a>
+    </div>
+  </div>
+
+  <div class="src">
+    <h3>NMDOT traffic counts (AADT)</h3>
+    <p>The measurement the model is calibrated against, and the exposure
+      denominator wherever a road has one. <b>7,149 count segments</b> intersect
+      the study area; 2,567 carry modelled traffic to compare. State highways
+      only — which is why 12% of the deaths sit on roads with a rate and the
+      rest are drawn as points and not ranked.</p>
+    <div class="meta">
+      <a class="pill" href="https://services.arcgis.com/hOpd7wfnKm16p9D9/arcgis/rest/services/Annual_Average_Daily_Traffic_2026/FeatureServer/0" target="_blank" rel="noopener">AADT layer</a>
+      <a class="pill" href="https://github.com/deknapp/otowi/blob/main/otowi/counts.py" target="_blank" rel="noopener">otowi/counts.py</a>
+    </div>
+  </div>
+
+  <div class="src">
+    <h3>Eclipse SUMO</h3>
+    <p>The traffic simulator itself — microscopic, open source, maintained by the
+      German Aerospace Center. Everything specific to northern New Mexico is in
+      this repository; SUMO supplies the model and the network format.</p>
+    <div class="meta">
+      <a class="pill" href="https://eclipse.dev/sumo/" target="_blank" rel="noopener">Eclipse SUMO</a>
+      <span class="pill plain">EPL-2.0</span>
+    </div>
+  </div>
+
+  <h2>Services the pages use</h2>
+  <div class="src">
+    <h3>Nominatim, and Esri basemap tiles</h3>
+    <p>Nominatim turns a typed address into a point, bounded to the study area,
+      one request per submitted address and never per keystroke. The basemap is
+      Esri's dark canvas; the road network drawn on top of it is this project's
+      own, and the pages are legible with no basemap at all.</p>
+    <div class="meta">
+      <a class="pill" href="https://nominatim.openstreetmap.org/" target="_blank" rel="noopener">Nominatim</a>
+      <a class="pill" href="https://operations.osmfoundation.org/policies/nominatim/" target="_blank" rel="noopener">its usage policy</a>
+      <a class="pill" href="https://www.esri.com/en-us/legal/terms/full-master-agreement" target="_blank" rel="noopener">Esri basemap terms</a>
+      <a class="pill" href="https://github.com/deknapp/otowi/blob/main/otowi/geocode.py" target="_blank" rel="noopener">otowi/geocode.py</a>
+    </div>
+  </div>
+
+  <div class="warn">
+    <b>One legal note.</b> New Mexico crash data is collected under
+    <a href="https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title23-section409" target="_blank" rel="noopener">23 U.S.C. § 409</a>,
+    which prohibits its use as evidence in any action for damages against a road
+    authority. This site reads published summaries and open map services, not
+    the protected file itself, but anything derived from them inherits the
+    restriction. It is published to inform, and it is not evidence.
+  </div>
+
+  <p class="foot">
+    Every dataset above is fetched by the module named beside it, cached on
+    disk, and re-fetched with <code>--force</code>. Nothing is committed to the
+    repository except the processed output this site serves. The code is at
+    <a href="https://github.com/deknapp/otowi" target="_blank" rel="noopener">github.com/deknapp/otowi</a>
+    — MIT licensed, and the data keeps the terms of whoever published it.
+  </p>
+</div>
+
+<script>
+(function () {
+  var STATIC = !!window.OTOWI_STATIC;
+  var CAR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14M6 17l-1.2-5.2A2 2 0 0 1 6.7 9.3h10.6a2 2 0 0 1 1.9 2.5L18 17"/><path d="M7 9.3 8.2 6.1A1.5 1.5 0 0 1 9.6 5h4.8a1.5 1.5 0 0 1 1.4 1.1L17 9.3"/><circle cx="7.5" cy="17" r="1.6"/><circle cx="16.5" cy="17" r="1.6"/></svg>';
+  var FOOT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13" cy="4" r="2"/><path d="M12.5 8 9.8 10.2 8 15"/><path d="m12.5 8 3 1.6.8 3.6"/><path d="M16.3 13.2 18 21"/><path d="M11 12.2 8.5 21"/></svg>';
+  var CLOCK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+  document.getElementById("v-drive").innerHTML = CAR + "Driving";
+  document.getElementById("v-walk").innerHTML = FOOT + "Walking &amp; cycling";
+  document.getElementById("v-hours").innerHTML = CLOCK + "By hour";
+  if (!STATIC) {
+    // Served from localhost the maps live at paths, and the tables are written
+    // into the cache rather than next to the page.
+    document.getElementById("v-drive").href = "/";
+    document.getElementById("v-walk").href = "/walk";
+    document.querySelectorAll('a[href^="data/"]').forEach(function (a) {
+      a.href = "/" + a.getAttribute("href").replace(/^data\//, "");
+    });
+  }
+})();
+</script>
+</body>
+</html>

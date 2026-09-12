@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>otowi — northern New Mexico morning peak</title>
+<title>Santa Fe &amp; Northern NM Traffic Safety — driving</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <style>
   :root {
@@ -129,6 +129,8 @@
   }
   .views a:hover { background: #1b232e; color: var(--text); }
   .views a.here { background: var(--accent); color: #0b1017; cursor: default; }
+  .views a.wide { grid-column: 1 / -1; min-height: 32px; font-weight: 500;
+                  border-top: 1px solid var(--border); }
   .views a.here.foot { background: var(--foot, #f0a35e); }
   .views a svg { width: 15px; height: 15px; flex: none; }
   .views a.pulse { box-shadow: inset 0 0 0 1px var(--foot, #f0a35e); color: var(--foot, #f0a35e); }
@@ -149,6 +151,17 @@
                   height: 30px; flex: none; }
   .tocard-spark i { flex: 1; border-radius: 1px; min-height: 2px; }
 
+  /* The project keeps its name, and a stranger does not have to decode it to
+     find out whose work this is or where the rest of it lives. */
+  .madeby { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border);
+            font-size: 11px; color: var(--muted); line-height: 1.6; }
+  .madeby .mark { color: var(--text); font-weight: 600; letter-spacing: .3px; }
+  .madeby a { color: var(--accent); text-decoration: none; }
+  .madeby a:hover { text-decoration: underline; }
+  .madeby .ghrow { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 5px; }
+  .madeby .ghrow a { display: inline-flex; align-items: center; gap: 5px; }
+  .madeby svg { width: 13px; height: 13px; flex: none; }
+
   .explain {
     font-size: 11.5px; color: var(--muted); margin-bottom: 12px;
     padding: 9px 10px; background: #141a22; border-left: 2px solid var(--accent);
@@ -160,15 +173,39 @@
   .legend .ends { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--muted); }
   /* The colour ramp was labelled at its ends and never said what it was a
      ramp *of*, and the crash points were never explained at all. */
-  .legend-what { font-size: 10px; letter-spacing: .05em; text-transform: uppercase;
-                 color: var(--muted); margin-bottom: 5px; }
-  .ptrow { display: flex; align-items: center; gap: 6px; font-size: 11px;
-           color: var(--muted); margin-bottom: 5px; }
-  .ptrow .pt { width: 10px; height: 10px; border-radius: 50%; flex: none;
-               border: 1.2px solid #e8e8e8; display: inline-block; }
-  .ptrow .pt-dark { border-color: #f0c674; }
-  .ptrow .pt-1 { width: 8px; height: 8px; }
-  .ptrow .pt-3 { width: 14px; height: 14px; margin-left: -2px; }
+  /* The legend and the filter are the same control: every row explains a
+     symbol and switches it off. Two panels saying the same thing in different
+     words is how a map ends up with a legend nobody reads. */
+  .legtitle { font-size: 10px; letter-spacing: .05em; text-transform: uppercase;
+              color: var(--muted); margin-bottom: 5px; }
+  .legtitle.sub2 { margin-top: 10px; }
+  .legrule { height: 1px; background: var(--border); margin: 11px 0 9px; }
+  .legendhead { display: flex; align-items: center; justify-content: space-between; }
+  #filterreset {
+    padding: 2px 8px; font: inherit; font-size: 10.5px; cursor: pointer;
+    background: #182029; color: var(--muted); border: 1px solid var(--border);
+    border-radius: 5px;
+  }
+  #filterreset:hover { color: var(--text); border-color: var(--accent); }
+  .filt { display: flex; align-items: center; gap: 7px; font-size: 11.5px;
+          color: var(--muted); cursor: pointer; padding: 3px 0; }
+  .filt:hover { color: var(--text); }
+  .filt input { accent-color: var(--accent); margin: 0; flex: none; }
+  .filt b { margin-left: auto; font-variant-numeric: tabular-nums; font-weight: 500;
+            font-size: 10.5px; color: #6e7d91; }
+  .filt .glyph { width: 13px; text-align: center; font-size: 12px; flex: none; color: #b6c2d2; }
+  .dot { border-radius: 50%; display: inline-block; flex: none;
+         width: 10px; height: 10px; border: 1px solid #0e1116; }
+  .s-k { width: 14px; height: 14px; }
+  .s-a { width: 10px; height: 10px; }
+  .s-b { width: 7px; height: 7px; }
+  .ring-dark { border: 1.6px solid #f0c674; }
+  .ring-day { border: 1.6px solid #e8e8e8; }
+  .legrow { display: flex; align-items: center; gap: 5px; font-size: 11px;
+            color: var(--muted); margin-bottom: 6px; flex-wrap: wrap; }
+  .legrow.sizes { gap: 4px; }
+  .legrow.sizes .dot { margin-left: 4px; }
+  .legnote { font-size: 10.5px; color: var(--muted); margin-top: 8px; line-height: 1.45; }
 
   table { width: 100%; border-collapse: collapse; font-size: 12px; }
   td { padding: 3px 0; }
@@ -223,7 +260,7 @@
 <div id="map"></div>
 
 <div id="controls" class="panel">
-  <h1>otowi</h1>
+  <h1>Santa Fe traffic safety</h1>
   <div class="sub">Northern New Mexico · where and when driving here kills people
     <span id="window"></span></div>
 
@@ -231,6 +268,7 @@
     <a class="here" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14M6 17l-1.2-5.2A2 2 0 0 1 6.7 9.3h10.6a2 2 0 0 1 1.9 2.5L18 17"/><path d="M7 9.3 8.2 6.1A1.5 1.5 0 0 1 9.6 5h4.8a1.5 1.5 0 0 1 1.4 1.1L17 9.3"/><circle cx="7.5" cy="17" r="1.6"/><circle cx="16.5" cy="17" r="1.6"/></svg>Driving</a>
     <a id="v-walk" class="pulse" href="walk.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13" cy="4" r="2"/><path d="M12.5 8 9.8 10.2 8 15"/><path d="m12.5 8 3 1.6.8 3.6"/><path d="M16.3 13.2 18 21"/><path d="M11 12.2 8.5 21"/></svg>Walking &amp; cycling</a>
       <a id="v-hours" href="hours.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>By hour</a>
+      <a id="v-sources" class="wide" href="sources.html">Data sources</a>
   </div>
 
   <div class="layers">
@@ -244,8 +282,6 @@
   <div class="explain" id="explain"></div>
 
   <div id="riskpanel" style="display:none">
-    <label class="footrow"><input type="checkbox" id="footonly">
-      <span id="footlabel">Only people on foot or bike</span></label>
     <a class="tocard" id="tohours" href="hours.html">
       <span class="tocard-spark" id="tospark"></span>
       <span>
@@ -256,24 +292,50 @@
   </div>
 
   <div class="legend">
-    <div class="legend-what" id="legend-what"></div>
+    <div class="legtitle" id="legend-what"></div>
     <div class="bar" id="legend-bar"></div>
     <div class="ends"><span id="legend-lo"></span><span id="legend-hi"></span></div>
+
     <div id="points-key" style="display:none">
-      <div class="legend-what" style="margin-top:9px">Each dot is a fatal crash</div>
-      <div class="ptrow">
-        <span class="pt" style="background:#c0392b"></span> someone in a vehicle
+      <div class="legrule"></div>
+      <div class="legendhead">
+        <div class="legtitle" style="margin:0">Each dot is a fatal crash</div>
+        <button id="filterreset" title="Show everything again">reset</button>
       </div>
-      <div class="ptrow">
-        <span class="pt" style="background:#8e6bc7"></span> someone on foot or a bike
+      <div class="legtitle sub2">Who died &mdash; click to show or hide</div>
+      <label class="filt"><input type="checkbox" data-f="who" value="vehicle" checked>
+        <span class="dot s-a" style="background:#c0392b"></span> in a vehicle
+        <b data-count="who:vehicle"></b></label>
+      <label class="filt"><input type="checkbox" data-f="who" value="foot" checked>
+        <span class="dot s-a" style="background:#8e6bc7"></span> on foot or a bike
+        <b data-count="who:foot"></b></label>
+
+      <div class="legtitle sub2">What the crash was</div>
+      <label class="filt"><input type="checkbox" data-f="harm" value="vehicle" checked>
+        <span class="glyph">&#8644;</span> hit another vehicle
+        <b data-count="harm:vehicle"></b></label>
+      <label class="filt"><input type="checkbox" data-f="harm" value="person" checked>
+        <span class="glyph">&#9971;</span> hit a person walking or riding
+        <b data-count="harm:person"></b></label>
+      <label class="filt"><input type="checkbox" data-f="harm" value="offroad" checked>
+        <span class="glyph">&#8631;</span> ran off the road
+        <b data-count="harm:offroad"></b></label>
+
+      <div class="legtitle sub2">Light</div>
+      <label class="filt"><input type="checkbox" data-f="light" value="day" checked>
+        <span class="dot s-a ring-day" style="background:#c0392b"></span> daylight
+        <b data-count="light:day"></b></label>
+      <label class="filt"><input type="checkbox" data-f="light" value="dark" checked>
+        <span class="dot s-a ring-dark" style="background:#c0392b"></span> after dark
+        <b data-count="light:dark"></b></label>
+
+      <div class="legtitle sub2">Size &mdash; how many died</div>
+      <div class="legrow sizes">
+        <span class="dot s-b" style="background:#c0392b"></span>one
+        <span class="dot s-a" style="background:#c0392b"></span>two
+        <span class="dot s-k" style="background:#c0392b"></span>three or more
       </div>
-      <div class="ptrow">
-        <span class="pt pt-dark" style="background:#c0392b"></span> a gold ring means after dark
-      </div>
-      <div class="ptrow">
-        <span class="pt pt-1" style="background:#c0392b"></span>
-        <span class="pt pt-3" style="background:#c0392b"></span> bigger means more died
-      </div>
+      <div class="legnote" id="filtcount"></div>
     </div>
   </div>
 
@@ -315,6 +377,14 @@
   <table id="stats"></table>
 
   <div class="hint">Click any road for its numbers.</div>
+  <div class="madeby">
+    <span class="mark">otowi</span> &mdash; named for the bridge on NM-502, the
+    bottleneck on the Los Alamos commute. Built by Nathaniel Knapp.
+    <div class="ghrow">
+      <a href="https://github.com/deknapp/otowi" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" aria-hidden="true" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>Source code</a>
+      <a href="https://github.com/deknapp" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" aria-hidden="true" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>All my projects</a>
+    </div>
+  </div>
 </div>
 
 <div id="detail" class="panel">
@@ -431,7 +501,7 @@
   // is "this is 14% of reality"; the risk layer is measured, and it is the
   // thing a person opening this page has a reason to care about.
   var current = "risk", geo = null, layer = null;
-  var risk = null, crashLayer = null, footOnly = false;
+  var risk = null, crashLayer = null;
 
   // Risk is loaded separately: 147 points against 8,000 lines, on a different
   // cadence, and a reader looking at traffic volumes should not pay for it.
@@ -464,9 +534,7 @@
   function drawCrashes(show) {
     if (crashLayer) { map.removeLayer(crashLayer); crashLayer = null; }
     if (!show || !risk || !risk.crashes) { return; }
-    var shown = risk.crashes.filter(function (c) {
-      return !footOnly || c.foot;
-    });
+    var shown = risk.crashes.filter(passesFilter);
     crashLayer = L.layerGroup(shown.map(function (c) {
       return L.circleMarker([c.lat, c.lon], {
         radius: 3 + Math.min(4, c.n),
@@ -512,10 +580,16 @@
     var explain = spec.explain;
     if (spec.points && risk && risk.summary) {
       var sm = risk.summary;
+      var foot = sm.on_foot || {};
       explain += " " + sm.fatalities + " deaths in " + sm.crashes +
         " crashes; only " + Math.round(sm.share_of_deaths_ranked * 100) +
         "% are on roads with a measured traffic count, which is what a rate " +
-        "needs. The rest are shown as points and not ranked.";
+        "needs. The rest are shown as points and not ranked. " +
+        foot.deaths + " of the dead were on foot or a bike, and " +
+        Math.round((foot.share_after_dark || 0) * 100) + "% of those died after " +
+        "dark against " +
+        Math.round((foot.vehicle_share_after_dark || 0) * 100) +
+        "% of the people in cars.";
     } else if (spec.points && risk === false) {
       explain = "Crash data unavailable in this export.";
     }
@@ -530,6 +604,64 @@
     document.getElementById("legend-what").textContent = "Line colour — " + spec.label;
     document.getElementById("points-key").style.display =
       (spec.points && risk && risk.crashes) ? "block" : "none";
+  }
+
+  // FARS records a "first harmful event" per crash -- 14 distinct values here,
+  // most of them one or two crashes against a specific roadside object. Three
+  // groups cover all 147 and are the three different problems: a collision
+  // with another vehicle, somebody outside a vehicle being hit, and leaving
+  // the road. A fourth bucket is deliberately absent -- every value maps.
+  function harmGroup(c) {
+    var h = (c.harm || "").toLowerCase();
+    if (h.indexOf("pedestrian") >= 0 || h.indexOf("pedalcyclist") >= 0) return "person";
+    if (h.indexOf("motor vehicle") >= 0) return "vehicle";
+    return "offroad";
+  }
+
+  // Every filter group starts with everything on: the map's job is to show
+  // what happened, and a default that hides some of it is a claim in itself.
+  var filters = { who: ["vehicle", "foot"], harm: ["vehicle", "person", "offroad"],
+                  light: ["day", "dark"] };
+
+  function passesFilter(c) {
+    if (filters.who.indexOf(c.foot ? "foot" : "vehicle") < 0) return false;
+    if (filters.harm.indexOf(harmGroup(c)) < 0) return false;
+    if (filters.light.indexOf(c.dark ? "dark" : "day") < 0) return false;
+    return true;
+  }
+
+  function readFilters() {
+    filters = { who: [], harm: [], light: [] };
+    document.querySelectorAll('#points-key input[data-f]').forEach(function (box) {
+      if (box.checked) filters[box.dataset.f].push(box.value);
+    });
+  }
+
+  // The count beside each row is of that row alone against the whole file, not
+  // of what is currently drawn: a number that moved every time you unticked
+  // something else would be unreadable, and the question the row answers is
+  // "how many of these are there".
+  function labelCounts() {
+    if (!risk || !risk.crashes) return;
+    var all = risk.crashes;
+    function tally(key, test) {
+      var node = document.querySelector('[data-count="' + key + '"]');
+      if (node) node.textContent = all.filter(test).length;
+    }
+    tally("who:vehicle", function (c) { return !c.foot; });
+    tally("who:foot", function (c) { return c.foot; });
+    ["vehicle", "person", "offroad"].forEach(function (g) {
+      tally("harm:" + g, function (c) { return harmGroup(c) === g; });
+    });
+    tally("light:day", function (c) { return !c.dark; });
+    tally("light:dark", function (c) { return c.dark; });
+
+    var drawn = all.filter(passesFilter).length;
+    var deaths = all.filter(passesFilter).reduce(function (a, c) { return a + c.n; }, 0);
+    document.getElementById("filtcount").innerHTML = drawn === all.length
+      ? "Showing all " + all.length + " fatal crashes."
+      : "Showing <b>" + drawn + "</b> of " + all.length + " crashes — " +
+        deaths + " of the " + risk.summary.fatalities + " deaths.";
   }
 
   function renderRisk(show) {
@@ -561,12 +693,7 @@
     document.getElementById("tosub").innerHTML =
       "per kilometre driven \u2014 see the whole day \u2192";
 
-    var foot = risk.summary.on_foot || {};
-    document.getElementById("footlabel").innerHTML =
-      "Only people on foot or bike \u2014 <b>" + foot.deaths + "</b> of " +
-      risk.summary.fatalities + " deaths, " +
-      Math.round((foot.share_after_dark || 0) * 100) + "% after dark against " +
-      Math.round((foot.vehicle_share_after_dark || 0) * 100) + "% for people in cars";
+    labelCounts();
   }
 
   function row(label, value, muted) {
@@ -603,9 +730,21 @@
     document.getElementById("detail").style.display = "block";
   }
 
-  document.getElementById("footonly").addEventListener("change", function (e) {
-    footOnly = e.target.checked;
-    drawCrashes(true);
+  document.querySelectorAll('#points-key input[data-f]').forEach(function (box) {
+    box.addEventListener("change", function () {
+      readFilters();
+      labelCounts();
+      drawCrashes(current === "risk");
+    });
+  });
+
+  document.getElementById("filterreset").addEventListener("click", function () {
+    document.querySelectorAll('#points-key input[data-f]').forEach(function (box) {
+      box.checked = true;
+    });
+    readFilters();
+    labelCounts();
+    drawCrashes(current === "risk");
   });
 
   map.on("click", function () { document.getElementById("detail").style.display = "none"; });
