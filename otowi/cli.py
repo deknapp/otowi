@@ -949,6 +949,11 @@ def cmd_export(args) -> None:
         walk_page = (web.STATIC_DIR / "walk.html").read_text().replace(
             "<body>", "<body>\n<script>window.OTOWI_STATIC = true;</script>", 1)
         (out / "walk.html").write_text(walk_page)
+        # The hour view reads risk.json and walk.json and writes nothing of
+        # its own, so it ships as a page and needs no data step.
+        hours_page = (web.STATIC_DIR / "hours.html").read_text().replace(
+            "<body>", "<body>\n<script>window.OTOWI_STATIC = true;</script>", 1)
+        (out / "hours.html").write_text(hours_page)
     except Exception as exc:                                   # noqa: BLE001
         print(f"walking page skipped: {exc}", file=sys.stderr)
 

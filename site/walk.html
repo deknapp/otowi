@@ -33,7 +33,8 @@
   }
   #controls { top: 14px; left: 14px; width: 320px; max-height: calc(100% - 28px); overflow-y: auto; }
   #detail { bottom: 14px; right: 14px; width: 264px; display: none; }
-  #layers { top: 14px; right: 14px; width: 178px; padding: 11px 12px; }
+  #layers { top: 14px; right: 14px; width: 212px; padding: 11px 12px;
+           max-height: calc(100% - 28px); overflow-y: auto; }
 
   h1 { font-size: 15px; margin: 0 0 2px; letter-spacing: .3px; }
   h2 { font-size: 13px; margin: 0 0 6px; }
@@ -110,6 +111,38 @@
   .toggle input { accent-color: var(--accent); }
   .swatch { width: 16px; height: 3px; border-radius: 2px; display: inline-block; }
 
+  /* The map carries four encodings at once -- colour for who, size for what
+     happened to them, a ring for darkness, and line colour and thickness for
+     the corridor -- and until now it explained none of them. */
+  .legendhead { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  #legendtoggle {
+    width: 20px; height: 20px; line-height: 1; padding: 0; cursor: pointer;
+    background: #182029; color: var(--muted); border: 1px solid var(--border);
+    border-radius: 5px; font-family: inherit; font-size: 13px;
+  }
+  #legendtoggle:hover { color: var(--text); }
+  .legrule { height: 1px; background: var(--border); margin: 10px 0 8px; }
+  .legtitle { font-size: 10px; letter-spacing: .05em; text-transform: uppercase;
+              color: var(--muted); margin-bottom: 5px; }
+  .legrow { display: flex; align-items: center; gap: 5px; font-size: 11px;
+            color: var(--muted); margin-bottom: 7px; flex-wrap: wrap; }
+  .legrow .dot { border-radius: 50%; display: inline-block; flex: none;
+                 width: 9px; height: 9px; border: 1px solid #0e1116; }
+  .legrow .s-k { width: 14px; height: 14px; }
+  .legrow .s-a { width: 10px; height: 10px; }
+  .legrow .s-b { width: 7px; height: 7px; }
+  .legrow.sizes { gap: 4px; }
+  .legrow.sizes .dot { margin-left: 4px; }
+  .legrow .ring-lit { border: 1.6px solid #7f9ddb; }
+  .legrow .ring-unlit { border: 1.6px solid #3c4a6b; }
+  .legbar { height: 9px; border-radius: 5px; margin-bottom: 3px;
+            background: linear-gradient(90deg,#4a5a3a,#8a7a24,#c07a28,#c0392b,#8e1b18); }
+  .legends { display: flex; justify-content: space-between; font-size: 9.5px; color: var(--muted); }
+  .legrow.widths { gap: 4px; }
+  .legrow .ln { display: inline-block; width: 16px; border-radius: 3px;
+                background: #c0392b; flex: none; }
+  .legnote { font-size: 10px; margin-left: 4px; }
+
   .route input {
     width: 100%; padding: 7px 9px; margin-bottom: 6px; font: inherit; font-size: 12px;
     background: #182029; color: var(--text); border: 1px solid var(--border);
@@ -133,13 +166,34 @@
   #routeout ul { margin: 6px 0 0; padding-left: 16px; }
   #routeout li { margin-bottom: 2px; }
 
+  /* The two pages are two views of one tool, and the only thing that said so
+     was a small link under the layer buttons. A segmented control at the top
+     of both panels, each half naming the other view, makes the pair the first
+     thing on the page rather than a footnote at the bottom of it. */
+  .views {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0;
+    margin: 0 0 12px; border: 1px solid var(--border); border-radius: 8px;
+    overflow: hidden;
+  }
+  .views a {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 8px 6px; min-height: 40px; font-size: 11.5px; line-height: 1.15;
+    font-weight: 600; text-align: center; text-decoration: none;
+    color: var(--muted); background: #141a22; transition: all .12s;
+  }
+  .views a:hover { background: #1b232e; color: var(--text); }
+  .views a.here { background: var(--accent); color: #0b1017; cursor: default; }
+  .views a.here.foot { background: var(--foot, #f0a35e); }
+  .views a svg { width: 15px; height: 15px; flex: none; }
+  .views a.pulse { box-shadow: inset 0 0 0 1px var(--foot, #f0a35e); color: var(--foot, #f0a35e); }
+
   .note { font-size: 10.5px; color: var(--muted); line-height: 1.45; margin-top: 10px; }
   a { color: var(--accent); }
 
   @media (max-width: 680px) {
     #controls { top: auto; bottom: 0; left: 0; right: 0; width: auto; max-height: 60%;
                 border-radius: 12px 12px 0 0; border-left: 0; border-right: 0; border-bottom: 0; }
-    #layers { width: 150px; }
+    #layers { width: 168px; max-height: 46%; }
     #detail { bottom: auto; top: 200px; right: 10px; left: 10px; width: auto; }
   }
 </style>
@@ -151,6 +205,12 @@
 <div id="controls" class="panel">
   <h1>otowi &middot; on foot, on a bike</h1>
   <div class="sub" id="lead">Santa Fe</div>
+
+  <div class="views">
+    <a id="v-drive" href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14M6 17l-1.2-5.2A2 2 0 0 1 6.7 9.3h10.6a2 2 0 0 1 1.9 2.5L18 17"/><path d="M7 9.3 8.2 6.1A1.5 1.5 0 0 1 9.6 5h4.8a1.5 1.5 0 0 1 1.4 1.1L17 9.3"/><circle cx="7.5" cy="17" r="1.6"/><circle cx="16.5" cy="17" r="1.6"/></svg>Driving</a>
+    <a class="here foot" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13" cy="4" r="2"/><path d="M12.5 8 9.8 10.2 8 15"/><path d="m12.5 8 3 1.6.8 3.6"/><path d="M16.3 13.2 18 21"/><path d="M11 12.2 8.5 21"/></svg>Walking &amp; cycling</a>
+      <a id="v-hours" href="hours.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>By hour</a>
+  </div>
 
   <div class="modes">
     <button data-mode="foot" class="on foot">Walking</button>
@@ -200,7 +260,11 @@
 </div>
 
 <div id="layers" class="panel">
-  <div class="sectiontitle" style="margin-bottom:6px">On the map</div>
+  <div class="legendhead">
+    <div class="sectiontitle" style="margin:0">On the map</div>
+    <button id="legendtoggle" title="Hide the legend">&minus;</button>
+  </div>
+
   <label class="toggle"><input type="checkbox" id="t-hin" checked>
     <span><span class="swatch" style="background:#c0392b"></span> injury network</span></label>
   <label class="toggle"><input type="checkbox" id="t-crash" checked>
@@ -211,6 +275,49 @@
     <span><span class="swatch" style="background:#5dd6c0"></span> bike lanes</span></label>
   <label class="toggle"><input type="checkbox" id="t-walk">
     <span><span class="swatch" style="background:#8fa3bd"></span> sidewalks</span></label>
+
+  <div id="legendbody">
+    <div class="legrule"></div>
+    <div class="legtitle">Each dot is one person</div>
+    <div class="legrow">
+      <span class="dot" style="background:#f0a35e"></span> on foot
+      <span class="dot" style="background:#5dd6c0;margin-left:10px"></span> on a bike
+    </div>
+
+    <div class="legtitle">Size &mdash; what happened to them</div>
+    <div class="legrow sizes">
+      <span class="dot s-k" style="background:#f0a35e"></span>killed
+      <span class="dot s-a" style="background:#f0a35e"></span>serious
+      <span class="dot s-b" style="background:#f0a35e"></span>minor
+    </div>
+
+    <div class="legtitle">A ring means it was dark</div>
+    <div class="legrow">
+      <span class="dot s-a ring-lit" style="background:#f0a35e"></span> street lit
+      <span class="dot s-a ring-unlit" style="background:#f0a35e;margin-left:10px"></span> unlit
+    </div>
+
+    <div class="legrule"></div>
+    <div class="legtitle">Injury network &mdash; colour</div>
+    <div class="legbar" id="hinbar"></div>
+    <div class="legends"><span>fewer</span><span>killed or hurt per mile</span><span>more</span></div>
+    <div class="legtitle" style="margin-top:8px">Injury network &mdash; thickness</div>
+    <div class="legrow widths">
+      <span class="ln" style="height:3px"></span>
+      <span class="ln" style="height:6px"></span>
+      <span class="ln" style="height:10px"></span>
+      <span class="legnote">NMDOT's crash severity index</span>
+    </div>
+
+    <div id="legroute" style="display:none">
+      <div class="legrule"></div>
+      <div class="legtitle">Your route</div>
+      <div class="legrow"><span class="ln" style="height:5px;background:#6ea8fe;width:22px"></span>
+        the way</div>
+      <div class="legrow"><span class="ln" style="height:7px;background:#e07a5f;width:22px"></span>
+        somebody was hit here</div>
+    </div>
+  </div>
 </div>
 
 <div id="detail" class="panel">
@@ -550,8 +657,7 @@
     el("foot").innerHTML =
       "Ranked by NMDOT's own crash severity index, which the state built from the " +
       "state's crash file without reference to anything here. It puts Cerrillos Road " +
-      "first, and so does NHTSA's fatal-crash census counting only deaths. " +
-      "<a href='" + (STATIC ? "index.html" : "/") + "'>The driving map is here.</a>";
+      "first, and so does NHTSA's fatal-crash census counting only deaths.";
   }
 
   function zoomTo(c) {
@@ -871,6 +977,7 @@
             fillColor: spec[1], fillOpacity: 1
           }).bindTooltip(spec[2] + ": " + (spec[0].typed || spec[0].name || "")));
         });
+        el("legroute").style.display = "block";
         if (all.length) map.fitBounds(L.latLngBounds(all), padded());
         el("routeout").innerHTML = describe(result, a, b, ends);
       })
@@ -941,7 +1048,23 @@
     };
   });
 
+  // Collapsible, because on a phone a full legend over a city map is the
+  // city map. Open by default on a desktop: the whole complaint was that the
+  // colours were unexplained, and a legend you have to find is not much
+  // better than no legend.
+  el("legendtoggle").onclick = function () {
+    var body = el("legendbody");
+    var hidden = body.style.display === "none";
+    body.style.display = hidden ? "block" : "none";
+    this.innerHTML = hidden ? "&minus;" : "?";
+    this.title = hidden ? "Hide the legend" : "What do the colours mean?";
+  };
+  if (window.innerWidth <= 680) el("legendtoggle").onclick();
+
   map.on("click", function () { el("detail").style.display = "none"; });
+
+  document.getElementById("v-drive").href = STATIC ? "index.html" : "/";
+  document.getElementById("v-hours").href = "hours.html";
 
   fetch(DATA + "walk.json").then(function (r) { return r.json(); }).then(function (d) {
     D = d;

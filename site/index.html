@@ -33,7 +33,7 @@
     backdrop-filter: blur(8px);
     box-shadow: 0 8px 30px rgba(0,0,0,.45);
   }
-  #controls { top: 14px; left: 14px; width: 288px; max-height: calc(100% - 28px); overflow-y: auto; }
+  #controls { top: 14px; left: 14px; width: 368px; max-height: calc(100% - 28px); overflow-y: auto; }
   #detail   { bottom: 14px; right: 14px; width: 268px; display: none; }
 
   h1 { font-size: 15px; margin: 0 0 2px; letter-spacing: .3px; }
@@ -42,7 +42,10 @@
   .whenrow { margin-top: 7px; }
   .whenrow label { color: var(--muted); font-size: 11.5px; }
   .whenrow input[type="time"] {
-    flex: 1; min-width: 0; padding: 5px 6px; font: inherit; font-size: 11.5px;
+    /* Chrome renders these as "06:00 AM" and the old 288px panel clipped the
+       meridiem clean off, which made a departure planner ambiguous about
+       morning and evening -- the one thing it exists to tell you. */
+    flex: 1; min-width: 104px; padding: 5px 7px; font: inherit; font-size: 12px;
     background: #182029; color: var(--text); border: 1px solid var(--border);
     border-radius: 6px;
   }
@@ -56,34 +59,7 @@
   }
   #addrrow input:focus { outline: none; border-color: var(--accent); }
 
-  #hours { display: flex; align-items: flex-end; gap: 1px; height: 54px; margin: 8px 0 4px; }
-  #hours .h { flex: 1; background: #2f6b3a; border-radius: 1px 1px 0 0; min-height: 2px; position: relative; }
-  #hours .h.bad { background: #c0392b; }
-  #hours .h.mid { background: #c9a227; }
-  .hourax { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); }
 
-  /* The second curve shares the first's axis, drawn as ticks in a layer over
-     the bars. Measured from the chart's own floor, not from inside each bar:
-     a mark positioned as a fraction of its bar's height is meaningless when
-     the bars are different heights, which is the entire point of the chart. */
-  #hours { position: relative; }
-  #hours .altlayer { position: absolute; inset: 0; display: flex; gap: 1px; pointer-events: none; }
-  #hours .altlayer .a { flex: 1; position: relative; }
-  #hours .altlayer .a i {
-    position: absolute; left: 0; right: 0; height: 2px; margin-bottom: -1px;
-    background: #eaf0f6; border-radius: 1px; box-shadow: 0 0 0 1px rgba(14,17,22,.85);
-  }
-
-  /* Share of that hour's crashes with drink in them. Its own strip, because
-     it is a share and the bars above are a rate -- putting them on one axis
-     would be a category error dressed as a chart. */
-  #drink { display: flex; gap: 1px; height: 16px; margin-top: 5px; }
-  #drink .d { flex: 1; background: #182029; border-radius: 1px; position: relative; overflow: hidden; }
-  #drink .d i { position: absolute; left: 0; right: 0; bottom: 0; background: #9b6bd6; }
-  .drinklab { font-size: 10.5px; color: var(--muted); margin-top: 4px; line-height: 1.45; }
-  .drinklab b { color: #b48ae4; }
-  .bracket { font-size: 10.5px; color: var(--muted); margin-top: 8px; line-height: 1.45; }
-  .bracket b { color: var(--text); }
   .prefrow { margin-top: 9px; }
   .preflabel { color: var(--muted); font-size: 11.5px; }
   .prefs { display: flex; gap: 5px; margin-top: 4px; }
@@ -124,7 +100,6 @@
     .layers { flex-wrap: wrap; }
     .layers button { flex: 1 1 44%; padding: 9px 4px; font-size: 12.5px; }
     .odrow select, .whenrow input[type="time"] { font-size: 16px; }
-    #hours { height: 44px; }
   }
 
   .layers { display: flex; gap: 5px; margin-bottom: 12px; }
@@ -137,12 +112,42 @@
   .layers button:hover { color: var(--text); border-color: #3d4759; }
   .layers button.on { background: var(--accent); border-color: var(--accent); color: #0b1017; font-weight: 600; }
 
-  .crosslink {
-    display: block; margin: -6px 0 12px; padding: 8px 10px; font-size: 11.5px;
-    text-decoration: none; color: #f0a35e; background: #1b1712;
-    border: 1px solid #3a2d1e; border-radius: 7px;
+  /* The two pages are two views of one tool, and the only thing that said so
+     was a small link under the layer buttons. A segmented control at the top
+     of both panels, each half naming the other view, makes the pair the first
+     thing on the page rather than a footnote at the bottom of it. */
+  .views {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0;
+    margin: 0 0 12px; border: 1px solid var(--border); border-radius: 8px;
+    overflow: hidden;
   }
-  .crosslink:hover { border-color: #f0a35e; }
+  .views a {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 8px 6px; min-height: 40px; font-size: 11.5px; line-height: 1.15;
+    font-weight: 600; text-align: center; text-decoration: none;
+    color: var(--muted); background: #141a22; transition: all .12s;
+  }
+  .views a:hover { background: #1b232e; color: var(--text); }
+  .views a.here { background: var(--accent); color: #0b1017; cursor: default; }
+  .views a.here.foot { background: var(--foot, #f0a35e); }
+  .views a svg { width: 15px; height: 15px; flex: none; }
+  .views a.pulse { box-shadow: inset 0 0 0 1px var(--foot, #f0a35e); color: var(--foot, #f0a35e); }
+
+  /* The hour chart used to live in this panel, 288px wide, under everything
+     else. It is the most interesting thing the project found and it was the
+     least legible thing on the page. It has its own view now; this is the way
+     in, carrying a sparkline so the card is an argument rather than a label. */
+  .tocard {
+    display: flex; align-items: center; gap: 11px; margin: 10px 0 2px;
+    padding: 10px 11px; text-decoration: none; border-radius: 8px;
+    background: #16202b; border: 1px solid #2f4055; transition: all .12s;
+  }
+  .tocard:hover { border-color: var(--accent); background: #18242f; }
+  .tocard b { display: block; color: var(--text); font-size: 12.5px; margin-bottom: 1px; }
+  .tocard span span, .tocard > span > span { color: var(--muted); font-size: 11px; }
+  .tocard-spark { display: flex; align-items: flex-end; gap: 1px; width: 84px;
+                  height: 30px; flex: none; }
+  .tocard-spark i { flex: 1; border-radius: 1px; min-height: 2px; }
 
   .explain {
     font-size: 11.5px; color: var(--muted); margin-bottom: 12px;
@@ -153,6 +158,17 @@
   .legend { margin-bottom: 12px; }
   .legend .bar { height: 9px; border-radius: 5px; margin-bottom: 4px; }
   .legend .ends { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--muted); }
+  /* The colour ramp was labelled at its ends and never said what it was a
+     ramp *of*, and the crash points were never explained at all. */
+  .legend-what { font-size: 10px; letter-spacing: .05em; text-transform: uppercase;
+                 color: var(--muted); margin-bottom: 5px; }
+  .ptrow { display: flex; align-items: center; gap: 6px; font-size: 11px;
+           color: var(--muted); margin-bottom: 5px; }
+  .ptrow .pt { width: 10px; height: 10px; border-radius: 50%; flex: none;
+               border: 1.2px solid #e8e8e8; display: inline-block; }
+  .ptrow .pt-dark { border-color: #f0c674; }
+  .ptrow .pt-1 { width: 8px; height: 8px; }
+  .ptrow .pt-3 { width: 14px; height: 14px; margin-left: -2px; }
 
   table { width: 100%; border-collapse: collapse; font-size: 12px; }
   td { padding: 3px 0; }
@@ -176,7 +192,8 @@
   }
   .arrow { color: var(--muted); }
   #go {
-    width: 100%; padding: 7px; font-size: 12px; cursor: pointer; font-family: inherit;
+    width: 100%; margin-top: 9px; padding: 8px; font-size: 12px; cursor: pointer;
+    font-family: inherit;
     background: var(--accent); color: #0b1017; font-weight: 600;
     border: none; border-radius: 6px;
   }
@@ -210,6 +227,12 @@
   <div class="sub">Northern New Mexico · where and when driving here kills people
     <span id="window"></span></div>
 
+  <div class="views">
+    <a class="here" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14M6 17l-1.2-5.2A2 2 0 0 1 6.7 9.3h10.6a2 2 0 0 1 1.9 2.5L18 17"/><path d="M7 9.3 8.2 6.1A1.5 1.5 0 0 1 9.6 5h4.8a1.5 1.5 0 0 1 1.4 1.1L17 9.3"/><circle cx="7.5" cy="17" r="1.6"/><circle cx="16.5" cy="17" r="1.6"/></svg>Driving</a>
+    <a id="v-walk" class="pulse" href="walk.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13" cy="4" r="2"/><path d="M12.5 8 9.8 10.2 8 15"/><path d="m12.5 8 3 1.6.8 3.6"/><path d="M16.3 13.2 18 21"/><path d="M11 12.2 8.5 21"/></svg>Walking &amp; cycling</a>
+      <a id="v-hours" href="hours.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>By hour</a>
+  </div>
+
   <div class="layers">
     <button data-layer="risk" class="on">Risk</button>
     <button data-layer="modelled">Traffic</button>
@@ -217,26 +240,41 @@
     <button data-layer="ratio">Coverage</button>
   </div>
 
-  <a class="crosslink" id="walklink" href="/walk">On foot and on a bike in Santa Fe &rarr;</a>
 
   <div class="explain" id="explain"></div>
 
   <div id="riskpanel" style="display:none">
-    <div class="rule"></div>
-    <div class="triptitle">When, not just where</div>
-    <div class="sub" id="hourlead"></div>
-    <div id="hours"></div>
-    <div class="hourax"><span>00</span><span>06</span><span>12</span><span>18</span><span>23</span></div>
-    <div id="drink"></div>
-    <div class="drinklab" id="drinklab"></div>
-    <div class="bracket" id="bracket"></div>
     <label class="footrow"><input type="checkbox" id="footonly">
       <span id="footlabel">Only people on foot or bike</span></label>
+    <a class="tocard" id="tohours" href="hours.html">
+      <span class="tocard-spark" id="tospark"></span>
+      <span>
+        <b id="tohead">When it is dangerous</b>
+        <span id="tosub">The hour-by-hour risk, full size &rarr;</span>
+      </span>
+    </a>
   </div>
 
   <div class="legend">
+    <div class="legend-what" id="legend-what"></div>
     <div class="bar" id="legend-bar"></div>
     <div class="ends"><span id="legend-lo"></span><span id="legend-hi"></span></div>
+    <div id="points-key" style="display:none">
+      <div class="legend-what" style="margin-top:9px">Each dot is a fatal crash</div>
+      <div class="ptrow">
+        <span class="pt" style="background:#c0392b"></span> someone in a vehicle
+      </div>
+      <div class="ptrow">
+        <span class="pt" style="background:#8e6bc7"></span> someone on foot or a bike
+      </div>
+      <div class="ptrow">
+        <span class="pt pt-dark" style="background:#c0392b"></span> a gold ring means after dark
+      </div>
+      <div class="ptrow">
+        <span class="pt pt-1" style="background:#c0392b"></span>
+        <span class="pt pt-3" style="background:#c0392b"></span> bigger means more died
+      </div>
+    </div>
   </div>
 
   <div class="rule"></div>
@@ -487,6 +525,11 @@
       "linear-gradient(90deg," + spec.gradient.join(",") + ")";
     document.getElementById("legend-lo").textContent = spec.lo;
     document.getElementById("legend-hi").textContent = spec.hi;
+    // The ramp's own label. Every layer already carries one; it was only ever
+    // used as a heading elsewhere and never next to the colours it describes.
+    document.getElementById("legend-what").textContent = "Line colour — " + spec.label;
+    document.getElementById("points-key").style.display =
+      (spec.points && risk && risk.crashes) ? "block" : "none";
   }
 
   function renderRisk(show) {
@@ -496,98 +539,34 @@
 
     var rows = risk.summary.by_hour || [];
     if (!rows.length) { return; }
+
+    // A sparkline of the curve rather than the curve. The full chart is its
+    // own view now; what belongs here is enough of it to make somebody click.
     var top = Math.max.apply(null, rows.map(function (r) { return r.relative_risk; }));
-    var best = rows.reduce(function (a, b) { return b.relative_risk < a.relative_risk ? b : a; });
-    var worst = rows.reduce(function (a, b) { return b.relative_risk > a.relative_risk ? b : a; });
-
-    // The second curve runs the same deaths against the state's all-severity
-    // crash counts instead of the model's travel. Two proxies for the same
-    // missing measurement, failing in opposite directions.
-    var cf = risk.summary.crash_file;
-    var alt = cf ? cf.by_hour_on_crash_exposure : null;
-    if (alt) {
-      top = Math.max(top, Math.max.apply(null, alt.map(function (r) {
-        return r.relative_risk; })));
-    }
-
-    var bars = rows.map(function (r) {
-      var cls = r.relative_risk >= 2 ? "bad" : (r.relative_risk >= 1 ? "mid" : "");
-      return '<div class="h ' + cls + '" style="height:' +
-        Math.max(4, Math.round(r.relative_risk / top * 100)) + '%" title="' +
-        String(r.hour).padStart(2, "0") + ':00 — ' + r.relative_risk.toFixed(2) +
-        '× an ordinary hour"></div>';
+    document.getElementById("tospark").innerHTML = rows.map(function (r) {
+      var colour = r.relative_risk >= 2 ? "#c0392b"
+                 : r.relative_risk >= 1 ? "#c9a227" : "#2f6b3a";
+      return '<i style="height:' + Math.max(6, Math.round(r.relative_risk / top * 100)) +
+             "%;background:" + colour + '"></i>';
     }).join("");
 
-    var ticks = alt ? '<div class="altlayer">' + alt.map(function (r) {
-      return '<div class="a"><i style="bottom:' +
-        Math.min(100, r.relative_risk / top * 100) + '%" title="' +
-        String(r.hour).padStart(2, "0") + ':00 — ' + r.relative_risk.toFixed(2) +
-        '× on the state\'s crash counts"></i></div>';
-    }).join("") + "</div>" : "";
-
-    document.getElementById("hours").innerHTML = bars + ticks;
-
-    renderCrashFile(cf, rows, alt);
-
+    var best = rows.reduce(function (a, b) { return b.relative_risk < a.relative_risk ? b : a; });
+    var worst = rows.reduce(function (a, b) { return b.relative_risk > a.relative_risk ? b : a; });
     var ratio = best.relative_risk > 0
       ? Math.round(worst.relative_risk / best.relative_risk) : null;
-    document.getElementById("hourlead").innerHTML =
-      "Per kilometre driven. " + (ratio ? "Driving at <b>" +
-      String(worst.hour).padStart(2, "0") + ":00</b> is about <b>" + ratio +
-      "×</b> as likely to kill someone as driving at <b>" +
-      String(best.hour).padStart(2, "0") + ":00</b> — the rush hour is the " +
-      "safest time on these roads, not the worst." : "");
+    document.getElementById("tohead").textContent =
+      ratio ? String(worst.hour).padStart(2, "0") + ":00 is " + ratio + "\u00d7 " +
+              String(best.hour).padStart(2, "0") + ":00"
+            : "When it is dangerous";
+    document.getElementById("tosub").innerHTML =
+      "per kilometre driven \u2014 see the whole day \u2192";
 
     var foot = risk.summary.on_foot || {};
     document.getElementById("footlabel").innerHTML =
-      "Only people on foot or bike — <b>" + foot.deaths + "</b> of " +
+      "Only people on foot or bike \u2014 <b>" + foot.deaths + "</b> of " +
       risk.summary.fatalities + " deaths, " +
       Math.round((foot.share_after_dark || 0) * 100) + "% after dark against " +
       Math.round((foot.vehicle_share_after_dark || 0) * 100) + "% for people in cars";
-  }
-
-  function renderCrashFile(cf, rows, alt) {
-    var drink = document.getElementById("drink");
-    var label = document.getElementById("drinklab");
-    var bracket = document.getElementById("bracket");
-    if (!cf) {
-      drink.innerHTML = ""; label.textContent = ""; bracket.textContent = "";
-      return;
-    }
-
-    // Share of each hour's crashes with drink in them. This needs no exposure
-    // denominator at all -- whatever the traffic was, it is in the numerator
-    // and the denominator alike -- which is why it sits under a chart that
-    // does need one, as the part of the night that is not an assumption.
-    var peak = Math.max.apply(null, cf.alcohol_share);
-    drink.innerHTML = cf.alcohol_share.map(function (share, hour) {
-      return '<div class="d" title="' + String(hour).padStart(2, "0") + ":00 — " +
-        Math.round(share * 100) + '% of crashes had drink in them">' +
-        '<i style="height:' + Math.round(share / peak * 100) + '%"></i></div>';
-    }).join("");
-
-    var worstHour = cf.alcohol_share.indexOf(peak);
-    var quietest = cf.alcohol_share.indexOf(Math.min.apply(null, cf.alcohol_share));
-    label.innerHTML = "<b>Drink</b>, as a share of that hour's crashes: <b>" +
-      Math.round(peak * 100) + "%</b> at " + String(worstHour).padStart(2, "0") +
-      ":00 against <b>" + Math.round(cf.alcohol_share[quietest] * 100) + "%</b> at " +
-      String(quietest).padStart(2, "0") + ":00. " + cf.crashes.toLocaleString() +
-      " crashes, no model — a share needs no exposure denominator.";
-
-    if (!alt) { bracket.textContent = ""; return; }
-    function spread(list, key) {
-      var vals = list.map(function (r) { return r.relative_risk; });
-      var hi = Math.max.apply(null, vals), lo = Math.min.apply(null, vals);
-      return { hi: hi, lo: lo, at: vals.indexOf(hi), ratio: lo > 0 ? hi / lo : 0 };
-    }
-    var a = spread(rows), b = spread(alt);
-    bracket.innerHTML =
-      "The white marks are the same deaths divided by the state's crash counts " +
-      "instead of by the model's travel. Both proxies are wrong, in opposite " +
-      "directions, so the swing is <b>" + Math.round(Math.min(a.ratio, b.ratio)) +
-      "×–" + Math.round(Math.max(a.ratio, b.ratio)) + "×</b> rather than a single " +
-      "number. The worst hour is <b>" + String(a.at).padStart(2, "0") +
-      ":00</b> on both.";
   }
 
   function row(label, value, muted) {
@@ -647,7 +626,9 @@
   // One page, so the served version and the published one cannot drift.
   var STATIC = !!window.OTOWI_STATIC;
   // Served from a path on localhost, a file next to this one when exported.
-  document.getElementById("walklink").href = STATIC ? "walk.html" : "/walk";
+  // Served from a path on localhost, a file next to this one when exported.
+  document.getElementById("v-walk").href = STATIC ? "walk.html" : "/walk";
+  document.getElementById("v-hours").href = "hours.html";
 
   // Arbitrary addresses need a router, and the published copy is a static
   // host carrying thirty precomputed journeys. Rather than show a box that

@@ -234,6 +234,8 @@ class _Handler(http.server.SimpleHTTPRequestHandler):
             return self._send_file(self.walk_path, "application/json")
         if self.path.rstrip("/") in ("/walk", "/walk.html"):
             return self._send_file(STATIC_DIR / "walk.html", "text/html; charset=utf-8")
+        if self.path.rstrip("/") in ("/hours", "/hours.html"):
+            return self._send_file(STATIC_DIR / "hours.html", "text/html; charset=utf-8")
         if self.path in ("/", "/index.html"):
             return self._send_file(STATIC_DIR / "index.html", "text/html; charset=utf-8")
         self.send_error(404)

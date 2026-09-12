@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>otowi — when it is dangerous</title>
+<style>
+  :root {
+    --bg: #0e1116; --panel: #141a22; --border: #2b3340;
+    --text: #e7ecf3; --muted: #93a1b4; --accent: #6ea8fe;
+    --foot: #f0a35e; --bike: #5dd6c0; --drink: #b48ae4;
+    --hot: #c0392b; --mid: #c9a227; --cool: #2f6b3a;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg); color: var(--text); padding: 0 0 60px;
+    font: 14px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+  .wrap { max-width: 1140px; margin: 0 auto; padding: 0 20px; }
+  a { color: var(--accent); }
+
+  header { padding: 22px 0 14px; }
+  h1 { font-size: 21px; margin: 0 0 4px; letter-spacing: .2px; }
+  .sub { color: var(--muted); font-size: 13px; }
+
+  .views { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0;
+           margin: 14px 0 20px; border: 1px solid var(--border);
+           border-radius: 8px; overflow: hidden; max-width: 560px; }
+  .views a {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 9px 6px; min-height: 40px; font-size: 12px; line-height: 1.15;
+    font-weight: 600; text-align: center; text-decoration: none;
+    color: var(--muted); background: var(--panel); transition: all .12s;
+  }
+  .views a:hover { background: #1b232e; color: var(--text); }
+  .views a.here { background: var(--accent); color: #0b1017; cursor: default; }
+  .views a svg { width: 15px; height: 15px; flex: none; }
+
+  .controls { display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-end;
+              padding: 14px 16px; background: var(--panel);
+              border: 1px solid var(--border); border-radius: 10px; margin-bottom: 18px; }
+  .ctl { display: flex; flex-direction: column; gap: 6px; }
+  .ctl > label { font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase;
+                 color: var(--muted); }
+  .seg { display: flex; border: 1px solid var(--border); border-radius: 7px; overflow: hidden; }
+  .seg button {
+    padding: 7px 12px; font: inherit; font-size: 12px; cursor: pointer;
+    background: #182029; color: var(--muted); border: 0; border-right: 1px solid var(--border);
+  }
+  .seg button:last-child { border-right: 0; }
+  .seg button:hover { color: var(--text); }
+  .seg button.on { background: var(--accent); color: #0b1017; font-weight: 600; }
+  .checks { display: flex; gap: 14px; flex-wrap: wrap; }
+  .checks label { display: flex; align-items: center; gap: 6px; font-size: 12px;
+                  color: var(--muted); cursor: pointer; }
+  .checks input { accent-color: var(--accent); }
+  .key { display: inline-block; width: 11px; height: 11px; border-radius: 3px; flex: none; }
+
+  .chartcard { background: var(--panel); border: 1px solid var(--border);
+               border-radius: 10px; padding: 18px 18px 10px; margin-bottom: 18px; }
+  .chartcard h2 { font-size: 14px; margin: 0 0 3px; }
+  .chartcard .note { color: var(--muted); font-size: 12px; margin: 0 0 14px; }
+  svg { display: block; width: 100%; overflow: visible; }
+  .gridline { stroke: #222b36; stroke-width: 1; }
+  .axis text { fill: var(--muted); font-size: 11px; }
+  .axis line { stroke: #2b3340; }
+  .bar { cursor: pointer; }
+  .bar:hover { filter: brightness(1.25); }
+  .hit { fill: transparent; cursor: pointer; }
+  .hit.sel { fill: rgba(110,168,254,.10); }
+  .annot { fill: var(--text); font-size: 11.5px; font-weight: 600; }
+  .annotsub { fill: var(--muted); font-size: 11px; }
+  .callout line { stroke: var(--muted); stroke-dasharray: 2 3; }
+  .refline { stroke: var(--muted); stroke-dasharray: 4 4; stroke-width: 1; }
+  .reftext { fill: var(--muted); font-size: 10.5px; }
+  .altdot { stroke: #0e1116; stroke-width: 1.5; }
+  .night { fill: rgba(120,150,220,.07); }
+
+  #readout { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+             gap: 10px; margin: 14px 0 4px; }
+  .fig { background: #111820; border: 1px solid var(--border); border-radius: 8px;
+         padding: 9px 11px; }
+  .fig .n { font-size: 19px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .fig .l { font-size: 11px; color: var(--muted); line-height: 1.3; }
+
+  .prose { max-width: 760px; color: var(--muted); font-size: 13px; }
+  .prose p { margin: 0 0 12px; }
+  .prose b { color: var(--text); }
+  .tip {
+    position: fixed; pointer-events: none; z-index: 60; display: none;
+    background: #0b1017; border: 1px solid var(--border); border-radius: 7px;
+    padding: 8px 10px; font-size: 12px; box-shadow: 0 8px 24px rgba(0,0,0,.5);
+    min-width: 172px;
+  }
+  .tip h4 { margin: 0 0 5px; font-size: 12.5px; }
+  .tip div { display: flex; justify-content: space-between; gap: 14px; color: var(--muted); }
+  .tip div b { color: var(--text); font-variant-numeric: tabular-nums; }
+  @media (max-width: 700px) {
+    .views { grid-template-columns: 1fr; }
+    .controls { gap: 12px; }
+  }
+</style>
+</head>
+<body>
+<script>window.OTOWI_STATIC = true;</script>
+<div class="wrap">
+  <header>
+    <h1>When it is dangerous</h1>
+    <div class="sub" id="lead">Northern New Mexico &middot; hour by hour</div>
+
+    <div class="views">
+      <a id="v-drive" href="index.html"></a>
+      <a id="v-walk" href="walk.html"></a>
+      <a class="here" aria-current="page">By hour</a>
+    </div>
+  </header>
+
+  <div class="controls">
+    <div class="ctl">
+      <label for="who">Who</label>
+      <div class="seg" id="who">
+        <button data-who="drivers" class="on">People driving</button>
+        <button data-who="walking">People walking or riding</button>
+      </div>
+    </div>
+    <div class="ctl">
+      <label>Measured against</label>
+      <div class="seg" id="basis">
+        <button data-basis="both" class="on">Both proxies</button>
+        <button data-basis="model">The model's travel</button>
+        <button data-basis="crash">The state's crashes</button>
+      </div>
+    </div>
+    <div class="ctl">
+      <label>Also show</label>
+      <div class="checks">
+        <label><input type="checkbox" id="c-drink" checked>
+          <span class="key" style="background:var(--drink)"></span> drink</label>
+        <label><input type="checkbox" id="c-hurt">
+          <span class="key" style="background:#5dd6c0"></span> injury rate</label>
+        <label><input type="checkbox" id="c-night" checked>
+          <span class="key" style="background:rgba(120,150,220,.35)"></span> night</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="chartcard">
+    <h2 id="charttitle">Risk per kilometre driven, by hour</h2>
+    <p class="note" id="chartnote"></p>
+    <svg id="chart" viewBox="0 0 1000 418" role="img" aria-label="Relative risk by hour"></svg>
+    <div id="readout"></div>
+  </div>
+
+  <div class="chartcard" id="secondcard">
+    <h2 id="secondtitle">What was in the crash, hour by hour</h2>
+    <p class="note" id="secondnote"></p>
+    <svg id="chart2" viewBox="0 0 1000 220" role="img" aria-label="Shares by hour"></svg>
+  </div>
+
+  <div class="prose" id="prose"></div>
+</div>
+
+<div class="tip" id="tip"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  var STATIC = !!window.OTOWI_STATIC;
+  var DATA = STATIC ? "data/" : "/";
+
+  var CAR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14M6 17l-1.2-5.2A2 2 0 0 1 6.7 9.3h10.6a2 2 0 0 1 1.9 2.5L18 17"/><path d="M7 9.3 8.2 6.1A1.5 1.5 0 0 1 9.6 5h4.8a1.5 1.5 0 0 1 1.4 1.1L17 9.3"/><circle cx="7.5" cy="17" r="1.6"/><circle cx="16.5" cy="17" r="1.6"/></svg>';
+  var FOOT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13" cy="4" r="2"/><path d="M12.5 8 9.8 10.2 8 15"/><path d="m12.5 8 3 1.6.8 3.6"/><path d="M16.3 13.2 18 21"/><path d="M11 12.2 8.5 21"/></svg>';
+  document.getElementById("v-drive").innerHTML = CAR + "Driving";
+  document.getElementById("v-walk").innerHTML = FOOT + "Walking &amp; cycling";
+  if (!STATIC) {
+    document.getElementById("v-drive").href = "/";
+    document.getElementById("v-walk").href = "/walk";
+  }
+
+  var RISK = null, WALK = null;
+  var who = "drivers", basis = "both", pinned = null;
+
+  function el(id) { return document.getElementById(id); }
+  function pad(h) { return (h < 10 ? "0" : "") + h + ":00"; }
+  function svgEl(name, attrs, text) {
+    var node = document.createElementNS("http://www.w3.org/2000/svg", name);
+    for (var k in attrs) if (attrs[k] != null) node.setAttribute(k, attrs[k]);
+    if (text != null) node.textContent = text;
+    return node;
+  }
+
+  // ------------------------------------------------------------ the series
+  //
+  // Two exposure proxies for one missing measurement. The model knows where
+  // the day's driving is but contains commuting and nothing else; the state's
+  // crash counts cover everybody but are the thing being measured, so using
+  // them as a divisor drags every hour toward 1.0. They fail in opposite
+  // directions, which is why the honest answer is the pair and not either one.
+
+  function series() {
+    if (who === "walking") {
+      var counts = WALK ? WALK.hours.pedestrian.map(function (v, i) {
+        return v + WALK.hours.cyclist[i];
+      }) : null;
+      if (!counts) return null;
+      var town = WALK.town_crashes_by_hour;
+      var model = RISK && RISK.summary.crash_file
+        ? RISK.summary.crash_file.temporal_bias.map(function (r) { return r.share_of_modelled_travel; })
+        : null;
+      return {
+        label: "people hit while walking or riding",
+        counts: counts,
+        model: model ? ratio(counts, model) : null,
+        crash: town ? ratio(counts, town.map(function (v) { return v; })) : null,
+        unit: "per kilometre driven"
+      };
+    }
+    var rows = RISK.summary.by_hour;
+    var cf = RISK.summary.crash_file;
+    return {
+      label: "people killed in a crash",
+      counts: rows.map(function (r) { return r.deaths; }),
+      model: rows.map(function (r) { return r.relative_risk; }),
+      crash: cf ? cf.by_hour_on_crash_exposure.map(function (r) { return r.relative_risk; }) : null,
+      unit: "per kilometre driven"
+    };
+  }
+
+  function ratio(counts, exposure) {
+    var tc = counts.reduce(function (a, b) { return a + b; }, 0) || 1;
+    var te = exposure.reduce(function (a, b) { return a + b; }, 0) || 1;
+    return counts.map(function (c, i) {
+      var e = exposure[i] / te;
+      return e > 0 ? +(c / tc / e).toFixed(2) : 0;
+    });
+  }
+
+  function shown(s) {
+    var out = [];
+    if (basis !== "crash" && s.model) out.push({ key: "model", values: s.model });
+    if (basis !== "model" && s.crash) out.push({ key: "crash", values: s.crash });
+    return out;
+  }
+
+  // -------------------------------------------------------------- the chart
+
+  var W = 1000, H = 418, M = { t: 28, r: 22, b: 52, l: 44 };
+
+  function draw() {
+    var s = series();
+    var svg = el("chart");
+    svg.innerHTML = "";
+    if (!s) { return; }
+
+    var sets = shown(s);
+    var peak = Math.max.apply(null, sets.reduce(function (a, x) {
+      return a.concat(x.values); }, [1]));
+    var top = Math.ceil(peak * 1.15 * 2) / 2;
+    var plotW = W - M.l - M.r, plotH = H - M.t - M.b;
+    var bw = plotW / 24;
+    function x(h) { return M.l + h * bw; }
+    function y(v) { return M.t + plotH - (v / top) * plotH; }
+
+    // Night, as a band rather than a note. 20:00-06:00.
+    if (el("c-night").checked) {
+      svg.appendChild(svgEl("rect", { class: "night", x: x(20), y: M.t,
+        width: bw * 4, height: plotH }));
+      svg.appendChild(svgEl("rect", { class: "night", x: x(0), y: M.t,
+        width: bw * 6, height: plotH }));
+    }
+
+    // Gridlines and the 1.0 reference, which is the whole scale: an ordinary
+    // hour. Without it a reader has no idea whether 2 is a lot.
+    for (var g = 0; g <= top; g += top > 6 ? 2 : 1) {
+      svg.appendChild(svgEl("line", { class: "gridline", x1: M.l, x2: W - M.r,
+        y1: y(g), y2: y(g) }));
+      svg.appendChild(svgEl("text", { class: "axis", x: M.l - 8, y: y(g) + 4,
+        "text-anchor": "end", fill: "#93a1b4", "font-size": 11 }, g + "×"));
+    }
+    svg.appendChild(svgEl("line", { class: "refline", x1: M.l, x2: W - M.r,
+      y1: y(1), y2: y(1) }));
+    // Park the reference label over the shortest bar. Pinned to the right
+    // edge it sat underneath the evening bars, which are tall, and a label
+    // you cannot read is worse than none because it still costs ink.
+    var quietest = 0, primaryVals = sets[0] ? sets[0].values : null;
+    if (primaryVals) quietest = primaryVals.indexOf(Math.min.apply(null, primaryVals));
+    svg.appendChild(svgEl("text", { class: "reftext",
+      x: Math.min(W - M.r - 40, Math.max(M.l + 40, x(quietest) + bw / 2)),
+      y: y(1) - 7, "text-anchor": "middle" }, "an ordinary hour"));
+
+    var primary = sets[0];
+    sets.forEach(function (set, si) {
+      set.values.forEach(function (v, h) {
+        if (set.key === "model" && sets.length) {
+          var colour = v >= 2 ? "var(--hot)" : v >= 1 ? "var(--mid)" : "var(--cool)";
+          svg.appendChild(svgEl("rect", { class: "bar", x: x(h) + 2, y: y(v),
+            width: bw - 4, height: Math.max(1, y(0) - y(v)), rx: 2,
+            fill: si === 0 ? colour : colour, opacity: sets.length > 1 ? 0.92 : 1,
+            "data-h": h }));
+        } else if (set.key === "crash") {
+          // The second proxy as a marker, on the same axis, so the two are
+          // read against each other and not against two different charts.
+          svg.appendChild(svgEl("circle", { class: "altdot", cx: x(h) + bw / 2,
+            cy: y(v), r: 4, fill: "#eaf0f6" }));
+        }
+      });
+    });
+
+    // Hour axis, every three hours so the labels do not collide.
+    for (var h = 0; h < 24; h += 3) {
+      svg.appendChild(svgEl("text", { class: "axis", x: x(h) + bw / 2, y: H - M.b + 17,
+        "text-anchor": "middle", fill: "#93a1b4", "font-size": 11 }, pad(h)));
+    }
+
+    // Annotations: the worst and safest hour, named on the chart rather than
+    // left for the reader to find.
+    if (primary) {
+      var vals = primary.values;
+      var worst = vals.indexOf(Math.max.apply(null, vals));
+      var safest = vals.indexOf(Math.min.apply(null, vals));
+
+      // The worst hour has room above it by definition. The safest does not:
+      // its bar is the shortest on the chart, so a label floated over it
+      // lands among its taller neighbours. It goes under the axis with a
+      // leader line instead.
+      svg.appendChild(svgEl("text", { class: "annot", x: x(worst) + bw / 2,
+        y: Math.max(M.t + 12, y(vals[worst]) - 12), "text-anchor": "middle" },
+        "worst hour · " + vals[worst].toFixed(1) + "×"));
+
+      var sx = x(safest) + bw / 2;
+      svg.appendChild(svgEl("line", { class: "refline", x1: sx, x2: sx,
+        y1: y(vals[safest]), y2: H - M.b + 6 }));
+      svg.appendChild(svgEl("text", { class: "annot",
+        x: Math.min(W - M.r - 46, Math.max(M.l + 46, sx)), y: H - M.b + 34,
+        "text-anchor": "middle" },
+        "safest hour · " + vals[safest].toFixed(1) + "×"));
+    }
+
+    // One transparent hit area per hour, so hovering anywhere in the column
+    // works rather than only on a 1.5 mm bar.
+    for (var hh = 0; hh < 24; hh++) {
+      var hit = svgEl("rect", { class: "hit" + (pinned === hh ? " sel" : ""),
+        x: x(hh), y: M.t, width: bw, height: plotH, "data-h": hh });
+      svg.appendChild(hit);
+    }
+    svg.querySelectorAll(".hit").forEach(function (node) {
+      node.addEventListener("mousemove", function (e) { showTip(e, +node.dataset.h, s); });
+      node.addEventListener("mouseleave", hideTip);
+      node.addEventListener("click", function () {
+        pinned = pinned === +node.dataset.h ? null : +node.dataset.h;
+        draw(); readout();
+      });
+    });
+
+    el("charttitle").textContent = who === "walking"
+      ? "People hit while walking or riding, per kilometre driven"
+      : "Fatal-crash risk per kilometre driven, by hour";
+    el("chartnote").innerHTML = note(s, sets);
+    drawSecond();
+    readout();
+  }
+
+  function note(s, sets) {
+    var bits = ["Bars are " + s.label + " in each hour, divided by how much " +
+                "driving happened in it, scaled so an ordinary hour is 1.0."];
+    if (sets.length > 1) {
+      bits.push("The <b>white dots</b> are the same crashes divided by the " +
+        "state's all-severity crash counts instead of by the model's travel " +
+        "curve — a second proxy for the same missing measurement.");
+    } else if (basis === "crash") {
+      bits.push("Exposure here is the state's all-severity crash counts, " +
+        "which drags every hour toward 1.0 because the thing being measured " +
+        "is inside the divisor.");
+    } else {
+      bits.push("Exposure here is the model's travel curve, which contains " +
+        "commuting and nothing else — it overstates the rush hour.");
+    }
+    return bits.join(" ");
+  }
+
+  // ------------------------------------------------- the shares underneath
+
+  function drawSecond() {
+    var svg = el("chart2");
+    svg.innerHTML = "";
+    var cf = RISK.summary.crash_file;
+    var want = [];
+    if (el("c-drink").checked && cf) {
+      want.push({ key: "drink", label: "had drink in them",
+                  values: cf.alcohol_share, colour: "var(--drink)" });
+    }
+    if (el("c-hurt").checked && cf) {
+      want.push({ key: "hurt", label: "hurt somebody",
+                  values: cf.hurt_share, colour: "#5dd6c0" });
+    }
+    el("secondcard").style.display = want.length ? "block" : "none";
+    if (!want.length) return;
+
+    var h2 = 220, m = { t: 20, r: 22, b: 30, l: 44 };
+    var plotW = W - m.l - m.r, plotH = h2 - m.t - m.b;
+    var bw = plotW / 24;
+    var top = Math.max.apply(null, want.reduce(function (a, s) {
+      return a.concat(s.values); }, [0.1])) * 1.15;
+    function x(h) { return m.l + h * bw; }
+    function y(v) { return m.t + plotH - (v / top) * plotH; }
+
+    [0, top / 2, top].forEach(function (g) {
+      svg.appendChild(svgEl("line", { class: "gridline", x1: m.l, x2: W - m.r,
+        y1: y(g), y2: y(g) }));
+      svg.appendChild(svgEl("text", { x: m.l - 8, y: y(g) + 4, "text-anchor": "end",
+        fill: "#93a1b4", "font-size": 11 }, Math.round(g * 100) + "%"));
+    });
+
+    want.forEach(function (set) {
+      set.values.forEach(function (v, h) {
+        svg.appendChild(svgEl("rect", { x: x(h) + 2, y: y(v),
+          width: bw - 4, height: Math.max(1, y(0) - y(v)), rx: 2,
+          fill: set.colour, opacity: want.length > 1 ? 0.65 : 0.9 }));
+      });
+    });
+
+    for (var h = 0; h < 24; h += 3) {
+      svg.appendChild(svgEl("text", { x: x(h) + bw / 2, y: h2 - m.b + 18,
+        "text-anchor": "middle", fill: "#93a1b4", "font-size": 11 }, pad(h)));
+    }
+
+    el("secondtitle").textContent = "Share of that hour's crashes that " +
+      want.map(function (s) { return s.label; }).join(" / ");
+    el("secondnote").innerHTML = "This needs <b>no exposure denominator at " +
+      "all</b>: whatever the traffic was, it is in the numerator and the " +
+      "denominator alike and cancels. Nothing here is modelled — it is " +
+      (cf ? cf.crashes.toLocaleString() : "") + " crashes the state recorded.";
+  }
+
+  // ------------------------------------------------------------- the numbers
+
+  function readout() {
+    var s = series();
+    if (!s) return;
+    var sets = shown(s);
+    var primary = sets[0] ? sets[0].values : null;
+    var cf = RISK.summary.crash_file;
+    var figs = [];
+
+    if (pinned != null && primary) {
+      figs.push([pad(pinned), "the hour you picked"]);
+      figs.push([primary[pinned].toFixed(2) + "×", "an ordinary hour"]);
+      figs.push([s.counts[pinned], who === "walking" ? "people hit then" : "people killed then"]);
+      if (cf) figs.push([Math.round(cf.alcohol_share[pinned] * 100) + "%",
+                         "of that hour's crashes had drink in them"]);
+    } else {
+      if (s.model && s.crash) {
+        var a = spread(s.model), b = spread(s.crash);
+        figs.push([Math.round(Math.min(a.ratio, b.ratio)) + "–" +
+                   Math.round(Math.max(a.ratio, b.ratio)) + "×",
+                   "worst hour against safest, on the two proxies"]);
+        figs.push([pad(a.worst), "the worst hour on both"]);
+      } else if (primary) {
+        var c = spread(primary);
+        figs.push([Math.round(c.ratio) + "×", "worst hour against safest"]);
+        figs.push([pad(c.worst), "the worst hour"]);
+      }
+      figs.push([s.counts.reduce(function (x, y) { return x + y; }, 0),
+                 who === "walking" ? "people hit, in total" : "people killed, in total"]);
+      if (cf) figs.push([Math.round(Math.max.apply(null, cf.alcohol_share) * 100) + "%",
+                         "the drunkest hour's crashes"]);
+    }
+
+    el("readout").innerHTML = figs.map(function (f) {
+      return '<div class="fig"><div class="n">' + f[0] + '</div><div class="l">' +
+             f[1] + "</div></div>";
+    }).join("");
+
+    el("prose").innerHTML = prose(s);
+  }
+
+  function spread(values) {
+    var hi = Math.max.apply(null, values), lo = Math.min.apply(null, values);
+    return { worst: values.indexOf(hi), safest: values.indexOf(lo),
+             ratio: lo > 0 ? hi / lo : 0 };
+  }
+
+  function prose(s) {
+    if (who === "walking") {
+      return "<p>This is the driver's exposure, not the walker's. It answers " +
+        "<b>how likely a kilometre of driving is to hit somebody</b> — a " +
+        "real question, and not the same as how dangerous walking is, which " +
+        "would need a count of how many people were walking. Nobody counts " +
+        "that anywhere in this study area.</p>" +
+        "<p>The shape is the point: it is not the drivers' shape. People on " +
+        "foot concentrate in the evening, when the light goes and they are " +
+        "still out. A tool that hands a pedestrian the driver's curve tells " +
+        "them to travel at exactly the wrong time.</p>";
+    }
+    var a = s.model ? spread(s.model) : null, b = s.crash ? spread(s.crash) : null;
+    var out = "<p>Most crashes happen when most people are driving, which is a " +
+      "fact about traffic rather than about risk. Dividing by how much driving " +
+      "happened in each hour turns it into the second thing — and the " +
+      "divisor is not measured, because nobody counts traffic by hour on every " +
+      "road.</p>";
+    if (a && b) {
+      out += "<p>So it is done twice. On the model's travel curve the swing is " +
+        "<b>" + Math.round(a.ratio) + "×</b>; on the state's crash counts, " +
+        "<b>" + Math.round(b.ratio) + "×</b>. Both proxies are wrong in " +
+        "opposite directions — the model overstates the rush hour because " +
+        "it contains commuting and nothing else, and crashes-as-exposure " +
+        "understates every swing because the thing being measured is inside " +
+        "the divisor. The truth is between them, and <b>" + pad(a.worst) +
+        "</b> is the worst hour on both.</p>" +
+        "<p>What does <i>not</i> survive the second opinion is the midday " +
+        "bump. That was the demand model's noon hole, not a fact about the " +
+        "road.</p>";
+    }
+    return out;
+  }
+
+  // ------------------------------------------------------------- the tooltip
+
+  function showTip(e, h, s) {
+    var tip = el("tip");
+    var cf = RISK.summary.crash_file;
+    var rows = "";
+    if (s.model) rows += "<div><span>on the model</span><b>" +
+      s.model[h].toFixed(2) + "×</b></div>";
+    if (s.crash) rows += "<div><span>on crash counts</span><b>" +
+      s.crash[h].toFixed(2) + "×</b></div>";
+    rows += "<div><span>" + (who === "walking" ? "people hit" : "people killed") +
+      "</span><b>" + s.counts[h] + "</b></div>";
+    if (cf) {
+      rows += "<div><span>drink involved</span><b>" +
+        Math.round(cf.alcohol_share[h] * 100) + "%</b></div>";
+      rows += "<div><span>all crashes then</span><b>" +
+        cf.all_crashes[h].toLocaleString() + "</b></div>";
+    }
+    tip.innerHTML = "<h4>" + pad(h) + "–" + pad((h + 1) % 24) + "</h4>" + rows;
+    tip.style.display = "block";
+    var pad2 = 14;
+    var left = e.clientX + pad2, tw = tip.offsetWidth;
+    if (left + tw > window.innerWidth - 8) left = e.clientX - tw - pad2;
+    tip.style.left = left + "px";
+    tip.style.top = Math.min(e.clientY + pad2, window.innerHeight - tip.offsetHeight - 8) + "px";
+  }
+  function hideTip() { el("tip").style.display = "none"; }
+
+  // ------------------------------------------------------------------ wiring
+
+  document.querySelectorAll("#who button").forEach(function (b) {
+    b.onclick = function () {
+      document.querySelectorAll("#who button").forEach(function (o) { o.className = ""; });
+      b.className = "on";
+      who = b.dataset.who;
+      pinned = null;
+      draw();
+    };
+  });
+  document.querySelectorAll("#basis button").forEach(function (b) {
+    b.onclick = function () {
+      document.querySelectorAll("#basis button").forEach(function (o) { o.className = ""; });
+      b.className = "on";
+      basis = b.dataset.basis;
+      draw();
+    };
+  });
+  ["c-drink", "c-hurt", "c-night"].forEach(function (id) {
+    el(id).onchange = draw;
+  });
+  window.addEventListener("resize", draw);
+
+  Promise.all([
+    fetch(DATA + "risk.json").then(function (r) { return r.json(); }),
+    fetch(DATA + "walk.json").then(function (r) { return r.json(); })
+      .catch(function () { return null; })
+  ]).then(function (both) {
+    RISK = both[0];
+    WALK = both[1];
+    var cf = RISK.summary.crash_file;
+    el("lead").innerHTML = RISK.summary.fatalities + " people killed in " +
+      RISK.summary.crashes + " crashes, " +
+      "2018–2023" + (cf ? " &middot; " + cf.crashes.toLocaleString() +
+      " crashes of every severity, " + cf.years[0] + "–" +
+      cf.years[cf.years.length - 1] : "") + " &middot; NHTSA and NMDOT";
+    draw();
+  }).catch(function (e) {
+    el("chartnote").textContent = "Could not load the data: " + e;
+  });
+})();
+</script>
+</body>
+</html>
