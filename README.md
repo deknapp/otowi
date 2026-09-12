@@ -92,6 +92,7 @@ otowi simulate    # SUMO: the microscopic run                   (~5 min)
 otowi calibrate   # compare against NMDOT counts                (~1 min)
 otowi risk        # fatal crashes per unit of travel, per road   (~1 min)
 otowi crashes     # the state's whole crash file, by hour        (~1 min first run)
+otowi vru         # pedestrians and cyclists: where, and when     (~20 s first run)
 otowi web         # interactive map on localhost                (instant)
 
 otowi run         # all of the above, skipping what is done
@@ -244,6 +245,38 @@ too wide. Averaging the two describes neither, so they are counted separately
 and drawn in a different colour. It is also the one finding here that no
 per-kilometre corridor rate would ever surface, because the people it describes
 were not driving.
+
+Forty is also too few to say much more than that. NMDOT's **Vulnerable Road
+User Safety Assessment** — federally mandated under the infrastructure act, and
+published as an open map layer rather than only a PDF — has **758 of these
+crashes inside the bounding box, 2013–2023**, with a coordinate, an hour, a
+severity and a lighting condition on each. Unlike the 40, it includes the
+people who were hit and lived, which is most of them.
+
+| | |
+|---|---|
+| Pedestrians and cyclists struck | 758 (446 on foot, 312 on a bike) |
+| Killed | 59 |
+| Killed or seriously injured | 146 |
+| Happened after dark | 28% |
+| …of the ones that killed somebody | **73%** |
+| Killed or serious falling 17:00–23:00 | 57% |
+
+**Darkness does not cause many more of these. It decides how they end.**
+
+And one road owns it. Cerrillos Road: 125 crashes, 25 killed or seriously
+hurt, 13 dead — the next road on the list has four. NMDOT's own **High Injury
+Network**, a ranking built by the state from the state's file without reference
+to anything here, puts Cerrillos Road at 2.3x the next road's severity index.
+FARS, counting only deaths, already put it first. Three methods, one answer.
+
+    otowi vru --window 0 24
+
+What none of this can do is give a pedestrian a rate. A rate needs to know how
+many people crossed, and nobody counts that. Dividing by *vehicle* travel — the
+only exposure this project measures — answers how likely a kilometre of driving
+is to hit somebody, which is a driver's question and a real one, but it is not
+the same number and it is labelled as what it is.
 
 **What the unit of analysis had to be.** Per SUMO edge — a couple of hundred
 metres — every road in the study area returns exactly one crash at 300 to 800
