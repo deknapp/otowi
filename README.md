@@ -90,6 +90,8 @@ otowi trips       # commute flows → individual vehicles         (~30 s)
 otowi route       # duarouter: trips → paths                    (~30 s)
 otowi simulate    # SUMO: the microscopic run                   (~5 min)
 otowi calibrate   # compare against NMDOT counts                (~1 min)
+otowi risk        # fatal crashes per unit of travel, per road   (~1 min)
+otowi crashes     # the state's whole crash file, by hour        (~1 min first run)
 otowi web         # interactive map on localhost                (instant)
 
 otowi run         # all of the above, skipping what is done
@@ -144,6 +146,7 @@ vocabulary first.
 | **GEH** | Not an acronym — the initials of Geoffrey E. Havers. A goodness-of-fit score for comparing a modelled traffic volume against a counted one; under 5 is a good match on one road, and 85% of roads under 5 is the usual bar for accepting a model. |
 | **LODES** | The Census Bureau's record of how many people commute between each pair of census blocks, built from unemployment-insurance wage records. |
 | **FARS** | NHTSA's Fatality Analysis Reporting System: a census of every crash on a US public road that killed someone within 30 days. |
+| **TRU** | UNM's Traffic Research Unit, which publishes NMDOT's full crash file — every severity, not only the fatal ones — as a report per county and per town. |
 | **SUMO** | Simulation of Urban MObility, the open-source traffic simulator this is built on. |
 | **K and D factors** | Published alongside a traffic count: K is the share of a day's traffic in its busiest hour, D the share of that hour going the busier way. |
 
@@ -205,19 +208,27 @@ expects:
     08:00  0.25x                    ##
     21:00  2.51x                    ####################
 
-**A kilometre driven at 3am is about nineteen times more likely to kill someone
-than a kilometre driven at 8am.** The rush hour is the safest time to be on
-these roads, not the worst.
+**A kilometre driven at 3am is somewhere between ten and nineteen times more
+likely to kill someone than a kilometre driven at 8am.** The rush hour is the
+safest time to be on these roads, not the worst.
 
-This is the one place the simulation is doing indispensable work in the safety
-numbers: nobody counts traffic by hour on every road, and the model supplies
-that denominator. Only the *shape* of its daily curve is used, never the level,
-since the comparison is a ratio of shares and the undercount cancels. The bias
-runs the same way as the result and is stated with it: a commute-only model
-overstates how much driving happens at 08:00 and understates midday shopping
-and freight. It cannot account for a nineteenfold swing, and the published
-figure of roughly three times worse at night sits inside the range this
-produces.
+The range is there because the denominator is not measured. Nobody counts
+traffic by hour on every road, so the model supplies that curve — and the model
+contains commuting and nothing else, which overstates how much of the day's
+driving happens at 08:00. That bias runs the same way as the result, so it has
+to be bounded rather than mentioned.
+
+The state's all-severity crash file is the second opinion (see below). Using
+its hourly crash counts as a stand-in for exposure — *quasi-induced exposure*,
+an old idea with an assumption that is wrong in a known direction — gives
+**10x**, against the model's 19x. Both proxies fail, in opposite directions:
+the model overstates the peak, and crashes-as-exposure drags every hour toward
+1.0 because the thing being measured is inside the divisor. The worst hour is
+03:00 on both, and the shape is the same on both. The size sits between them.
+
+What does *not* survive the second opinion is the midday bump: 2.7x on the
+model's curve, 0.9x on the crash curve. That one was the demand model's noon
+hole, not a fact about the road.
 
 ### A quarter of the people killed here were not in a car
 
@@ -242,6 +253,54 @@ Per OSM street name is not much better, since most edges here are unnamed and
 the highways carrying the deaths are among them. NMDOT's route identifiers are
 the unit, they arrive free with the count segments already matched for
 calibration, and they were chosen without reference to where anybody died.
+
+### The state records 136 crashes for every one FARS sees
+
+FARS is a census of deaths and nothing else. New Mexico keeps a second file —
+every police Uniform Crash Report, meaning any incident on a public road with a
+death, an injury, or $500 of damage — and UNM's Traffic Research Unit publishes
+it back as a per-community report under NMDOT contract. For the three counties
+here that is **59,849 crashes over 2007–2021**, of which 439 were fatal.
+
+Most of what it says needs no exposure denominator at all, which is what makes
+it worth having next to a simulation. "Is driving more dangerous at 3am" has to
+divide by how much driving happened. "*Given that* a crash happened, was drink
+involved" does not — whatever the exposure was, it is in the numerator and the
+denominator alike and cancels. Nothing modelled, nothing assumed:
+
+| hour | crashes | drink involved | someone hurt | pedestrian or cyclist, per 1,000 |
+|---|---|---|---|---|
+| 02:00 | 124 | **30%** | 31% | — |
+| 08:00 | 875 | **1%** | 30% | 16 |
+| 17:00 | 1,388 | 4% | 37% | 28 |
+| 21:00 | 476 | 15% | 35% | **80** |
+
+Three things fall out of that table.
+
+**Drink is the whole of the night.** A fortyfold swing between 02:00 and 08:00,
+measured on 15,000 crashes.
+
+**Crashes at night are not worse crashes.** Whether anyone was hurt barely
+moves — 28% to 37% across the entire day, with no night spike. So the answer to
+*why* 3am is dangerous is not that the crashes are more severe; it is who is
+driving. (At the injury-or-property-damage threshold, which is the one these
+reports publish by hour. Death is a rarer threshold and could still behave
+differently.)
+
+**Pedestrians are a different curve, not a smaller one.** They are in 16 of
+every 1,000 town crashes at 08:00 and 80 at 21:00 — 30% of them hit between
+18:00 and 23:00. That is neither when drivers crash nor when the roads are
+empty. It is when the light goes. A tool that hands a pedestrian the driver's
+hourly curve tells them to walk at exactly the wrong time.
+
+The reports are published per county and per municipality, and neither is the
+bounding box — Rio Arriba County runs north to Chama. So only the *shape* of
+these curves is used, never the level, and there are no coordinates on any of
+these records: FARS still does all the per-road work. NMDOT crash data is
+collected under 23 U.S.C. § 409 and may not be used as evidence in an action
+for damages against a road authority.
+
+    otowi crashes --window 0 24
 
 ## Built on
 
@@ -277,6 +336,13 @@ Things this will say about itself, and keep saying:
   they will be estimated separately and labelled as estimates.
 - **Uncalibrated output is not a result.** Until the validation error is
   reported, this repository will say so at the top.
+- **The calibration checks place, not time.** Count stations say whether the
+  right number of vehicles is on a road; nothing says whether the right number
+  is on it at 14:00. The state's crash file is the only check available, and
+  it does not flatter: the model puts 14% of the day's driving in the 08:00
+  hour where 6% of the crashes are, and 2% at noon where 7% are. Anything that
+  divides by the hourly travel curve inherits that, which is why the 3am
+  finding is published as a range.
 
 ## What the calibration says
 
