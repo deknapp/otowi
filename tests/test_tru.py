@@ -185,3 +185,55 @@ class TestKinds:
         # have silently split in two.
         assert tru.KINDS["pedestrian and pedalcyclist crashes"] == "vru"
         assert tru.KINDS["all pedestrian and pedalcycle crashes"] == "vru"
+
+
+class TestWhatNeedsNoExposure:
+    """The half of this that no modelling assumption can move.
+
+    "Is driving more dangerous at 3am" needs a divisor, and this project's
+    divisor is a commuter-only model. "Given that a crash happened, was drink
+    involved" does not: whatever the exposure was, it is in the numerator and
+    the denominator alike.
+    """
+
+    def test_a_share_is_the_ratio_of_two_counts(self):
+        assert tru.share_by_hour([1] * 24, [4] * 24) == [0.25] * 24
+
+    def test_an_hour_with_no_crashes_is_zero_not_a_division_error(self):
+        counts = [0] * 24
+        assert tru.share_by_hour([0] * 24, counts) == [0.0] * 24
+
+    def test_exposure_from_crash_counts_understates_the_variation(self):
+        # Using crashes as the exposure denominator drags every hour toward
+        # 1.0, because the thing being measured is inside the divisor. It
+        # fails in a known direction, which is what makes it a useful second
+        # opinion rather than a better answer.
+        crashes = [10] * 24
+        crashes[3] = 1
+        deaths = [1] * 24
+        deaths[3] = 1
+        exposure = tru.as_exposure(crashes)
+        rows = tru.relative_risk(deaths, exposure)
+        assert rows[3]["relative_risk"] > rows[12]["relative_risk"]
+        # 10x fewer crashes and the same deaths, but nothing like 10x, because
+        # the hour's own crashes are the denominator.
+        assert rows[3]["relative_risk"] < 10.0
+
+
+class TestTemporalBias:
+    def test_a_model_that_matches_the_crash_curve_scores_one(self):
+        counts = [100] * 24
+        travel = {hour: 5.0 for hour in range(24)}
+        rows = tru.temporal_bias(travel, counts)
+        assert all(row["ratio"] == pytest.approx(1.0) for row in rows)
+
+    def test_a_commuter_only_peak_shows_up_above_one(self):
+        # The real shape: the model puts 14% of the day's driving in the 08:00
+        # hour and 2% at noon; the crash file says 6% and 7%.
+        counts = [100] * 24
+        travel = {hour: 100.0 for hour in range(24)}
+        travel[8] = 400.0
+        travel[12] = 25.0
+        rows = tru.temporal_bias(travel, counts)
+        assert rows[8]["ratio"] > 1.0
+        assert rows[12]["ratio"] < 1.0

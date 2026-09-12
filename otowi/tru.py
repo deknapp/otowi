@@ -582,3 +582,70 @@ def summarise(hourly: list[HourlyCrashes], severity: list[SeverityYear]) -> dict
         out["severity"]["crashes_per_fatal"] = round(
             out["severity"]["crashes"] / max(out["severity"]["fatal"], 1), 1)
     return out
+
+
+# ------------------------------------------- what needs no exposure at all
+
+
+def share_by_hour(numerator: list[int], denominator: list[int]) -> list[float]:
+    """One kind of crash as a fraction of all of them, hour by hour.
+
+    The most useful thing in this file, and the reason for it. Every question
+    of the form "is driving more dangerous at 3am" needs an exposure
+    denominator, and this project's denominator is a commuter-only model with
+    a known temporal bias. Questions of the form "**given that** a crash
+    happened, was drink involved" need no denominator whatsoever: the exposure,
+    whatever it was, is in the numerator and the denominator alike and cancels.
+
+    So the alcohol share by hour, the injury share by hour, and the pedestrian
+    share of crashes by hour are facts about the crash file, not outputs of a
+    model, and they are the parts of this analysis that no assumption can move.
+    """
+    return [n / d if d else 0.0 for n, d in zip(numerator, denominator)]
+
+
+def as_exposure(counts: list[int]) -> dict[int, float]:
+    """All-severity crash counts, used as a stand-in for how much driving happens.
+
+    A second opinion on the exposure curve, and worth having because the first
+    one is a model that contains commuting and nothing else. The idea is old --
+    *quasi-induced exposure* -- and the assumption behind it is visible and
+    checkable: that the number of crashes of all severities in an hour is
+    roughly proportional to how much driving happened in it.
+
+    That assumption is not true. Risk per kilometre genuinely varies by hour,
+    which is the whole question, so using crashes as exposure drags every
+    estimate toward 1.0 and **understates** the real variation. It fails in a
+    known direction, which is what makes it useful: the model's curve
+    overstates the peak and the crash curve understates it, so the honest
+    answer is bracketed rather than asserted.
+    """
+    return {hour: float(count) for hour, count in enumerate(counts)}
+
+
+def temporal_bias(travel: dict[int, float], counts: list[int]) -> list[dict]:
+    """Where the model puts the day's driving, against where the crashes are.
+
+    The project calibrates volumes against count stations, which is a check on
+    *place*. Nothing has ever checked *time* outside the morning peak, and this
+    is the closest thing available to one: crashes are not travel, but a model
+    that puts 14% of the day's driving into the 08:00 hour while 6% of the
+    year's crashes happen then is making a claim about the shape of the day
+    that the crash file does not support.
+
+    A ratio above 1.0 means the model thinks more of the day's driving happens
+    then than the crashes suggest.
+    """
+    total_travel = sum(travel.values()) or 1.0
+    total_crashes = sum(counts) or 1
+    rows = []
+    for hour in range(24):
+        modelled = travel.get(hour, 0.0) / total_travel
+        observed = counts[hour] / total_crashes
+        rows.append({
+            "hour": hour,
+            "share_of_modelled_travel": round(modelled, 4),
+            "share_of_crashes": round(observed, 4),
+            "ratio": round(modelled / observed, 2) if observed else 0.0,
+        })
+    return rows

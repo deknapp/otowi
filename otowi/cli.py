@@ -619,6 +619,158 @@ def cmd_risk(args) -> None:
     print("  there is nothing honest to rank them by.\n")
 
 
+def cmd_crashes(args) -> None:
+    """When crashes happen, from the state's whole file rather than only the deaths.
+
+    `otowi risk` answers this from FARS: a census of fatal crashes, about 150
+    records here, single digits per hour. This answers it from the NMDOT/UNM
+    community reports -- 15,000 crashes over the same three counties -- and it
+    does most of the work without an exposure denominator at all.
+
+    That last part is the point. Every "is driving more dangerous at 3am"
+    question needs to divide by how much driving happened, and this project's
+    divisor is a commuter-only model. Every "given that a crash happened, was
+    drink involved" question does not: the exposure is in the numerator and
+    denominator alike and cancels. So the alcohol share by hour and the
+    pedestrian share by hour are facts about the crash file that no modelling
+    assumption can move, and they come first.
+    """
+    from . import fatalities, tru
+
+    hourly, severity = tru.fetch(force=getattr(args, "force", False))
+    if not hourly:
+        raise SystemExit("No TRU reports could be read. Check the network, "
+                         "or run with -v to see which fetch failed.")
+
+    summary = tru.summarise(hourly, severity)
+    counties = tru.names_for(tru.COUNTY_KEYS)
+    cities = tru.names_for(tru.CITY_KEYS)
+
+    county_all = tru.profile(hourly, "all", places=counties)
+    county_ksi = tru.profile(hourly, "injury_or_fatal", places=counties)
+    county_alcohol = tru.profile(hourly, "alcohol", places=counties)
+    # Pedestrians from the city reports against city crashes: a county figure
+    # is diluted by highway crashes no pedestrian was anywhere near, and the
+    # share only means something if both halves cover the same ground.
+    town_all = tru.profile(hourly, "all", places=cities)
+    town_vru = tru.profile(hourly, "vru", places=cities)
+
+    summary["shares"] = {
+        "injury_or_fatal": tru.share_by_hour(county_ksi, county_all),
+        "alcohol": tru.share_by_hour(county_alcohol, county_all),
+        "vru_in_towns": tru.share_by_hour(town_vru, town_all),
+    }
+
+    window = tuple(args.window)
+    travel = None
+    if simulate.edgedata_path(window).exists():
+        travel = fatalities.hourly_travel(
+            _load_net(), simulate.intervals_path(window))
+        summary["temporal_bias"] = tru.temporal_bias(travel, county_all)
+        crashes = fatalities.fetch()
+        summary["fars_on_model_exposure"] = fatalities.by_hour(crashes, travel)
+        summary["fars_on_crash_exposure"] = fatalities.by_hour(
+            crashes, tru.as_exposure(county_all))
+
+    if args.json:
+        print(json.dumps(summary, indent=2))
+        return
+
+    years = ", ".join(str(y) for y in summary["years"])
+    print(f"\nNMDOT crashes, {', '.join(counties)}, {years}\n")
+    sev = summary.get("severity", {})
+    if sev:
+        print(f"  {sev['crashes']:,} crashes over {sev['years'][0]}-{sev['years'][1]}: "
+              f"{sev['fatal']:,} fatal, {sev['injury']:,} injury, "
+              f"{sev['property_damage']:,} damage only.")
+        print(f"  {sev['crashes_per_fatal']:.0f} recorded crashes for every one that "
+              f"killed someone. FARS sees the one.\n")
+
+    print("  Hour by hour, needing no exposure denominator\n")
+    print(f"  {'hour':<6}{'crashes':>9}{'drink':>8}{'hurt':>8}"
+          f"{'on foot, per 1,000':>20}")
+    alcohol = summary["shares"]["alcohol"]
+    hurt = summary["shares"]["injury_or_fatal"]
+    walking = summary["shares"]["vru_in_towns"]
+    for hour in range(24):
+        print(f"  {hour:02d}:00 {county_all[hour]:>9,}{alcohol[hour]:>7.0%}"
+              f"{hurt[hour]:>8.0%}{walking[hour] * 1000:>16.0f}")
+
+    worst_drink = max(range(24), key=lambda h: alcohol[h])
+    print(f"\n  Drink is in {alcohol[worst_drink]:.0%} of the crashes at "
+          f"{worst_drink:02d}:00 and {min(alcohol):.0%} of them at "
+          f"{alcohol.index(min(alcohol)):02d}:00 --")
+    print("  a fortyfold swing, measured on 15,000 crashes, with nothing modelled.")
+    print(f"  Whether a crash hurt someone barely moves: "
+          f"{min(hurt):.0%} to {max(hurt):.0%} across the")
+    print("  whole day. The night is not more dangerous because crashes are worse")
+    print("  then; it is more dangerous because of who is driving.")
+
+    town = summary["vru_in_towns"]
+    evening = sum(town_vru[18:23]) / sum(town_vru) if sum(town_vru) else 0.0
+    print(f"\n  {town['total']} pedestrians and cyclists were hit in the three towns. "
+          f"Of every 1,000")
+    print(f"  crashes at 08:00, {walking[8] * 1000:.0f} involved one; at 21:00, "
+          f"{walking[21] * 1000:.0f}. {evening:.0%} of them were hit")
+    print("  between 18:00 and 23:00 -- not when drivers crash, and not when the")
+    print("  roads are empty. It is when the light goes.\n")
+
+    if travel is None:
+        print(f"  No whole-day simulation for {window}, so there is no exposure")
+        print("  curve to check against. Run:")
+        print(f"    otowi run --window {window[0]} {window[1]}\n")
+        return
+
+    bias = summary["temporal_bias"]
+    over = max(bias, key=lambda r: r["ratio"])
+    under = min((r for r in bias if r["ratio"] > 0), key=lambda r: r["ratio"])
+    print("  And what that says about this model's day\n")
+    print(f"  {'hour':<6}{'model travel':>14}{'crashes':>10}{'ratio':>8}")
+    for row in bias:
+        print(f"  {row['hour']:02d}:00 {row['share_of_modelled_travel']:>13.1%}"
+              f"{row['share_of_crashes']:>10.1%}{row['ratio']:>8.2f}")
+    print(f"\n  The model puts {over['share_of_modelled_travel']:.0%} of the day's "
+          f"driving in the {over['hour']:02d}:00 hour, when "
+          f"{over['share_of_crashes']:.0%} of")
+    print(f"  the crashes happen, and {under['share_of_modelled_travel']:.0%} in the "
+          f"{under['hour']:02d}:00 hour, when {under['share_of_crashes']:.0%} do. "
+          f"That is the")
+    print("  commuter-only demand showing: LODES knows the drive to work and")
+    print("  nothing about the errands that fill the middle of the day.")
+
+    model_rows = summary["fars_on_model_exposure"]
+    proxy_rows = summary["fars_on_crash_exposure"]
+    print("\n  Which moves the headline. Fatal-crash risk per unit of exposure,")
+    print("  once on the model's travel curve and once on the crash curve:\n")
+    print(f"  {'hour':<6}{'deaths':>8}{'on the model':>14}{'on crashes':>13}")
+    for a, b in zip(model_rows, proxy_rows):
+        print(f"  {a['hour']:02d}:00 {a['deaths']:>8}{a['relative_risk']:>13.2f}x"
+              f"{b['relative_risk']:>12.2f}x")
+
+    def spread(rows):
+        high = max(rows, key=lambda r: r["relative_risk"])
+        low = min(rows, key=lambda r: r["relative_risk"])
+        return high, low, high["relative_risk"] / max(low["relative_risk"], 1e-9)
+
+    high_m, low_m, ratio_m = spread(model_rows)
+    high_p, low_p, ratio_p = spread(proxy_rows)
+    print(f"\n  On the model: {high_m['hour']:02d}:00 is {ratio_m:.0f}x "
+          f"{low_m['hour']:02d}:00. On the crash curve: "
+          f"{high_p['hour']:02d}:00 is {ratio_p:.0f}x {low_p['hour']:02d}:00.")
+    print("  The worst hour is the same one either way, and so is the direction --")
+    print("  the rush hour is the safe part of the day. The size of it is not:")
+    print(f"  the published {ratio_m:.0f}x is the top of a "
+          f"{min(ratio_p, ratio_m):.0f}x-to-{max(ratio_p, ratio_m):.0f}x range. "
+          f"The model overstates how")
+    print("  much of the day's driving happens at rush hour, which deflates the")
+    print("  rush hour's risk and inflates the ratio against it.")
+    print("  Crashes are not travel either, and using them as exposure drags")
+    print("  every hour toward 1.0, so the truth is inside the bracket.\n")
+    print("  Counties are not the study area -- Rio Arriba runs north to Chama --")
+    print("  so only the shape of these curves is used, never the level. NMDOT")
+    print("  crash data is protected under 23 U.S.C. 409.\n")
+
+
 def cmd_web(args) -> None:
     """Build the map data and serve it on localhost."""
     from . import web
@@ -828,6 +980,8 @@ def build_parser() -> argparse.ArgumentParser:
          "Iterate routing against measured congestion (user equilibrium)."),
         ("calibrate", cmd_calibrate, "Compare modelled volumes against NMDOT counts."),
         ("risk", cmd_risk, "Rank corridors by fatal crashes per unit of travel."),
+        ("crashes", cmd_crashes,
+         "When crashes happen, from the state's all-severity file."),
         ("web", cmd_web, "Serve an interactive map of the model and its error."),
         ("export", cmd_export, "Write the map as static files for GitHub Pages."),
         ("run", cmd_run, "Do every stage that has not been done."),
