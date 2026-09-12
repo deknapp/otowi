@@ -93,7 +93,7 @@ otowi calibrate   # compare against NMDOT counts                (~1 min)
 otowi risk        # fatal crashes per unit of travel, per road   (~1 min)
 otowi crashes     # the state's whole crash file, by hour        (~1 min first run)
 otowi vru         # pedestrians and cyclists: where, and when     (~20 s first run)
-otowi web         # interactive map on localhost                (instant)
+otowi web         # both maps on localhost, including /walk      (instant)
 
 otowi run         # all of the above, skipping what is done
 ```
@@ -334,6 +334,54 @@ collected under 23 U.S.C. § 409 and may not be used as evidence in an action
 for damages against a road authority.
 
     otowi crashes --window 0 24
+
+## Two maps
+
+`otowi web` serves both; `otowi export` writes both as static files.
+
+### The driving map
+
+Four layers over the same network — simulated volume, NMDOT's counts, the
+ratio between them, and the fatal-crash rate per corridor — plus the
+hour-of-day panel. That panel now carries the bracket rather than a point
+estimate: the bars are risk against the model's travel curve, the white ticks
+are the same deaths against the state's all-severity crash counts, and the two
+agree at night and come apart at midday, which is exactly where the
+commuter-only demand has its hole. Under them is the drink ribbon — the share
+of each hour's crashes with alcohol in them, 30% at 02:00 against 1% at 08:00,
+a number that needs no exposure denominator and so no model at all.
+
+"When should I leave" takes the six named places, or any address in the study
+area when a server is behind the page.
+
+### On foot and on a bike, in Santa Fe
+
+A second page for a different question and a different scale — `/walk`, or
+`walk.html` in the export. Every person struck while walking or riding since
+2013, sized by what happened to them, coloured by mode, ringed when it was
+dark; NMDOT's High Injury Network under them; and the crossings, sidewalks and
+bike lanes as optional overlays, so the gaps can be seen rather than described.
+
+The control is the hour scrubber. Press play and the day runs: the points thin
+out overnight, fill the afternoon, and the clock above fills from pale to dark
+while the columns are still tall. That is the finding — it is when the light
+goes, and people are still out — made watchable rather than asserted.
+
+**It takes two addresses and checks the route.** Geocoding is OpenStreetMap's
+Nominatim, bounded to the study area, one request per submitted address and
+cached forever. Routing happens in the browser: the driving page can
+precompute thirty journeys because six places make thirty pairs, and an
+address box has no such list, so the city's 18,342 edges ship as a 1.7 MB
+graph fetched only when somebody actually asks for a route. What comes back is
+a history, not a rate — the crashes within 30 m of the route, which of them
+killed or maimed somebody, which named streets they are on, and whether those
+are on the state's injury network. There is no count of how many people walk
+anywhere in this city, so a quiet street may be quiet because nobody uses it,
+and the page says so.
+
+Switching to Cycling switches the question with it: the comparison chart
+becomes distance to a bike lane, and the clock shows a different day —
+cyclists are a daytime problem here in a way pedestrians are not.
 
 ## Built on
 
