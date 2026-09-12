@@ -34,6 +34,12 @@
     box-shadow: 0 8px 30px rgba(0,0,0,.45);
   }
   #controls { top: 14px; left: 14px; width: 368px; max-height: calc(100% - 28px); overflow-y: auto; }
+  /* The legend lives on the right on both maps. It is a key to what is drawn,
+     not a control for what the page is about, and putting it beside the map
+     rather than at the bottom of a column of other things is the difference
+     between a legend that is read and one that is scrolled past. */
+  #legendpanel { top: 14px; right: 14px; width: 226px;
+                 max-height: calc(100% - 28px); overflow-y: auto; padding: 11px 13px; }
   #detail   { bottom: 14px; right: 14px; width: 268px; display: none; }
 
   h1 { font-size: 15px; margin: 0 0 2px; letter-spacing: .3px; }
@@ -97,6 +103,7 @@
       border-left: 0; border-right: 0; border-bottom: 0;
     }
     #detail { bottom: auto; top: 10px; right: 10px; left: 10px; width: auto; }
+    #legendpanel { top: 10px; right: 10px; width: 172px; max-height: 34%; padding: 9px 10px; }
     .layers { flex-wrap: wrap; }
     .layers button { flex: 1 1 44%; padding: 9px 4px; font-size: 12.5px; }
     .odrow select, .whenrow input[type="time"] { font-size: 16px; }
@@ -290,54 +297,6 @@
     </a>
   </div>
 
-  <div class="legend">
-    <div class="legtitle" id="legend-what"></div>
-    <div class="bar" id="legend-bar"></div>
-    <div class="ends"><span id="legend-lo"></span><span id="legend-hi"></span></div>
-
-    <div id="points-key" style="display:none">
-      <div class="legrule"></div>
-      <div class="legendhead">
-        <div class="legtitle" style="margin:0">Each dot is a fatal crash</div>
-        <button id="filterreset" title="Show everything again">reset</button>
-      </div>
-      <div class="legtitle sub2">Who died &mdash; click to show or hide</div>
-      <label class="filt"><input type="checkbox" data-f="who" value="vehicle" checked>
-        <span class="dot s-a" style="background:#c0392b"></span> in a vehicle
-        <b data-count="who:vehicle"></b></label>
-      <label class="filt"><input type="checkbox" data-f="who" value="foot" checked>
-        <span class="dot s-a" style="background:#8e6bc7"></span> on foot or a bike
-        <b data-count="who:foot"></b></label>
-
-      <div class="legtitle sub2">What the crash was</div>
-      <label class="filt"><input type="checkbox" data-f="harm" value="vehicle" checked>
-        <span class="glyph">&#8644;</span> hit another vehicle
-        <b data-count="harm:vehicle"></b></label>
-      <label class="filt"><input type="checkbox" data-f="harm" value="person" checked>
-        <span class="glyph">&#9971;</span> hit a person walking or riding
-        <b data-count="harm:person"></b></label>
-      <label class="filt"><input type="checkbox" data-f="harm" value="offroad" checked>
-        <span class="glyph">&#8631;</span> ran off the road
-        <b data-count="harm:offroad"></b></label>
-
-      <div class="legtitle sub2">Light</div>
-      <label class="filt"><input type="checkbox" data-f="light" value="day" checked>
-        <span class="dot s-a ring-day" style="background:#c0392b"></span> daylight
-        <b data-count="light:day"></b></label>
-      <label class="filt"><input type="checkbox" data-f="light" value="dark" checked>
-        <span class="dot s-a ring-dark" style="background:#c0392b"></span> after dark
-        <b data-count="light:dark"></b></label>
-
-      <div class="legtitle sub2">Size &mdash; how many died</div>
-      <div class="legrow sizes">
-        <span class="dot s-b" style="background:#c0392b"></span>one
-        <span class="dot s-a" style="background:#c0392b"></span>two
-        <span class="dot s-k" style="background:#c0392b"></span>three or more
-      </div>
-      <div class="legnote" id="filtcount"></div>
-    </div>
-  </div>
-
   <div class="rule"></div>
 
   <div class="trip">
@@ -386,6 +345,63 @@
   </div>
 </div>
 
+<div id="legendpanel" class="panel">
+  <div class="legendhead">
+    <div class="legtitle" style="margin:0">On the map</div>
+    <button id="legendtoggle" title="Hide the legend">&minus;</button>
+  </div>
+  <div id="legendbody">
+  <div class="legend">
+    <div class="legtitle" id="legend-what"></div>
+    <div class="bar" id="legend-bar"></div>
+    <div class="ends"><span id="legend-lo"></span><span id="legend-hi"></span></div>
+
+    <div id="points-key" style="display:none">
+      <div class="legrule"></div>
+      <div class="legendhead">
+        <div class="legtitle" style="margin:0">Each dot is a fatal crash</div>
+        <button id="filterreset" title="Show everything again">reset</button>
+      </div>
+      <div class="legtitle sub2">Who died &mdash; click to show or hide</div>
+      <label class="filt"><input type="checkbox" data-f="who" value="vehicle" checked>
+        <span class="dot s-a" style="background:#c0392b"></span> in a vehicle
+        <b data-count="who:vehicle"></b></label>
+      <label class="filt"><input type="checkbox" data-f="who" value="foot" checked>
+        <span class="dot s-a" style="background:#8e6bc7"></span> on foot or a bike
+        <b data-count="who:foot"></b></label>
+
+      <div class="legtitle sub2">What the crash was</div>
+      <label class="filt"><input type="checkbox" data-f="harm" value="vehicle" checked>
+        <span class="glyph">&#8644;</span> hit another vehicle
+        <b data-count="harm:vehicle"></b></label>
+      <label class="filt"><input type="checkbox" data-f="harm" value="person" checked>
+        <span class="glyph">&#9971;</span> hit a person walking or riding
+        <b data-count="harm:person"></b></label>
+      <label class="filt"><input type="checkbox" data-f="harm" value="offroad" checked>
+        <span class="glyph">&#8631;</span> ran off the road
+        <b data-count="harm:offroad"></b></label>
+
+      <div class="legtitle sub2">Light</div>
+      <label class="filt"><input type="checkbox" data-f="light" value="day" checked>
+        <span class="dot s-a ring-day" style="background:#c0392b"></span> daylight
+        <b data-count="light:day"></b></label>
+      <label class="filt"><input type="checkbox" data-f="light" value="dark" checked>
+        <span class="dot s-a ring-dark" style="background:#c0392b"></span> after dark
+        <b data-count="light:dark"></b></label>
+
+      <div class="legtitle sub2">Size &mdash; how many died</div>
+      <div class="legrow sizes">
+        <span class="dot s-b" style="background:#c0392b"></span>one
+        <span class="dot s-a" style="background:#c0392b"></span>two
+        <span class="dot s-k" style="background:#c0392b"></span>three or more
+      </div>
+      <div class="legnote" id="filtcount"></div>
+    </div>
+  </div>
+
+  </div>
+</div>
+
 <div id="detail" class="panel">
   <h2 id="d-name">—</h2>
   <div class="road" id="d-road"></div>
@@ -400,8 +416,10 @@
   var map = L.map("map", { preferCanvas: true, zoomControl: false })
              .setView([35.85, -106.10], 10);
 
-  // Zoom on the right: the controls panel occupies the top left.
-  L.control.zoom({ position: "topright" }).addTo(map);
+  // Bottom right: the controls own the top left and the legend the top right,
+  // which is where the zoom buttons used to be and where they were sitting
+  // underneath it.
+  L.control.zoom({ position: "bottomright" }).addTo(map);
 
   // Esri's dark canvas, which needs no key. CARTO's dark tiles were used here
   // first and now watermark every tile with "API KEY REQUIRED", which is worth
@@ -728,6 +746,16 @@
     document.getElementById("d-table").innerHTML = html;
     document.getElementById("detail").style.display = "block";
   }
+
+  document.getElementById("legendtoggle").addEventListener("click", function () {
+    var body = document.getElementById("legendbody");
+    var hidden = body.style.display === "none";
+    body.style.display = hidden ? "block" : "none";
+    this.innerHTML = hidden ? "&minus;" : "?";
+    this.title = hidden ? "Hide the legend" : "What do the colours mean?";
+  });
+  // Collapsed on a phone, where a full legend over the map is the map.
+  if (window.innerWidth <= 620) document.getElementById("legendtoggle").click();
 
   document.querySelectorAll('#points-key input[data-f]').forEach(function (box) {
     box.addEventListener("change", function () {
