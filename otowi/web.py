@@ -199,6 +199,8 @@ class _Handler(http.server.SimpleHTTPRequestHandler):
 
     data_path: Path
     walk_path: Path
+    walknet_path: Path
+    risk_path: Path
     summary: dict
     window: tuple[int, int]
 
@@ -222,6 +224,12 @@ class _Handler(http.server.SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(body)
             return None
+        if self.path.startswith("/geocode.json"):
+            return self._geocode()
+        if self.path.startswith("/walknet.json"):
+            return self._send_file(self.walknet_path, "application/json")
+        if self.path.startswith("/risk.json"):
+            return self._send_file(self.risk_path, "application/json")
         if self.path.startswith("/walk.json"):
             return self._send_file(self.walk_path, "application/json")
         if self.path.rstrip("/") in ("/walk", "/walk.html"):
@@ -230,6 +238,29 @@ class _Handler(http.server.SimpleHTTPRequestHandler):
             return self._send_file(STATIC_DIR / "index.html", "text/html; charset=utf-8")
         self.send_error(404)
         return None
+
+    def _geocode(self):
+        """Address to point, through the disk-cached lookup.
+
+        Proxied rather than called from the page when a server is running, so
+        that a developer reloading the map fifty times makes one request to a
+        donated service instead of fifty. The published copy has no server and
+        calls Nominatim itself.
+        """
+        from urllib.parse import parse_qs, urlparse
+
+        from . import geocode
+
+        query = (parse_qs(urlparse(self.path).query).get("q") or [""])[0]
+        try:
+            found = geocode.lookup(query)
+        except Exception as exc:                                # noqa: BLE001
+            log.exception("geocode failed")
+            return self._send_json({"error": str(exc)}, status=500)
+        return self._send_json([
+            {"name": place.name, "lat": place.lat, "lon": place.lon}
+            for place in found
+        ])
 
     def _plan(self):
         """Route one trip across every candidate departure time.
@@ -302,9 +333,20 @@ def serve(
     except Exception as exc:                                    # noqa: BLE001
         log.warning("walking page unavailable: %s", exc)
         walk_data = CACHE_DIR / "walk.json"
+    try:
+        risk_data, _ = build_risk(window, force=force)
+    except Exception as exc:                                    # noqa: BLE001
+        log.warning("risk view unavailable: %s", exc)
+        risk_data = risk_path(window)
+    try:
+        walknet_data, _ = build_walk_network(force=force)
+    except Exception as exc:                                    # noqa: BLE001
+        log.warning("walking routes unavailable: %s", exc)
+        walknet_data = walknet_path()
 
     handler = type("Handler", (_Handler,),
                    {"data_path": data_path, "walk_path": walk_data,
+                    "walknet_path": walknet_data, "risk_path": risk_data,
                     "summary": summary, "window": window})
 
     # Without this a restart inside the TIME_WAIT window fails with "Address
@@ -491,6 +533,8 @@ def build_walk(*, box=SANTA_FE_BBOX, force: bool = False) -> tuple[Path, dict]:
         },
         "crossings": walking.crossings_and_crashes(
             exposures, corridors, assets["crosswalk"]),
+        "lanes": walking.lanes_and_crashes(
+            exposures, corridors, assets["bike_lane"]),
         "by_corridor": walking.by_corridor(here, corridors)[:12],
         "infrastructure": walking.summarise(here),
         "summary": {
@@ -519,4 +563,237 @@ def build_walk(*, box=SANTA_FE_BBOX, force: bool = False) -> tuple[Path, dict]:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, separators=(",", ":")))
     log.info("wrote %s (%.1f MB)", path.name, path.stat().st_size / 1e6)
+    return path, data
+
+
+# ------------------------------------------------------------------- the risk payload
+#
+# This lived in `otowi export` and nowhere else, which meant the Risk tab
+# worked on the published copy and 404'd on localhost -- the one place it is
+# most useful, because that is where the numbers are being changed. Built here
+# so both callers get the same file.
+
+
+def risk_path(window: tuple[int, int] = AM_PEAK) -> Path:
+    return CACHE_DIR / f"risk-{window[0]:02d}{window[1]:02d}.json"
+
+
+def build_risk(window: tuple[int, int] = AM_PEAK, *, force: bool = False
+               ) -> tuple[Path, dict]:
+    """Fatal crashes, corridor rates, and the two hourly curves that bracket them.
+
+    Written as a separate file from the map rather than folded into it: it is
+    147 points against 8,000 lines, it changes on a different cadence, and a
+    reader who never opens the risk view should not pay for it.
+    """
+    from . import counts, fatalities, simulate, tru
+    from .network import network_path
+
+    path = risk_path(window)
+    if path.exists() and not force:
+        return path, json.loads(path.read_text())
+
+    import sumolib
+
+    net = sumolib.net.readNet(str(network_path()))
+    hours = window[1] - window[0]
+    crashes = fatalities.fetch()
+    segments = counts.parse_segments(counts.fetch_aadt())
+    matched = counts.match_to_edges(net, segments)
+    modelled = counts.simulated_hourly(simulate.edgedata_path(window), hours)
+    comparison = counts.compare(matched, modelled, window_hours=hours)
+    carries = comparison["held_out"].get(
+        "median_ratio_modelled_over_observed") or 1.0
+    years = fatalities.DEFAULT_YEARS[1] - fatalities.DEFAULT_YEARS[0] + 1
+    risks = fatalities.build(
+        net, fatalities.match_to_edges(net, crashes),
+        modelled=modelled, counted=matched, years=years, model_carries=carries)
+
+    travel = fatalities.hourly_travel(net, simulate.intervals_path(window))
+    summary = fatalities.summarise(crashes, risks)
+    summary["by_hour"] = fatalities.by_hour(crashes, travel)
+    summary["regional_average"] = round(fatalities.regional_average(risks), 1)
+
+    # The second exposure proxy, and the curves that need no exposure at all.
+    # Optional: a FARS view must not depend on a UNM web server being up.
+    try:
+        hourly, _ = tru.fetch()
+        counties = tru.names_for(tru.COUNTY_KEYS)
+        all_crashes = tru.profile(hourly, "all", places=counties)
+        summary["crash_file"] = {
+            "years": sorted({h.year for h in hourly}),
+            "crashes": sum(all_crashes),
+            "all_crashes": all_crashes,
+            "alcohol_share": tru.share_by_hour(
+                tru.profile(hourly, "alcohol", places=counties), all_crashes),
+            "hurt_share": tru.share_by_hour(
+                tru.profile(hourly, "injury_or_fatal", places=counties),
+                all_crashes),
+            "by_hour_on_crash_exposure": fatalities.by_hour(
+                crashes, tru.as_exposure(all_crashes)),
+            "temporal_bias": tru.temporal_bias(travel, all_crashes),
+        }
+    except Exception as exc:                                    # noqa: BLE001
+        log.warning("crash-file curves unavailable: %s", exc)
+
+    payload = {
+        "summary": summary,
+        "model_carries": round(carries, 3),
+        "corridor_of": fatalities.corridors_from_counts(matched),
+        "corridors": {k: r.as_dict() for k, r in risks.items() if r.fatalities},
+        "crashes": [
+            {"lat": round(c.lat, 5), "lon": round(c.lon, 5),
+             "n": c.fatalities, "year": c.year, "hour": c.hour,
+             "road": c.road, "dark": c.is_dark, "harm": c.harm,
+             "foot": c.on_foot}
+            for c in crashes
+        ],
+    }
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, separators=(",", ":")))
+    return path, payload
+
+
+# --------------------------------------------------------- routing on foot
+#
+# The driving page precomputes thirty journeys because there are six places and
+# thirty ordered pairs of them. An address box has no such list, and the
+# published copy of this project is a static host with nothing to ask.
+#
+# So the walking page routes in the browser. That is only affordable because
+# the question is small: Santa Fe rather than the region, and distance rather
+# than a travel time that changes every fifteen minutes. 18,000 edges and a
+# Dijkstra over them is a few milliseconds of work, and the graph is fetched
+# only when somebody actually types an address -- the page itself never pays
+# for it.
+
+
+def walknet_path() -> Path:
+    return CACHE_DIR / "walknet.json"
+
+
+#: Roads nobody may legally walk or cycle on. Routing over them would produce a
+#: confident line down the shoulder of I-25, which is worse than refusing.
+FORBIDDEN_ON_FOOT = ("highway.motorway", "highway.motorway_link")
+
+#: How close a crash has to be to an edge to be counted against it. The same
+#: radius `fatalities` uses to put a fatal crash on a road, for the same
+#: reason: these coordinates are geocoded from a written location as often as
+#: they are recorded from a device.
+CRASH_TO_EDGE_M = 30.0
+
+#: Shape thinning for the routing graph. Coarser than the map layers -- this
+#: geometry is drawn as a route line over a street that is already on the
+#: basemap, so it has to follow the right streets, not trace the kerb.
+ROUTE_THIN_M = 25.0
+
+
+def build_walk_network(*, box=SANTA_FE_BBOX, force: bool = False
+                       ) -> tuple[Path, dict]:
+    """A compact, routable street graph for the city, with crash counts on it.
+
+    Encoded for size rather than for readability, because it crosses a network:
+    coordinates are fixed-point integers at 1e-5 of a degree -- about a metre,
+    finer than the source -- and every shape after the first point is a delta
+    from the one before it, which turns nine-character floats into two- and
+    three-character integers.
+    """
+    from . import vru, walking
+    from .network import network_path
+
+    path = walknet_path()
+    if path.exists() and not force:
+        return path, json.loads(path.read_text())
+
+    import sumolib
+
+    net = sumolib.net.readNet(str(network_path()))
+    west, south, east, north = box
+
+    def lonlat(node):
+        return net.convertXY2LonLat(*node.getCoord())
+
+    node_index: dict[str, int] = {}
+    nodes: list[list[float]] = []
+
+    def node_id(node) -> int:
+        key = node.getID()
+        if key not in node_index:
+            node_index[key] = len(nodes)
+            nodes.append(list(lonlat(node)))
+        return node_index[key]
+
+    kept = []
+    for edge in net.getEdges():
+        if edge.isSpecial():
+            continue
+        lon, lat = lonlat(edge.getFromNode())
+        if not (west <= lon <= east and south <= lat <= north):
+            continue
+        kept.append(edge)
+
+    # Crashes, attributed to the nearest edge. Done here rather than in the
+    # page because it is 630 crashes against 18,000 edges, and the browser
+    # would be doing it again on every route.
+    shapes = {}
+    for edge in kept:
+        shapes[edge.getID()] = [
+            [round(v, 6) for v in net.convertXY2LonLat(x, y)]
+            for x, y in edge.getShape()
+        ]
+    edge_index = walking.Nearby([
+        walking.Asset(object_id=i, kind="edge", subtype="", route=edge.getID(),
+                      side="", condition="", paths=[shapes[edge.getID()]])
+        for i, edge in enumerate(kept)
+    ])
+
+    hurt: dict[str, list[int]] = {}
+    for crash in vru.fetch():
+        if not (west <= crash.lon <= east and south <= crash.lat <= north):
+            continue
+        distance, found = edge_index.nearest(crash.lon, crash.lat,
+                                             limit_m=CRASH_TO_EDGE_M)
+        if found is None:
+            continue
+        row = hurt.setdefault(found.route, [0, 0])
+        row[0] += 1
+        row[1] += 1 if crash.killed_or_serious else 0
+
+    def fixed(value: float) -> int:
+        return int(round(value * 1e5))
+
+    out_edges = []
+    for edge in kept:
+        shape = _thin(shapes[edge.getID()], ROUTE_THIN_M)
+        first = [fixed(shape[0][0]), fixed(shape[0][1])]
+        deltas: list[int] = []
+        previous = first
+        for lon, lat in shape[1:]:
+            point = [fixed(lon), fixed(lat)]
+            deltas.extend((point[0] - previous[0], point[1] - previous[1]))
+            previous = point
+        counts = hurt.get(edge.getID(), (0, 0))
+        out_edges.append([
+            node_id(edge.getFromNode()),
+            node_id(edge.getToNode()),
+            round(edge.getLength()),
+            1 if edge.getType() in FORBIDDEN_ON_FOOT else 0,
+            counts[0], counts[1],
+            first, deltas,
+            edge.getName() or "",
+        ])
+
+    data = {
+        "scale": 1e5,
+        "box": list(box),
+        "nodes": [[fixed(lon), fixed(lat)] for lon, lat in nodes],
+        # from, to, metres, forbidden-on-foot, crashes, killed-or-serious,
+        # first point, shape deltas, street name
+        "edges": out_edges,
+        "crash_radius_m": CRASH_TO_EDGE_M,
+    }
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(data, separators=(",", ":")))
+    log.info("wrote %s (%.1f MB, %d edges)", path.name,
+             path.stat().st_size / 1e6, len(out_edges))
     return path, data

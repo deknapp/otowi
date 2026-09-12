@@ -925,35 +925,14 @@ def cmd_export(args) -> None:
     (data / "map.geojson").write_bytes(geojson.read_bytes())
     (data / "summary.json").write_text(json.dumps(summary, indent=2))
 
-    # Fatal crashes, and the corridor rates computed from them. Written as a
-    # separate file rather than folded into the map: it is 147 points against
-    # 8,000 lines, it changes on a different cadence, and a reader who wants
-    # the risk view should not pay for it on every other view.
+    # Fatal crashes, the corridor rates computed from them, and the two
+    # hourly curves that bracket the headline. Built by web.build_risk so the
+    # served map and the published one are reading the same file; it used to
+    # be assembled here and nowhere else, which left the Risk tab 404ing on
+    # localhost -- the one place the numbers are being changed.
     try:
-        from . import counts, fatalities
-        net_r, crashes, risks, carries = _risk_inputs(args, window)
-        route_of = fatalities.corridors_from_counts(
-            counts.match_to_edges(net_r, counts.parse_segments(counts.fetch_aadt())))
-        risk_net_travel = fatalities.hourly_travel(
-            net_r, simulate.intervals_path(window))
-        risk_summary = fatalities.summarise(crashes, risks)
-        risk_summary["by_hour"] = fatalities.by_hour(crashes, risk_net_travel)
-        risk_summary["regional_average"] = round(
-            fatalities.regional_average(risks), 1)
-        (data / "risk.json").write_text(json.dumps({
-            "summary": risk_summary,
-            "model_carries": round(carries, 3),
-            # edge -> corridor, so the map can colour a line by its road's rate
-            "corridor_of": route_of,
-            "corridors": {k: r.as_dict() for k, r in risks.items() if r.fatalities},
-            "crashes": [
-                {"lat": round(c.lat, 5), "lon": round(c.lon, 5),
-                 "n": c.fatalities, "year": c.year, "hour": c.hour,
-                 "road": c.road, "dark": c.is_dark, "harm": c.harm,
-                 "foot": c.on_foot}
-                for c in crashes
-            ],
-        }, separators=(",", ":")))
+        risk_data, _ = web.build_risk(window, force=args.force)
+        (data / "risk.json").write_bytes(risk_data.read_bytes())
     except Exception as exc:                                   # noqa: BLE001
         # The risk view is additive. A FARS outage must not take the map with
         # it, but it must also not silently ship a page whose tab is empty.
@@ -965,6 +944,8 @@ def cmd_export(args) -> None:
     try:
         walk_data, _ = web.build_walk(force=args.force)
         (data / "walk.json").write_bytes(walk_data.read_bytes())
+        walknet, _ = web.build_walk_network(force=args.force)
+        (data / "walknet.json").write_bytes(walknet.read_bytes())
         walk_page = (web.STATIC_DIR / "walk.html").read_text().replace(
             "<body>", "<body>\n<script>window.OTOWI_STATIC = true;</script>", 1)
         (out / "walk.html").write_text(walk_page)
@@ -987,7 +968,7 @@ def cmd_export(args) -> None:
     core = trips.reachable_core(net)
     risk_ctx = None
     try:
-        from . import fatalities as _f
+        from . import counts, fatalities as _f
         _net, _crashes, _risks, _ = _risk_inputs(args, window)
         risk_ctx = {
             "net": _net, "risks": _risks,

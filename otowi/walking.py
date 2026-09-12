@@ -433,6 +433,37 @@ def distance_profile(distances) -> dict:
     }
 
 
+def lanes_and_crashes(exposures: list[Exposure], corridors,
+                      bike_lanes: list[Asset]) -> dict:
+    """The cyclist's version of the same question, and a worse answer.
+
+    Where a pedestrian's crossing either exists or does not, a bike lane's
+    absence is the normal condition: most of the High Injury Network has none,
+    so a cyclist being far from one is unremarkable and being *near* one is the
+    thing worth measuring. The comparison runs the same way regardless -- the
+    road itself against the people hit on it -- and if the two distributions
+    sit on top of each other, that is the finding: the lanes are not where the
+    crashes are, in either direction.
+    """
+    lanes = Nearby(bike_lanes)
+    on_hin = Nearby([
+        Asset(object_id=c.object_id, kind="corridor", subtype="", route=c.name,
+              side="", condition="", paths=c.paths)
+        for c in corridors if c.paths
+    ])
+    riders = [e for e in exposures
+              if e.crash.pedalcycle
+              and on_hin.nearest(e.crash.lon, e.crash.lat, limit_m=40.0)[1] is not None]
+
+    return {
+        "road_itself": distance_profile(
+            lanes.nearest(lon, lat)[0] for lon, lat in control_points(corridors)),
+        "cyclist_hit": distance_profile(e.bike_lane_m for e in riders),
+        "cyclist_killed_or_serious": distance_profile(
+            e.bike_lane_m for e in riders if e.crash.killed_or_serious),
+    }
+
+
 def crossings_and_crashes(exposures: list[Exposure], corridors,
                           crosswalks: list[Asset]) -> dict:
     """Where pedestrians are hit, against where the crossings are.

@@ -110,6 +110,29 @@
   .toggle input { accent-color: var(--accent); }
   .swatch { width: 16px; height: 3px; border-radius: 2px; display: inline-block; }
 
+  .route input {
+    width: 100%; padding: 7px 9px; margin-bottom: 6px; font: inherit; font-size: 12px;
+    background: #182029; color: var(--text); border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+  .route input:focus { outline: none; border-color: var(--accent); }
+  .route button {
+    width: 100%; padding: 8px 4px; font: inherit; font-size: 12px; font-weight: 600;
+    cursor: pointer; background: var(--accent); color: #0b1017;
+    border: 1px solid var(--accent); border-radius: 6px;
+  }
+  .route button:disabled { opacity: .55; cursor: default; }
+  #routeout { margin-top: 9px; font-size: 11.5px; color: var(--muted); line-height: 1.5; }
+  #routeout b { color: var(--text); }
+  #routeout .verdict {
+    display: block; margin-bottom: 6px; font-size: 12.5px; font-weight: 600;
+  }
+  #routeout .v-ok { color: #6fcf97; }
+  #routeout .v-mid { color: #e9c46a; }
+  #routeout .v-bad { color: #e07a5f; }
+  #routeout ul { margin: 6px 0 0; padding-left: 16px; }
+  #routeout li { margin-bottom: 2px; }
+
   .note { font-size: 10.5px; color: var(--muted); line-height: 1.45; margin-top: 10px; }
   a { color: var(--accent); }
 
@@ -139,6 +162,15 @@
   <div class="figs" id="figs"></div>
 
   <div class="rule"></div>
+  <div class="sectiontitle">Is my route any good?</div>
+  <div class="route">
+    <input id="from" type="text" placeholder="From — e.g. 1600 St Michaels Dr" autocomplete="off">
+    <input id="to" type="text" placeholder="To — e.g. Santa Fe Plaza" autocomplete="off">
+    <button id="go">Check this route</button>
+    <div id="routeout"></div>
+  </div>
+
+  <div class="rule"></div>
   <div class="sectiontitle">When, and what the light was doing</div>
   <div id="clock"></div>
   <div class="clockax" id="clockax"></div>
@@ -156,7 +188,7 @@
   <div class="note" id="clocknote"></div>
 
   <div class="rule"></div>
-  <div class="sectiontitle">How far from a marked crossing</div>
+  <div class="sectiontitle" id="cmptitle">How far from a marked crossing</div>
   <div class="cmp" id="cmp"></div>
   <div class="note" id="cmpnote"></div>
 
@@ -204,7 +236,7 @@
 
   var map = L.map("map", { zoomControl: false, preferCanvas: true });
   L.control.zoom({ position: "bottomright" }).addTo(map);
-  L.control.scale({ imperial: true, metric: true }).addTo(map);
+  L.control.scale({ imperial: true, metric: true, position: "bottomright" }).addTo(map);
 
   L.tileLayer(
     "https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}",
@@ -409,6 +441,7 @@
       (h < 10 ? "0" : "") + h + ":00–" + (h < 9 ? "0" : "") + (h + 1) + ":00";
     drawClock();
     drawCrashes();
+    writeHash();
   }
 
   // ------------------------------------------------------- the other panels
@@ -442,13 +475,27 @@
         who + ", " + D.years[0] + " to " + D.years[1] + ".";
   }
 
+  // Below this many crashes a percentile is a story about three people. The
+  // cyclist killed-or-serious set is eight, and drawing it next to a bar built
+  // on four thousand control points would invite exactly the comparison it
+  // cannot support.
+  var MIN_FOR_A_SHARE = 20;
+
   function drawComparison() {
-    var c = D.crossings;
-    var rows = [
-      ["a random spot on these roads", c.road_itself, "#5b6676"],
-      ["a pedestrian who was hit", c.pedestrian_hit, "#f0a35e"],
-      ["a pedestrian killed or maimed", c.pedestrian_killed_or_serious, "#c0392b"]
-    ];
+    var cycling = mode === "bike";
+    var c = cycling ? D.lanes : D.crossings;
+    el("cmptitle").textContent = cycling
+      ? "How far from a bike lane" : "How far from a marked crossing";
+
+    var rows = cycling
+      ? [["a random spot on these roads", c.road_itself, "#5b6676"],
+         ["a cyclist who was hit", c.cyclist_hit, "#5dd6c0"],
+         ["a cyclist killed or maimed", c.cyclist_killed_or_serious, "#c0392b"]]
+      : [["a random spot on these roads", c.road_itself, "#5b6676"],
+         ["a pedestrian who was hit", c.pedestrian_hit, "#f0a35e"],
+         ["a pedestrian killed or maimed", c.pedestrian_killed_or_serious, "#c0392b"]];
+    rows = rows.filter(function (r) { return r[1] && r[1].n >= MIN_FOR_A_SHARE; });
+
     var max = Math.max.apply(null, rows.map(function (r) { return r[1].median_m || 0; })) || 1;
     el("cmp").innerHTML = rows.map(function (r) {
       return '<div class="row"><div class="lab">' + r[0] + "</div>" +
@@ -457,15 +504,28 @@
              '<div class="v">' + r[1].median_m + " m</div></div>";
     }).join("");
 
-    el("cmpnote").innerHTML =
-      "Median distance to the nearest marked crossing. Pedestrians are <b>not</b> " +
-      "being hit away from the crossings — they are hit " +
-      Math.round(c.road_itself.median_m / c.pedestrian_hit.median_m) +
-      "&times; closer to one than the average spot on the same road. But the crashes " +
-      "that kill or maim are twice as likely to be the far-from-a-crossing ones (" +
-      pct(c.pedestrian_killed_or_serious.share_over_100m) + " over 100 m, against " +
-      pct(c.pedestrian_hit.share_over_100m) + " of all of them). Two problems, two fixes. " +
-      "Nobody counts how many people cross where, so this is a distribution and not a cause.";
+    if (cycling) {
+      el("cmpnote").innerHTML =
+        "Median distance to the nearest inventoried bike lane. Most of this " +
+        "network has none — " + pct(c.road_itself.share_over_100m) + " of the road " +
+        "is more than 100 m from one — so a cyclist being far from a lane is the " +
+        "normal condition and not, on its own, an explanation. They are hit " +
+        Math.round(c.road_itself.median_m / c.cyclist_hit.median_m) + "&times; " +
+        "closer to a lane than the average spot on the same road, which is the " +
+        "same pattern as the pedestrians: the crashes are where the infrastructure " +
+        "is, because that is where the people are. " +
+        "The killed-and-seriously-hurt set here is too small to split.";
+    } else {
+      el("cmpnote").innerHTML =
+        "Median distance to the nearest marked crossing. Pedestrians are <b>not</b> " +
+        "being hit away from the crossings — they are hit " +
+        Math.round(c.road_itself.median_m / c.pedestrian_hit.median_m) +
+        "&times; closer to one than the average spot on the same road. But the crashes " +
+        "that kill or maim are twice as likely to be the far-from-a-crossing ones (" +
+        pct(c.pedestrian_killed_or_serious.share_over_100m) + " over 100 m, against " +
+        pct(c.pedestrian_hit.share_over_100m) + " of all of them). Two problems, two fixes. " +
+        "Nobody counts how many people cross where, so this is a distribution and not a cause.";
+    }
   }
 
   function drawCorridors() {
@@ -533,6 +593,288 @@
     el("detail").style.display = "block";
   }
 
+  // ------------------------------------------------------------- the route
+  //
+  // The graph is 1.7 MB and most visitors never type an address, so it is
+  // fetched the first time somebody asks for a route and kept after that.
+
+  var NET = null;
+  var netPromise = null;
+  var routeLayer = L.layerGroup([]).addTo(map);
+  var pins = L.layerGroup([]).addTo(map);
+
+  function loadNet() {
+    if (netPromise) return netPromise;
+    netPromise = fetch(DATA + "walknet.json")
+      .then(function (r) { return r.json(); })
+      .then(function (n) {
+        NET = n;
+        // Adjacency, built once. Undirected: a bicycle on a one-way street is
+        // a real problem and not one this graph knows about, and refusing to
+        // route the wrong way up a one-way would silently reject half the
+        // journeys people actually make on a bike.
+        NET.adj = [];
+        for (var i = 0; i < NET.nodes.length; i++) NET.adj.push([]);
+        NET.edges.forEach(function (e, i) {
+          if (e[3]) return;                       // no walking on a motorway
+          NET.adj[e[0]].push([e[1], e[2], i]);
+          NET.adj[e[1]].push([e[0], e[2], i]);
+        });
+        // A coarse grid over the nodes, so snapping an address is a scan of
+        // one cell rather than of eight thousand points.
+        NET.grid = {};
+        NET.nodes.forEach(function (n2, i) {
+          var k = Math.round(n2[0] / 300) + ":" + Math.round(n2[1] / 300);
+          (NET.grid[k] = NET.grid[k] || []).push(i);
+        });
+        return NET;
+      });
+    return netPromise;
+  }
+
+  function metres(a, b, c, d) {
+    // The graph stores hundred-thousandths of a degree.
+    return Math.hypot((c - a) * 0.9014, (d - b) * 1.109);
+  }
+
+  function snap(lon, lat) {
+    var x = Math.round(lon * 1e5), y = Math.round(lat * 1e5);
+    var best = -1, bestD = Infinity;
+    for (var dx = -1; dx <= 1; dx++) {
+      for (var dy = -1; dy <= 1; dy++) {
+        var k = (Math.round(x / 300) + dx) + ":" + (Math.round(y / 300) + dy);
+        (NET.grid[k] || []).forEach(function (i) {
+          if (!NET.adj[i].length) return;         // an island helps nobody
+          var d = metres(x, y, NET.nodes[i][0], NET.nodes[i][1]);
+          if (d < bestD) { bestD = d; best = i; }
+        });
+      }
+    }
+    return best >= 0 && bestD < 1200 ? { node: best, away: bestD } : null;
+  }
+
+  function shortestPath(from, to) {
+    // Dijkstra on length. Not on travel time: a person walking or riding is
+    // not sitting in the traffic this project models, and pretending the car
+    // network's congestion applies to them would be the wrong answer dressed
+    // up as the right one.
+    var n = NET.nodes.length;
+    var dist = new Float64Array(n).fill(Infinity);
+    var prev = new Int32Array(n).fill(-1);
+    var prevEdge = new Int32Array(n).fill(-1);
+    var seen = new Uint8Array(n);
+    dist[from] = 0;
+
+    // A binary heap, because a linear scan over 8,000 nodes per step is a
+    // visible pause and this has to feel instant.
+    var heap = [[0, from]];
+    function push(item) {
+      heap.push(item);
+      var i = heap.length - 1;
+      while (i > 0) {
+        var p = (i - 1) >> 1;
+        if (heap[p][0] <= heap[i][0]) break;
+        var t = heap[p]; heap[p] = heap[i]; heap[i] = t; i = p;
+      }
+    }
+    function pop() {
+      var top = heap[0], last = heap.pop();
+      if (heap.length) {
+        heap[0] = last;
+        var i = 0;
+        for (;;) {
+          var l = 2 * i + 1, r = l + 1, m = i;
+          if (l < heap.length && heap[l][0] < heap[m][0]) m = l;
+          if (r < heap.length && heap[r][0] < heap[m][0]) m = r;
+          if (m === i) break;
+          var t = heap[m]; heap[m] = heap[i]; heap[i] = t; i = m;
+        }
+      }
+      return top;
+    }
+
+    while (heap.length) {
+      var item = pop();
+      var u = item[1];
+      if (seen[u]) continue;
+      seen[u] = 1;
+      if (u === to) break;
+      var neighbours = NET.adj[u];
+      for (var i = 0; i < neighbours.length; i++) {
+        var v = neighbours[i][0], w = neighbours[i][1];
+        if (dist[u] + w < dist[v]) {
+          dist[v] = dist[u] + w;
+          prev[v] = u;
+          prevEdge[v] = neighbours[i][2];
+          push([dist[v], v]);
+        }
+      }
+    }
+    if (!isFinite(dist[to])) return null;
+
+    var edges = [], at = to;
+    while (at !== from && prevEdge[at] >= 0) { edges.push(prevEdge[at]); at = prev[at]; }
+    return { edges: edges.reverse(), metres: dist[to] };
+  }
+
+  function edgeShape(e) {
+    // First point absolute, the rest deltas, both in hundred-thousandths.
+    var pts = [[e[6][1] / 1e5, e[6][0] / 1e5]];
+    var x = e[6][0], y = e[6][1];
+    for (var i = 0; i < e[7].length; i += 2) {
+      x += e[7][i]; y += e[7][i + 1];
+      pts.push([y / 1e5, x / 1e5]);
+    }
+    return pts;
+  }
+
+  function describe(result, a, b, ends) {
+    var km = result.metres / 1000;
+    var crashes = 0, ksi = 0, hin = 0, streets = {};
+    result.edges.forEach(function (i) {
+      var e = NET.edges[i];
+      crashes += e[4];
+      ksi += e[5];
+      if (e[4]) streets[e[8] || "an unnamed street"] =
+        (streets[e[8] || "an unnamed street"] || 0) + e[4];
+    });
+    // Which High Injury Network roads the route runs along, by name.
+    var names = Object.keys(streets).sort(function (a, b) { return streets[b] - streets[a]; });
+    var onHin = names.filter(function (name) {
+      return D.by_corridor.some(function (c) {
+        return c.name.toLowerCase().indexOf(name.toLowerCase().split(" ")[0]) >= 0;
+      });
+    });
+
+    var perKm = km > 0 ? crashes / km : 0;
+    // The city's own average, so "three crashes" means something. Total
+    // crashes over the total length of the High Injury Network is the only
+    // denominator available -- there is no inventory of how far people walk.
+    var cityKm = D.by_corridor.reduce(function (a, c) { return a + c.miles * 1.609; }, 0);
+    var cityCrashes = D.by_corridor.reduce(function (a, c) { return a + c.crashes; }, 0);
+    var cityPerKm = cityKm > 0 ? cityCrashes / cityKm : 0;
+    var ratio = cityPerKm > 0 ? perKm / cityPerKm : 0;
+
+    var verdict, cls;
+    if (crashes === 0) { verdict = "Nobody has been hit along this route"; cls = "v-ok"; }
+    else if (ratio < 0.6) { verdict = "Quieter than the city's worst streets"; cls = "v-ok"; }
+    else if (ratio < 1.2) { verdict = "About as bad as Santa Fe's injury network"; cls = "v-mid"; }
+    else { verdict = "Worse than the city's injury network average"; cls = "v-bad"; }
+
+    var html = '<span class="verdict ' + cls + '">' + verdict + "</span>" +
+      "<b>" + km.toFixed(1) + " km</b> by the shortest street route. Along it, <b>" +
+      crashes + "</b> " + (crashes === 1 ? "person has" : "people have") +
+      " been hit while walking or riding since " + D.years[0] +
+      (ksi ? ", <b>" + ksi + "</b> of them killed or seriously hurt" : "") + ".";
+
+    if (names.length) {
+      html += "<ul>" + names.slice(0, 4).map(function (name) {
+        return "<li>" + name + " — " + streets[name] +
+          (onHin.indexOf(name) >= 0 ? " <b>(injury network)</b>" : "") + "</li>";
+      }).join("") + "</ul>";
+    }
+
+    // The hour advice, from the curve for the selected mode, computed the same
+    // way the clock above is.
+    var hours = mode === "bike" ? D.hours.cyclist : D.hours.pedestrian;
+    var day = hours.slice(7, 18).reduce(function (a, b) { return a + b; }, 0);
+    var evening = hours.slice(18, 23).reduce(function (a, b) { return a + b; }, 0);
+    html += "<div style='margin-top:7px'>Riding or walking it in the evening is " +
+      "the part to think about: " + Math.round(evening / (day + evening) * 100) +
+      "% of these crashes happen after 18:00, on a fifth of the day.</div>";
+
+    var gap = Math.round(Math.max(a.away, b.away));
+    html += "<div style='margin-top:7px;font-size:10.5px'>Crashes within " +
+      NET.crash_radius_m + " m of the route, " + D.years[0] + "–" + D.years[1] +
+      ". There is no count of how many people walk here, so this is a history, " +
+      "not a rate — a quiet street may be quiet because nobody uses it." +
+      (gap > 80 ? " The route runs between junctions up to " + gap +
+                  " m from the addresses themselves; the dashed lines are that gap." : "") +
+      "</div>";
+    return html;
+  }
+
+  function geocodeOne(query) {
+    if (STATIC) {
+      // No server on the published copy, so the browser asks OpenStreetMap
+      // directly. One request per submitted address, never per keystroke.
+      var box = D.box;
+      var url = "https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1" +
+        "&bounded=1&viewbox=" + box[0] + "," + box[3] + "," + box[2] + "," + box[1] +
+        "&q=" + encodeURIComponent(query);
+      return fetch(url).then(function (r) { return r.json(); }).then(function (rows) {
+        return rows.length ? { lat: +rows[0].lat, lon: +rows[0].lon,
+                               name: rows[0].display_name } : null;
+      });
+    }
+    return fetch("/geocode.json?q=" + encodeURIComponent(query))
+      .then(function (r) { return r.json(); })
+      .then(function (rows) { return rows.length ? rows[0] : null; });
+  }
+
+  function runRoute() {
+    var from = el("from").value.trim(), to = el("to").value.trim();
+    if (!from || !to) {
+      el("routeout").textContent = "Type a start and an end — a street address, " +
+        "an intersection, or a place name in Santa Fe.";
+      return;
+    }
+    el("go").disabled = true;
+    el("routeout").textContent = "Looking both up…";
+
+    loadNet()
+      .then(function () { return Promise.all([geocodeOne(from), geocodeOne(to)]); })
+      .then(function (ends) {
+        if (!ends[0] || !ends[1]) {
+          throw new Error("Could not find " +
+            (!ends[0] ? "the start" : "the destination") +
+            " in Santa Fe. Try adding the street type, or a nearby cross street.");
+        }
+        var a = snap(ends[0].lon, ends[0].lat), b = snap(ends[1].lon, ends[1].lat);
+        if (!a || !b) throw new Error("That is off the street network this model covers.");
+
+        var result = shortestPath(a.node, b.node);
+        if (!result) throw new Error("No route between those two points on this network.");
+
+        routeLayer.clearLayers();
+        pins.clearLayers();
+        var all = [];
+        result.edges.forEach(function (i) {
+          var pts = edgeShape(NET.edges[i]);
+          all = all.concat(pts);
+          routeLayer.addLayer(L.polyline(pts, {
+            pane: "hin", color: "#6ea8fe", weight: 6, opacity: 0.9, lineCap: "round"
+          }));
+          // The stretches where somebody was hit, marked on top of the line.
+          if (NET.edges[i][4]) {
+            routeLayer.addLayer(L.polyline(pts, {
+              pane: "hin", color: "#e07a5f", weight: 9, opacity: 0.55, lineCap: "round"
+            }));
+          }
+        });
+        [[ends[0], "#6fcf97", "start", a], [ends[1], "#e07a5f", "end", b]].forEach(function (spec) {
+          var node = NET.nodes[spec[3].node];
+          // The address is a building; the graph is junctions. Drawing the
+          // gap rather than hiding it is the difference between a route that
+          // looks wrong and one that says where it had to start.
+          pins.addLayer(L.polyline([[spec[0].lat, spec[0].lon],
+                                    [node[1] / 1e5, node[0] / 1e5]], {
+            pane: "hin", color: spec[1], weight: 2, opacity: 0.7, dashArray: "3 4"
+          }));
+          pins.addLayer(L.circleMarker([spec[0].lat, spec[0].lon], {
+            pane: "crashes", radius: 7, color: "#0e1116", weight: 2,
+            fillColor: spec[1], fillOpacity: 1
+          }).bindTooltip(spec[2] + ": " + (spec[0].name || "").split(",")[0]));
+        });
+        if (all.length) map.fitBounds(L.latLngBounds(all), padded());
+        el("routeout").innerHTML = describe(result, a, b, ends);
+      })
+      .catch(function (err) {
+        el("routeout").textContent = err.message || String(err);
+      })
+      .then(function () { el("go").disabled = false; });
+  }
+
   // ------------------------------------------------------------------ wiring
 
   Array.prototype.forEach.call(document.querySelectorAll(".modes button"), function (b) {
@@ -542,11 +884,39 @@
       });
       b.className = "on " + (b.dataset.mode === "foot" ? "foot" : b.dataset.mode === "bike" ? "bike" : "");
       mode = b.dataset.mode;
-      drawFigures(); drawClock(); drawCrashes();
+      drawFigures(); drawClock(); drawCrashes(); drawComparison(); writeHash();
     };
   });
 
+  el("go").onclick = function () { runRoute(); writeHash(); };
+  ["from", "to"].forEach(function (id) {
+    el(id).onkeydown = function (e) { if (e.key === "Enter") runRoute(); };
+  });
+
   el("hour").oninput = function () { stop(); setHour(+this.value); };
+
+  // The state worth sharing is the mode and the hour: "cyclists at 20:00" is
+  // a different claim from "everybody, all day", and a link to it should open
+  // on it. Written to the hash rather than pushed, so the back button still
+  // leaves the page.
+  function writeHash() {
+    var bits = [];
+    if (mode !== "foot") bits.push("mode=" + mode);
+    if (hour >= 0) bits.push("hour=" + hour);
+    if (el("from").value.trim()) bits.push("from=" + encodeURIComponent(el("from").value.trim()));
+    if (el("to").value.trim()) bits.push("to=" + encodeURIComponent(el("to").value.trim()));
+    var next = bits.length ? "#" + bits.join("&") : "#";
+    if (next !== location.hash) history.replaceState(null, "", next);
+  }
+
+  function readHash() {
+    var out = {};
+    location.hash.replace(/^#/, "").split("&").forEach(function (bit) {
+      var kv = bit.split("=");
+      if (kv.length === 2) out[kv[0]] = decodeURIComponent(kv[1].replace(/\+/g, " "));
+    });
+    return out;
+  }
   el("play").onclick = function () { playing ? stop() : start(); };
 
   function start() {
@@ -575,8 +945,31 @@
       " people struck while walking or riding, " + d.years[0] + "–" + d.years[1] +
       " &middot; NMDOT";
 
+    var want = readHash();
+    if (want.mode === "bike" || want.mode === "all") {
+      mode = want.mode;
+      Array.prototype.forEach.call(document.querySelectorAll(".modes button"), function (b) {
+        b.className = b.dataset.mode === mode
+          ? "on " + (mode === "bike" ? "bike" : "") : "";
+      });
+    }
+    if (want.hour !== undefined && +want.hour >= 0 && +want.hour < 24) {
+      hour = +want.hour;
+      el("hour").value = hour;
+      el("hourlab").textContent = (hour < 10 ? "0" : "") + hour + ":00–" +
+        (hour < 9 ? "0" : "") + (hour + 1) + ":00";
+    }
+
     drawAssets(); drawHin(); drawCrashes(); drawClock(); drawFigures();
     drawComparison(); drawCorridors();
+
+    // A route in the link is a shared route: "here is the ride I do every
+    // morning" should open on that ride, not on an empty form.
+    if (want.from && want.to) {
+      el("from").value = want.from;
+      el("to").value = want.to;
+      runRoute();
+    }
 
     groups.hin.addTo(map);
     groups.crash.addTo(map);
